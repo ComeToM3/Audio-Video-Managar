@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>C · Étagère vinyle — AVM-08C</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Literata:opsz,wght@7..72,500;7..72,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --wall:#D4DDD6; --shelf:#F4F0E8; --ink:#24302A; --muted:#5C6B62;
+      --accent:#B87333; --accent-deep:#8A5524; --sage:#5F7A6A; --line:#C5CEC7;
+      --ok-bg:#E3EDE6; --ok:#2F5D45; --warn-bg:#F3E6D0; --warn:#7A5420;
+      --rad:20px; --font:"Sora",system-ui,sans-serif; --lit:"Literata",Georgia,serif;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:
+      radial-gradient(ellipse 900px 400px at 80% -10%, rgba(184,115,51,.12), transparent),
+      linear-gradient(180deg, #cfd8d1 0%, var(--wall) 28%, #c8d2cb 100%);
+      color:var(--ink); font-family:var(--font); padding-bottom:96px; }
+    .wrap { max-width:1120px; margin:0 auto; padding:28px 20px 0; }
+    .mast { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:22px; flex-wrap:wrap; }
+    .mast h1 { margin:0; font-size:clamp(1.6rem,3vw,2rem); font-weight:700; letter-spacing:-0.03em; }
+    .mast h1 span { color:var(--sage); font-weight:600; }
+    .mast .status { color:var(--muted); font-size:13px; }
+    .ghost { border:1px solid var(--line); background:rgba(244,240,232,.7); color:var(--muted); border-radius:999px; padding:8px 12px; font:500 12px var(--font); cursor:pointer; text-decoration:none; }
+
+    .stage { display:none; }
+    .stage.on { display:block; animation:up .3s ease; }
+    @keyframes up { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:none;} }
+
+    /* Library — shelf metaphor */
+    .shelf { background:var(--shelf); border-radius:24px; padding:22px; box-shadow:0 20px 50px rgba(36,48,42,.12), inset 0 1px 0 rgba(255,255,255,.65); border:1px solid rgba(197,206,199,.8); }
+    .search { background:#fff; border:1px solid var(--line); border-radius:14px; padding:13px 16px; color:var(--muted); margin-bottom:20px; }
+    .row-covers { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; }
+    .lp { cursor:pointer; }
+    .sleeve { aspect-ratio:1; border-radius:10px; background:linear-gradient(145deg,#5b1a22,#9a3412 55%,#ca8a04); box-shadow:6px 8px 0 rgba(36,48,42,.08), 0 12px 24px rgba(36,48,42,.12); transform:rotate(-1.2deg); transition:transform .2s ease, box-shadow .2s; }
+    .lp:nth-child(2n) .sleeve { transform:rotate(1deg); background:linear-gradient(145deg,#1e3a5f,#38bdf8); }
+    .lp:nth-child(3n) .sleeve { transform:rotate(-.5deg); background:linear-gradient(145deg,#3f2a1d,#d6a77a); }
+    .lp:nth-child(4) .sleeve { background:linear-gradient(145deg,#374151,#9ca3af); }
+    .lp:hover .sleeve { transform:rotate(0) translateY(-6px) scale(1.03); box-shadow:0 18px 30px rgba(36,48,42,.18); }
+    .lp figcaption { margin-top:10px; text-align:center; }
+    .lp strong { display:block; font-size:12px; font-family:var(--lit); }
+    .lp span { font-size:11px; color:var(--muted); }
+    .chip { display:inline-block; margin-top:4px; font-size:10px; font-weight:700; padding:3px 7px; border-radius:999px; background:var(--ok-bg); color:var(--ok); }
+    .chip.w { background:var(--warn-bg); color:var(--warn); }
+
+    .drawer { margin-top:22px; display:grid; grid-template-columns:100px 1fr auto; gap:16px; align-items:center; background:#fff; border-radius:18px; padding:16px; border:1px solid var(--line); }
+    .drawer .t { width:100px; height:100px; border-radius:10px; background:linear-gradient(145deg,#5b1a22,#ca8a04); }
+    .drawer h2 { margin:0; font-family:var(--lit); font-size:1.25rem; font-weight:600; }
+    .drawer p { margin:6px 0 0; color:var(--muted); font-size:13px; }
+    .cta { background:var(--accent); color:#fff; border:0; border-radius:14px; padding:12px 16px; font:700 13px var(--font); cursor:pointer; }
+    .cta:hover { background:var(--accent-deep); }
+
+    /* Archive — card stack */
+    .arc-wrap { display:grid; gap:16px; max-width:680px; margin:0 auto; }
+    .stepper { display:flex; justify-content:center; gap:10px; margin-bottom:4px; }
+    .stepper span { width:10px; height:10px; border-radius:50%; background:#B7C2BB; }
+    .stepper span.on { background:var(--accent); width:28px; border-radius:999px; }
+    .postcard { background:var(--shelf); border-radius:24px; padding:28px 26px; border:1px solid var(--line); box-shadow:0 16px 40px rgba(36,48,42,.1); }
+    .postcard h1 { margin:0; font-family:var(--lit); font-size:2rem; font-weight:600; }
+    .postcard .lead { color:var(--muted); margin:8px 0 20px; }
+    .block { background:#fff; border-radius:14px; padding:14px; border:1px solid var(--line); margin-bottom:12px; }
+    .block label { display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:6px; }
+    .note { background:var(--warn-bg); color:var(--warn); border-radius:14px; padding:12px 14px; font-size:13px; margin:12px 0; }
+    .row { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+    .primary { background:var(--sage); color:#fff; border:0; border-radius:14px; padding:12px 18px; font:700 13px var(--font); }
+    .secondary { background:transparent; border:1px solid var(--line); border-radius:14px; padding:12px 16px; font:600 13px var(--font); color:var(--ink); }
+
+    /* History — timeline shelf */
+    .timeline { display:grid; gap:12px; max-width:820px; margin:0 auto; }
+    .event { display:grid; grid-template-columns:16px 1fr; gap:14px; }
+    .event .dot { width:16px; height:16px; border-radius:50%; background:var(--sage); margin-top:18px; box-shadow:0 0 0 4px rgba(95,122,106,.2); }
+    .event .card { background:var(--shelf); border-radius:18px; padding:16px 18px; border:1px solid var(--line); display:grid; grid-template-columns:1fr auto; gap:10px; align-items:start; }
+    .event .card h3 { margin:0; font-size:15px; font-family:var(--lit); }
+    .event .card p { margin:4px 0 0; color:var(--muted); font-size:13px; }
+    .event .btns { display:flex; flex-direction:column; gap:6px; }
+    .event .btns button { border-radius:10px; border:1px solid var(--line); background:#fff; padding:8px 10px; font:600 12px var(--font); cursor:pointer; white-space:nowrap; }
+    .event .btns button.p { background:var(--accent); color:#fff; border:0; }
+
+    /* Dock */
+    .dock { position:fixed; left:50%; bottom:18px; transform:translateX(-50%); display:flex; gap:6px; padding:8px; background:rgba(244,240,232,.88); border:1px solid var(--line); border-radius:22px; box-shadow:0 12px 40px rgba(36,48,42,.18); backdrop-filter:blur(12px); z-index:10; }
+    .dock button { border:0; background:transparent; padding:12px 18px; border-radius:16px; font:600 13px var(--font); color:var(--muted); cursor:pointer; }
+    .dock button.on { background:#fff; color:var(--ink); box-shadow:0 1px 0 var(--line); }
+
+    body.narrow .row-covers { grid-template-columns:repeat(2,1fr); }
+    body.narrow .drawer { grid-template-columns:1fr; text-align:center; justify-items:center; }
+    body.narrow .event .card { grid-template-columns:1fr; }
+    .note-foot { text-align:center; color:var(--muted); font-size:12px; margin:28px 0 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="mast">
+      <h1>AudioVideo <span>Manager</span></h1>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="status">Collection locale · sans cloud</span>
+        <button class="ghost" type="button" id="narrow">Vue 820 px</button>
+        <a class="ghost" href="../../index.html">← Directions</a>
+      </div>
+    </div>
+
+    <section id="lib" class="stage on">
+      <div class="shelf">
+        <div class="search">Rechercher sur l’étagère…</div>
+        <div class="row-covers">
+          <figure class="lp"><div class="sleeve"></div><figcaption><strong>Greatest Hits</strong><span>Queen</span><span class="chip">Prêt</span></figcaption></figure>
+          <figure class="lp"><div class="sleeve"></div><figcaption><strong>Blue</strong><span>Demo</span><span class="chip">Prêt</span></figcaption></figure>
+          <figure class="lp"><div class="sleeve"></div><figcaption><strong>Amber</strong><span>Demo</span><span class="chip">Prêt</span></figcaption></figure>
+          <figure class="lp"><div class="sleeve"></div><figcaption><strong>Ghost</strong><span>2001</span><span class="chip w">Manquant</span></figcaption></figure>
+          <figure class="lp"><div class="sleeve" style="background:linear-gradient(145deg,#14532d,#86efac)"></div><figcaption><strong>Grove</strong><span>Demo</span><span class="chip">Prêt</span></figcaption></figure>
+        </div>
+        <div class="drawer">
+          <div class="t"></div>
+          <div>
+            <h2>Queen — Greatest Hits</h2>
+            <p>1992 · 17 pistes · Queen / Greatest Hits (1992)</p>
+          </div>
+          <button class="cta" type="button">Ouvrir le dossier</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="arc" class="stage">
+      <div class="arc-wrap">
+        <div class="stepper" aria-hidden="true"><span class="on"></span><span></span><span></span><span></span><span></span></div>
+        <div class="postcard">
+          <h1>Disque</h1>
+          <p class="lead">Une carte à la fois — comme retourner une pochette.</p>
+          <div class="block"><label>Lecteur</label>Lecteur CD/DVD (D:)</div>
+          <div class="block">CD détecté — 17 pistes · environ 59 minutes</div>
+          <div class="note">Déjà sur l’étagère : Queen — Greatest Hits. Ouvrir l’existant avant de réarchiver.</div>
+          <div class="row">
+            <button class="primary" type="button">Continuer</button>
+            <button class="secondary" type="button">Relire</button>
+            <button class="secondary" type="button">Détails techniques</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="his" class="stage">
+      <h2 style="text-align:center;font-family:var(--lit);font-weight:600;margin:0 0 18px">Ce qui s’est passé</h2>
+      <div class="timeline">
+        <div class="event"><div class="dot"></div><div class="card"><div><h3>Archivage CD → FLAC</h3><p>Terminé · album publié</p></div><div class="btns"><button class="p" type="button">Ouvrir l’album</button><button type="button">Détails</button></div></div></div>
+        <div class="event"><div class="dot" style="background:var(--accent)"></div><div class="card"><div><h3>Archivage CD → FLAC</h3><p>Échec · fichiers récupérables</p></div><div class="btns"><button type="button">Temporaire</button><button type="button">Abandonner</button></div></div></div>
+        <div class="event"><div class="dot"></div><div class="card"><div><h3>Test technique</h3><p>Terminé · zone temporaire</p></div><div class="btns"><button type="button">Ouvrir</button></div></div></div>
+      </div>
+    </section>
+
+    <p class="note-foot">Direction C · Étagère vinyle · recommandée AVM-08C</p>
+  </div>
+
+  <nav class="dock" aria-label="Navigation principale">
+    <button type="button" data-s="lib" class="on">Bibliothèque</button>
+    <button type="button" data-s="arc">Archiver</button>
+    <button type="button" data-s="his">Historique</button>
+  </nav>
+
+  <script>
+    document.querySelectorAll('.dock button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.dock button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        document.querySelectorAll('.stage').forEach(s => s.classList.remove('on'));
+        document.getElementById(btn.dataset.s).classList.add('on');
+      });
+    });
+    document.getElementById('narrow').onclick = () => {
+      document.body.classList.toggle('narrow');
+      document.getElementById('narrow').textContent = document.body.classList.contains('narrow') ? 'Vue large' : 'Vue 820 px';
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+platform=windows
+resume_visible=False
+selected=n-comp

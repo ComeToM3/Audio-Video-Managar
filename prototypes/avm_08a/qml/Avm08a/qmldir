@@ -1,0 +1,6 @@
+module Avm08a
+singleton Theme 1.0 Theme.qml
+AlbumCard 1.0 AlbumCard.qml
+DetailPane 1.0 DetailPane.qml
+SearchBar 1.0 SearchBar.qml
+EmptyState 1.0 EmptyState.qml

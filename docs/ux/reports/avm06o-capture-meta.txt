@@ -1,0 +1,6 @@
+platform=windows
+style=QStyleSheetStyle
+status_after_leave_archive=Outil d’extraction détecté
+library_root_label=Albums FLAC locaux — .capture_avm06o / lib
+w1_tech_default_checked=False
+captured_at=2026-11-03T22:34:20.755478+00:00

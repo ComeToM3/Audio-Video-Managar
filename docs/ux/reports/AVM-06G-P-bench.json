@@ -1,0 +1,223 @@
+{
+  "env": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "python": "3.12.10",
+    "cpu_count": 12,
+    "ffmpeg": "C:\\Tools\\ffmpeg\\bin\\ffmpeg.EXE",
+    "flac_source": "C:\\Users\\ComeToM3\\AppData\\Local\\AudioVideoManager\\jobs\\bd40b604b7a147b985916f9f97f70223\\rip",
+    "bench_root": "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\avm-06gp-bench"
+  },
+  "album_bytes": 380987348,
+  "track_count": 17,
+  "micro_transfer": {
+    "copy": {
+      "seconds": 0.1816,
+      "bytes": 380987348,
+      "mb_per_s": 2097.52,
+      "methods": {
+        "copy": 17
+      }
+    },
+    "auto": {
+      "seconds": 0.0063,
+      "bytes": 380987348,
+      "mb_per_s": 60455.95,
+      "methods": {
+        "hardlink": 17
+      }
+    }
+  },
+  "verify": {
+    "integrity_ok": true,
+    "decode_attempted": true,
+    "decode_ok": true,
+    "perf": {
+      "label": "verify",
+      "total_seconds": 1.8382,
+      "spans": [
+        {
+          "name": "f08a",
+          "seconds": 0.0021,
+          "bytes_in": 380987348,
+          "bytes_out": 0,
+          "items": 17
+        },
+        {
+          "name": "decode",
+          "seconds": 1.8361,
+          "bytes_in": 380987348,
+          "bytes_out": 0,
+          "items": 17
+        }
+      ]
+    }
+  },
+  "pipeline_copy": {
+    "mode": "copy",
+    "state": "CompletedWithWarnings",
+    "wall_seconds": 2.6778,
+    "perf": {
+      "label": "archive_job",
+      "total_seconds": 2.6317,
+      "spans": [
+        {
+          "name": "staging_to_zone_a",
+          "seconds": 0.185,
+          "bytes_in": 0,
+          "bytes_out": 380987348,
+          "items": 17,
+          "extra": {
+            "transfer": {
+              "copy": 17
+            }
+          }
+        },
+        {
+          "name": "flac_integrity_f08a",
+          "seconds": 0.0026,
+          "bytes_in": 380987348,
+          "bytes_out": 0,
+          "items": 17
+        },
+        {
+          "name": "flac_decode_full",
+          "seconds": 1.8464,
+          "bytes_in": 380987348,
+          "bytes_out": 0,
+          "items": 17,
+          "extra": {
+            "attempted": true,
+            "tool": "C:\\Tools\\ffmpeg\\bin\\ffmpeg.EXE"
+          }
+        },
+        {
+          "name": "cover_resolve",
+          "seconds": 0.0,
+          "bytes_in": 0,
+          "bytes_out": 0,
+          "items": 0,
+          "extra": {
+            "status": "unavailable",
+            "source": "sheet"
+          }
+        },
+        {
+          "name": "tagging_copy_and_write",
+          "seconds": 0.2129,
+          "bytes_in": 0,
+          "bytes_out": 380987348,
+          "items": 17
+        },
+        {
+          "name": "inbox_transfer",
+          "seconds": 0.1883,
+          "bytes_in": 0,
+          "bytes_out": 380987348,
+          "items": 17,
+          "extra": {
+            "transfer": {
+              "copy": 17
+            }
+          }
+        },
+        {
+          "name": "publish_c",
+          "seconds": 0.1964,
+          "bytes_in": 0,
+          "bytes_out": 0,
+          "items": 17,
+          "extra": {
+            "published": true,
+            "skipped": false,
+            "message": "Publié (destination libre; transfer={'hardlink': 0, 'copy': 17})"
+          }
+        }
+      ]
+    },
+    "tracks": 17
+  },
+  "pipeline_auto": {
+    "mode": "auto",
+    "state": "CompletedWithWarnings",
+    "wall_seconds": 2.2502,
+    "perf": {
+      "label": "archive_job",
+      "total_seconds": 2.203,
+      "spans": [
+        {
+          "name": "staging_to_zone_a",
+          "seconds": 0.0079,
+          "bytes_in": 0,
+          "bytes_out": 380987348,
+          "items": 17,
+          "extra": {
+            "transfer": {
+              "hardlink": 17
+            }
+          }
+        },
+        {
+          "name": "flac_integrity_f08a",
+          "seconds": 0.0081,
+          "bytes_in": 380987348,
+          "bytes_out": 0,
+          "items": 17
+        },
+        {
+          "name": "flac_decode_full",
+          "seconds": 1.9516,
+          "bytes_in": 380987348,
+          "bytes_out": 0,
+          "items": 17,
+          "extra": {
+            "attempted": true,
+            "tool": "C:\\Tools\\ffmpeg\\bin\\ffmpeg.EXE"
+          }
+        },
+        {
+          "name": "cover_resolve",
+          "seconds": 0.0,
+          "bytes_in": 0,
+          "bytes_out": 0,
+          "items": 0,
+          "extra": {
+            "status": "unavailable",
+            "source": "sheet"
+          }
+        },
+        {
+          "name": "tagging_copy_and_write",
+          "seconds": 0.213,
+          "bytes_in": 0,
+          "bytes_out": 380987348,
+          "items": 17
+        },
+        {
+          "name": "inbox_transfer",
+          "seconds": 0.0091,
+          "bytes_in": 0,
+          "bytes_out": 380987348,
+          "items": 17,
+          "extra": {
+            "transfer": {
+              "hardlink": 17
+            }
+          }
+        },
+        {
+          "name": "publish_c",
+          "seconds": 0.0132,
+          "bytes_in": 0,
+          "bytes_out": 0,
+          "items": 17,
+          "extra": {
+            "published": true,
+            "skipped": false,
+            "message": "Publié (destination libre; transfer={'hardlink': 17, 'copy': 0})"
+          }
+        }
+      ]
+    },
+    "tracks": 17
+  }
+}

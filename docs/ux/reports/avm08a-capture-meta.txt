@@ -1,0 +1,4 @@
+platform=windows
+source=catalogue local (lecture seule)
+albums=1
+captured_at=2026-11-03T23:00:30.358134+00:00

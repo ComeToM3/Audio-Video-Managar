@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>B · Flux chromatique — AVM-08D.2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --amber:#F1B65C; --iris:#7D8FE8; --rose:#D782A6; --jade:#58B9AA; --anth:#17191F;
+      --ink:#1E2433; --muted:#4E586C; --surface:rgba(248,246,255,0.48); --elev:rgba(255,248,240,0.68);
+      --line:rgba(29,36,52,0.14); --rad:30px; --rad-sm:18px;
+      --font:"Outfit",system-ui,sans-serif; --display:"Fraunces",Georgia,serif;
+      --side:204px;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; min-height:100vh; color:var(--ink); font-family:var(--font);
+      background:#2A3144 url("../../assets/paint-vivid.jpg") center/cover no-repeat fixed;
+    }
+    .app {
+      display:grid; grid-template-columns:var(--side) 1fr; gap:18px;
+      max-width:1240px; margin:0 auto; padding:18px; min-height:100vh;
+    }
+    .rail {
+      border-radius:var(--rad); background:rgba(255,248,252,0.38);
+      border:1px solid rgba(255,255,255,0.35); backdrop-filter:blur(20px);
+      padding:20px 14px; display:flex; flex-direction:column; gap:8px;
+      box-shadow:0 18px 50px rgba(23,25,31,0.12);
+    }
+    .brand { font-family:var(--display); font-size:1.15rem; font-weight:600; letter-spacing:-0.02em; margin:0 0 4px; color:var(--anth); }
+    .brand span { color:var(--iris); }
+    .sub { font-size:11px; color:var(--muted); margin:0 0 16px; }
+    .navbtn {
+      border:0; background:transparent; text-align:left; padding:12px 14px; border-radius:16px;
+      font:600 13px var(--font); color:var(--muted); cursor:pointer;
+    }
+    .navbtn.on {
+      background:linear-gradient(135deg, rgba(241,182,92,0.45), rgba(125,143,232,0.28));
+      color:var(--anth);
+    }
+    .navbtn:hover:not(.on) { background:rgba(215,130,166,0.16); color:var(--ink); }
+    .rail .foot { margin-top:auto; font-size:11px; color:var(--muted); line-height:1.45; }
+
+    .stage {
+      border-radius:var(--rad); background:var(--surface); border:1px solid rgba(255,255,255,0.4);
+      backdrop-filter:blur(18px); padding:28px 26px 22px;
+      box-shadow:0 20px 56px rgba(23,25,31,0.1); display:flex; flex-direction:column; gap:22px;
+      min-height:calc(100vh - 36px);
+    }
+    .tools { display:flex; justify-content:flex-end; gap:8px; }
+    .ghost {
+      border:1px solid rgba(255,255,255,0.45); background:rgba(255,255,255,0.28); color:var(--muted);
+      border-radius:999px; padding:8px 12px; font:500 12px var(--font); cursor:pointer; text-decoration:none;
+    }
+    .hero { display:grid; grid-template-columns:1.1fr .9fr; gap:24px; align-items:end; }
+    .hero h1 {
+      font-family:var(--display); font-size:clamp(2rem,4vw,3.2rem); margin:0; line-height:1.05;
+      letter-spacing:-0.03em; font-weight:600; color:var(--anth);
+    }
+    .hero p { margin:10px 0 0; color:var(--muted); max-width:28rem; font-size:14px; line-height:1.45; }
+    .search {
+      background:var(--elev); border:1px solid rgba(125,143,232,0.25); border-radius:20px; padding:14px 16px;
+      color:var(--muted); font-size:14px;
+      box-shadow:inset 0 0 0 1px rgba(241,182,92,0.12);
+    }
+    .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; flex:1; }
+    .cover {
+      aspect-ratio:1; border-radius:22px;
+      background:linear-gradient(145deg,#8B3A44,#C45C3A 40%,#F1B65C);
+      box-shadow:0 16px 32px rgba(23,25,31,0.22); position:relative;
+      transition:transform .2s ease;
+    }
+    .lp:nth-child(2) .cover { background:linear-gradient(145deg,#3A4A8B,#7D8FE8 60%,#D782A6); }
+    .lp:nth-child(3) .cover { background:linear-gradient(145deg,#6A3A58,#D782A6 55%,#F1B65C); }
+    .lp:nth-child(4) .cover { background:linear-gradient(145deg,#2A5A52,#58B9AA 50%,#7D8FE8); }
+    .lp:hover .cover { transform:translateY(-5px) scale(1.03); }
+    .chip {
+      position:absolute; left:10px; bottom:10px; background:rgba(255,252,248,0.9);
+      color:#1F6B60; font-size:11px; font-weight:700; padding:5px 10px; border-radius:999px;
+    }
+    .meta { margin-top:10px; text-align:center; }
+    .meta strong { display:block; font-size:13px; }
+    .meta span { color:var(--muted); font-size:12px; }
+    .detail {
+      display:grid; grid-template-columns:120px 1fr auto; gap:18px; align-items:center;
+      background:linear-gradient(120deg, rgba(255,248,240,0.75), rgba(240,242,255,0.65));
+      border:1px solid rgba(255,255,255,0.5); border-radius:26px; padding:16px 18px;
+    }
+    .detail .t { width:120px; height:120px; border-radius:20px; background:linear-gradient(145deg,#8B3A44,#F1B65C); }
+    .detail h3 { margin:0; font-family:var(--display); font-size:1.4rem; font-weight:600; }
+    .detail p { margin:6px 0 0; color:var(--muted); font-size:13px; }
+    .cta {
+      background:linear-gradient(135deg, var(--amber), #E8A04A);
+      color:var(--anth); border:0; border-radius:18px;
+      padding:13px 18px; font:700 13px var(--font); cursor:pointer;
+      box-shadow:0 8px 20px rgba(241,182,92,0.35);
+    }
+
+    body.narrow { --side:78px; }
+    body.narrow .app { grid-template-columns:var(--side) 1fr; gap:12px; padding:12px; }
+    body.narrow .brand, body.narrow .sub, body.narrow .foot { display:none; }
+    body.narrow .navbtn { padding:12px 8px; font-size:11px; text-align:center; }
+    body.narrow .hero, body.narrow .detail { grid-template-columns:1fr; }
+    body.narrow .grid { grid-template-columns:repeat(2,1fr); }
+    .note { font-size:12px; color:var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail" aria-label="Navigation principale">
+      <div class="brand">AudioVideo <span>Manager</span></div>
+      <p class="sub">Collection locale</p>
+      <button type="button" class="navbtn on">Bibliothèque</button>
+      <button type="button" class="navbtn">Archiver</button>
+      <button type="button" class="navbtn">Historique</button>
+      <button type="button" class="navbtn">Paramètres</button>
+      <div class="foot">Couleur expressive · sans cloud</div>
+    </aside>
+    <main class="stage">
+      <div class="tools">
+        <button class="ghost" type="button" id="narrow">Vue 820 px</button>
+        <a class="ghost" href="../../index.html">← Variantes</a>
+      </div>
+      <div class="hero">
+        <div>
+          <h1>Votre collection,<br/>sous le flux.</h1>
+          <p>Même palette, intensité plus vive. Les nappes de couleur restent derrière le contenu — jamais un aplat noir.</p>
+        </div>
+        <div class="search" role="search">Rechercher un artiste ou un album…</div>
+      </div>
+      <div class="grid">
+        <figure class="lp"><div class="cover"><span class="chip">Prêt</span></div><figcaption class="meta"><strong>Greatest Hits</strong><span>Queen · 1992</span></figcaption></figure>
+        <figure class="lp"><div class="cover"><span class="chip">Prêt</span></div><figcaption class="meta"><strong>Iris Night</strong><span>Demo · 2018</span></figcaption></figure>
+        <figure class="lp"><div class="cover"><span class="chip">Prêt</span></div><figcaption class="meta"><strong>Rose Garden</strong><span>Demo · 2009</span></figcaption></figure>
+        <figure class="lp"><div class="cover"><span class="chip" style="color:#8A4A20">Manquant</span></div><figcaption class="meta"><strong>Jade Mist</strong><span>Ghost · 2001</span></figcaption></figure>
+      </div>
+      <div class="detail">
+        <div class="t"></div>
+        <div>
+          <h3>Queen — Greatest Hits</h3>
+          <p>1992 · 17 pistes · Queen / Greatest Hits (1992)</p>
+        </div>
+        <button class="cta" type="button">Ouvrir le dossier</button>
+      </div>
+      <p class="note">Variante B · Flux chromatique · intensité plus saturée · prototype isolé AVM-08D.2</p>
+    </main>
+  </div>
+  <script>
+    document.getElementById('narrow').onclick = () => {
+      document.body.classList.toggle('narrow');
+      document.getElementById('narrow').textContent =
+        document.body.classList.contains('narrow') ? 'Vue large' : 'Vue 820 px';
+      document.querySelectorAll('.navbtn').forEach((b,i) => {
+        const full = ['Bibliothèque','Archiver','Historique','Paramètres'];
+        const short = ['Bibl.','Arch.','Histo.','Régl.'];
+        b.textContent = document.body.classList.contains('narrow') ? short[i] : full[i];
+      });
+    };
+  </script>
+</body>
+</html>

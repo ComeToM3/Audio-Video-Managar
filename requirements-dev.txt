@@ -1,0 +1,7 @@
+# Dépendances de développement — versions bornées pour CI reproductible (AVM-10C).
+# Install : pip install -e ".[dev]" && pip install -r requirements-dev.txt
+# (ou : pip install -e ".[dev]" qui tire pytest via pyproject)
+
+pytest>=8.0,<10
+setuptools>=68
+wheel

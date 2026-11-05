@@ -1,0 +1,4 @@
+platform=windows
+mandate=AVM-08D.1
+using_qml_after_fallback=False
+captured_at=2026-11-03T23:41:38.758382+00:00

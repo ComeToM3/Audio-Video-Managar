@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A · Atelier nocturne — AVM-08C</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:#141210; --surface:#1C1917; --elev:#292524; --ink:#FAFAF9; --muted:#A8A29E;
+      --accent:#E8A54B; --accent-soft:rgba(232,165,75,.15); --line:#3F3A36; --ok:#6EE7B7; --danger:#FCA5A5;
+      --rad:18px; --font:"Outfit",system-ui,sans-serif; --display:"Fraunces",serif;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:radial-gradient(1200px 600px at 10% -10%, #2a2118, var(--bg)); color:var(--ink); font-family:var(--font); }
+    .chrome { max-width:1180px; margin:0 auto; padding:20px 20px 40px; }
+    .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; gap:12px; flex-wrap:wrap; }
+    .brand { font-family:var(--display); font-size:1.35rem; letter-spacing:-0.02em; }
+    .brand span { color:var(--accent); }
+    .pillnav { display:flex; gap:6px; background:rgba(0,0,0,.35); padding:6px; border-radius:999px; border:1px solid var(--line); backdrop-filter:blur(10px); }
+    .pillnav button { border:0; background:transparent; color:var(--muted); font:600 13px var(--font); padding:10px 16px; border-radius:999px; cursor:pointer; }
+    .pillnav button.on { background:var(--accent-soft); color:var(--accent); }
+    .tools { display:flex; gap:8px; }
+    .ghost { border:1px solid var(--line); background:transparent; color:var(--muted); border-radius:999px; padding:8px 12px; font:500 12px var(--font); cursor:pointer; }
+    .stage { display:none; }
+    .stage.on { display:block; animation:in .28s ease; }
+    @keyframes in { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:none;} }
+
+    /* Library */
+    .hero-lib { display:grid; grid-template-columns:1.1fr .9fr; gap:28px; align-items:end; margin-bottom:28px; }
+    .hero-lib h1 { font-family:var(--display); font-size:clamp(2.4rem,5vw,3.6rem); margin:0; line-height:1.05; letter-spacing:-0.03em; }
+    .hero-lib p { color:var(--muted); margin:10px 0 0; max-width:28rem; }
+    .search { background:var(--elev); border:1px solid var(--line); border-radius:14px; padding:14px 16px; color:var(--muted); }
+    .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+    .cover { aspect-ratio:1; border-radius:14px; background:linear-gradient(145deg,#4a1c24,#7a2e2e 40%,#c9a227); position:relative; box-shadow:0 18px 40px rgba(0,0,0,.45); transition:transform .2s; }
+    .cover:hover { transform:translateY(-4px) scale(1.02); }
+    .cover .chip { position:absolute; left:10px; bottom:10px; background:rgba(20,18,16,.85); color:var(--ok); font-size:11px; font-weight:600; padding:5px 9px; border-radius:999px; }
+    .meta { margin-top:10px; }
+    .meta strong { display:block; font-size:14px; }
+    .meta span { color:var(--muted); font-size:12px; }
+    .detail { margin-top:28px; display:grid; grid-template-columns:120px 1fr auto; gap:18px; background:var(--surface); border:1px solid var(--line); border-radius:var(--rad); padding:18px; align-items:center; }
+    .detail .thumb { width:120px; height:120px; border-radius:12px; background:linear-gradient(145deg,#4a1c24,#c9a227); }
+    .detail h3 { margin:0; font-family:var(--display); font-size:1.35rem; }
+    .detail p { margin:6px 0 0; color:var(--muted); font-size:13px; }
+    .cta { background:var(--accent); color:#1C1917; border:0; border-radius:12px; padding:12px 16px; font:700 13px var(--font); cursor:pointer; }
+
+    /* Archive */
+    .wiz { display:grid; grid-template-columns:220px 1fr; gap:24px; min-height:520px; }
+    .steps { background:var(--surface); border:1px solid var(--line); border-radius:var(--rad); padding:18px; }
+    .steps h2 { font-family:var(--display); font-size:1.1rem; margin:0 0 16px; }
+    .step { padding:12px 10px; border-radius:12px; color:var(--muted); font-size:13px; margin-bottom:4px; }
+    .step.on { background:var(--accent-soft); color:var(--accent); font-weight:600; }
+    .panel { background:var(--surface); border:1px solid var(--line); border-radius:var(--rad); padding:28px; display:flex; flex-direction:column; gap:18px; }
+    .panel h1 { font-family:var(--display); font-size:2rem; margin:0; }
+    .panel .lead { color:var(--muted); margin:0; }
+    .field { display:flex; flex-direction:column; gap:6px; max-width:420px; }
+    .field label { font-size:12px; color:var(--muted); font-weight:600; letter-spacing:.04em; text-transform:uppercase; }
+    .field .box { background:var(--elev); border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+    .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .primary { background:var(--accent); color:#1C1917; border:0; border-radius:12px; padding:12px 18px; font:700 14px var(--font); width:fit-content; }
+    .warn { background:rgba(232,165,75,.12); border:1px solid rgba(232,165,75,.35); color:#FDE68A; border-radius:12px; padding:12px 14px; font-size:13px; max-width:520px; }
+
+    /* History */
+    .hist { display:grid; grid-template-columns:1.1fr .9fr; gap:20px; }
+    .job { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:16px 18px; margin-bottom:12px; display:grid; grid-template-columns:1fr auto; gap:8px; }
+    .job.on { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent-soft); }
+    .job h3 { margin:0; font-size:15px; }
+    .job p { margin:4px 0 0; color:var(--muted); font-size:13px; }
+    .badge { font-size:11px; font-weight:700; padding:5px 9px; border-radius:999px; align-self:start; }
+    .ok { background:rgba(110,231,183,.15); color:var(--ok); }
+    .bad { background:rgba(252,165,165,.15); color:var(--danger); }
+    .side { background:var(--surface); border:1px solid var(--line); border-radius:var(--rad); padding:20px; min-height:360px; }
+    .side h2 { font-family:var(--display); margin:0 0 12px; }
+    .side .actions { display:flex; flex-direction:column; gap:8px; margin-top:18px; }
+    .side .actions button { border-radius:12px; padding:12px; font:600 13px var(--font); cursor:pointer; border:1px solid var(--line); background:var(--elev); color:var(--ink); }
+    .side .actions button.p { background:var(--accent); color:#1C1917; border:0; }
+
+    body.narrow .hero-lib, body.narrow .wiz, body.narrow .hist, body.narrow .detail, body.narrow .grid { grid-template-columns:1fr; }
+    body.narrow .grid { grid-template-columns:repeat(2,1fr); }
+    body.narrow .pillnav { width:100%; overflow:auto; }
+    .note { margin-top:28px; color:var(--muted); font-size:12px; }
+  </style>
+</head>
+<body>
+  <div class="chrome">
+    <div class="top">
+      <div class="brand">AudioVideo <span>Manager</span></div>
+      <nav class="pillnav" aria-label="Sections">
+        <button type="button" data-s="lib" class="on">Bibliothèque</button>
+        <button type="button" data-s="arc">Archivage</button>
+        <button type="button" data-s="his">Historique</button>
+      </nav>
+      <div class="tools">
+        <button class="ghost" type="button" id="narrow">Vue 820 px</button>
+        <a class="ghost" href="../../index.html" style="text-decoration:none;display:inline-flex;align-items:center">← Directions</a>
+      </div>
+    </div>
+
+    <section id="lib" class="stage on">
+      <div class="hero-lib">
+        <div>
+          <h1>Votre collection,<br/>dans la pénombre.</h1>
+          <p>Pochettes d’abord. Le détail arrive quand vous choisissez — jamais comme un formulaire.</p>
+        </div>
+        <div class="search" role="search">Rechercher un artiste ou un album…</div>
+      </div>
+      <div class="grid">
+        <div><div class="cover"><span class="chip">Prêt</span></div><div class="meta"><strong>Greatest Hits</strong><span>Queen · 1992</span></div></div>
+        <div><div class="cover" style="background:linear-gradient(145deg,#1e3a5f,#7dd3fc)"><span class="chip">Prêt</span></div><div class="meta"><strong>Blue</strong><span>Demo · 2018</span></div></div>
+        <div><div class="cover" style="background:linear-gradient(145deg,#3f2a1d,#d6a77a)"><span class="chip">Prêt</span></div><div class="meta"><strong>Amber Roads</strong><span>Demo · 2009</span></div></div>
+        <div><div class="cover" style="background:linear-gradient(145deg,#222,#666)"><span class="chip" style="color:#FDE68A">Manquant</span></div><div class="meta"><strong>Dossier disparu</strong><span>Ghost · 2001</span></div></div>
+      </div>
+      <div class="detail">
+        <div class="thumb"></div>
+        <div>
+          <h3>Queen — Greatest Hits</h3>
+          <p>1992 · 17 pistes · Queen / Greatest Hits (1992)</p>
+        </div>
+        <button class="cta" type="button">Ouvrir le dossier</button>
+      </div>
+    </section>
+
+    <section id="arc" class="stage">
+      <div class="wiz">
+        <aside class="steps">
+          <h2>Archivage</h2>
+          <div class="step on">1 · Disque</div>
+          <div class="step">2 · Identification</div>
+          <div class="step">3 · Approbation</div>
+          <div class="step">4 · Extraction</div>
+          <div class="step">5 · Terminé</div>
+        </aside>
+        <div class="panel">
+          <h1>Disque</h1>
+          <p class="lead">Confirmez le lecteur. Les détails techniques restent hors du parcours.</p>
+          <div class="field"><label>Lecteur</label><div class="box">Lecteur CD/DVD (D:)</div></div>
+          <p style="margin:0;font-size:15px">CD détecté — 17 pistes · environ 59 minutes</p>
+          <div class="warn">Cet album semble déjà dans votre bibliothèque (Queen — Greatest Hits). Ouvrir l’existant reste prioritaire.</div>
+          <div class="row">
+            <button class="primary" type="button">Relire le disque</button>
+            <button class="ghost" type="button" style="border-radius:12px;padding:12px 16px">Détails techniques…</button>
+            <button class="primary" type="button" style="margin-left:auto">Continuer →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="his" class="stage">
+      <div class="hist">
+        <div>
+          <h1 style="font-family:var(--display);font-size:2rem;margin:0 0 16px">Historique</h1>
+          <div class="job on"><div><h3>Archivage CD → FLAC</h3><p>Terminé · album publié</p></div><span class="badge ok">Terminé</span></div>
+          <div class="job"><div><h3>Archivage CD → FLAC</h3><p>L’extraction n’a pas abouti</p></div><span class="badge bad">Échec</span></div>
+          <div class="job"><div><h3>Test technique</h3><p>Zone temporaire uniquement</p></div><span class="badge ok">Terminé</span></div>
+        </div>
+        <aside class="side">
+          <h2>Terminé</h2>
+          <p style="color:var(--muted);font-size:13px;line-height:1.5">Album publié : Queen / Greatest Hits<br/>Message : Opération terminée.</p>
+          <div class="actions">
+            <button class="p" type="button">Ouvrir l’album</button>
+            <button type="button">Ouvrir le temporaire</button>
+            <button type="button">Abandonner</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <p class="note">Direction A · Atelier nocturne · maquette AVM-08C (non branchée à l’app)</p>
+  </div>
+  <script>
+    const body = document.body;
+    document.querySelectorAll('.pillnav button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.pillnav button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        document.querySelectorAll('.stage').forEach(s => s.classList.remove('on'));
+        document.getElementById(btn.dataset.s).classList.add('on');
+      });
+    });
+    document.getElementById('narrow').onclick = () => {
+      body.classList.toggle('narrow');
+      document.getElementById('narrow').textContent = body.classList.contains('narrow') ? 'Vue large' : 'Vue 820 px';
+    };
+  </script>
+</body>
+</html>

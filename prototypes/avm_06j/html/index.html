@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AVM-06J — Références visuelles</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div>
+      <p class="eyebrow">AVM-06J · références inspectables</p>
+      <h1>Direction visuelle AudioVideoManager</h1>
+      <p class="lede">Premium minimaliste · chaleureux · musical · fonctionnel. Redimensionnez la fenêtre.</p>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-panel="archive" type="button">Archivage</button>
+      <button class="tab" data-panel="library" type="button">Bibliothèque</button>
+      <button class="tab" data-panel="history" type="button">Historique</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="archive" class="panel active" aria-label="Prototype Archivage">
+      <div class="steps">
+        <span class="pill done">1 Disque</span>
+        <span class="arrow">→</span>
+        <span class="pill done">2 Identification</span>
+        <span class="arrow">→</span>
+        <span class="pill done">3 Approbation</span>
+        <span class="arrow">→</span>
+        <span class="pill now">4 Extraction</span>
+        <span class="arrow">→</span>
+        <span class="pill">5 Terminé</span>
+      </div>
+      <div class="grid-2">
+        <article class="card">
+          <h2>Extraction en cours</h2>
+          <p class="meta">Queen — Greatest Hits (1992, CA)</p>
+          <p class="track">Piste 4/17 — Killer Queen</p>
+          <div class="bar" role="progressbar" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100"><i style="width:42%"></i></div>
+          <p class="hint">La barre suit les événements réels — aucun pourcentage inventé.</p>
+          <ul class="pipeline">
+            <li>Vérification du disque</li>
+            <li class="on">Extraction audio</li>
+            <li>Contrôle des fichiers</li>
+            <li>Mise en tags et pochette</li>
+            <li>Organisation</li>
+            <li>Publication</li>
+          </ul>
+          <button class="ghost" type="button">Annuler</button>
+        </article>
+        <article class="card cover-card">
+          <div class="cover" aria-label="Pochette">GH</div>
+          <h2>Édition proposée</h2>
+          <p class="meta">Canada · 1992 · Hollywood Records<br/>17 pistes · approbation manuelle requise</p>
+          <button class="primary" type="button">Voir la fiche à approuver</button>
+        </article>
+      </div>
+      <aside class="states">
+        <div class="card mini"><strong>État vide</strong><p>Insérez un CD audio, puis continuez.</p></div>
+        <div class="card mini warn"><strong>Erreur</strong><p>Le disque a changé — réinsérez le bon CD.</p></div>
+        <div class="card mini"><strong>Focus / survol</strong><p>Bords verts 2 px, cartes relevées au survol.</p></div>
+      </aside>
+    </section>
+
+    <section id="library" class="panel" aria-label="Prototype Bibliothèque">
+      <div class="lib-head">
+        <div>
+          <h2 class="hero">Ma bibliothèque</h2>
+          <p class="lede">Pochettes d’abord, détails ensuite.</p>
+        </div>
+        <input class="search" type="search" placeholder="Rechercher un artiste ou un album…" aria-label="Recherche" />
+      </div>
+      <div class="album-grid">
+        <article class="card album" tabindex="0">
+          <div class="cover tall c1">Q</div>
+          <h3>Queen<br/><span>Greatest Hits</span></h3>
+          <p class="meta">1992 · 17 pistes</p>
+          <span class="pill ok">Prêt</span>
+        </article>
+        <article class="card album" tabindex="0">
+          <div class="cover tall c2">D</div>
+          <h3>Daft Punk<br/><span>Random Access Memories</span></h3>
+          <p class="meta">2013 · 13 pistes</p>
+          <span class="pill ok">Prêt</span>
+        </article>
+        <article class="card album" tabindex="0">
+          <div class="cover tall c3">N</div>
+          <h3>Norah Jones<br/><span>Come Away With Me</span></h3>
+          <p class="meta">2002 · 14 pistes</p>
+          <span class="pill warn">Fichiers manquants</span>
+        </article>
+      </div>
+      <article class="card detail-strip">
+        <div class="cover sm c1">QH</div>
+        <div>
+          <strong>Queen — Greatest Hits</strong>
+          <p class="meta">01 We Will Rock You · 02 We Are the Champions · 03 Another One Bites the Dust…</p>
+        </div>
+        <button class="primary" type="button">Ouvrir le dossier</button>
+      </article>
+    </section>
+
+    <section id="history" class="panel" aria-label="Prototype Historique">
+      <h2 class="hero">Historique</h2>
+      <p class="lede">Statuts compréhensibles · actions réellement disponibles.</p>
+      <article class="card job">
+        <div>
+          <p class="meta">Aujourd’hui · 14:32</p>
+          <h3>Queen — Greatest Hits</h3>
+          <p class="meta">17 pistes publiées dans la bibliothèque.</p>
+        </div>
+        <span class="pill ok">Terminé</span>
+        <button class="primary" type="button">Ouvrir l’album</button>
+      </article>
+      <article class="card job">
+        <div>
+          <p class="meta">Hier · 19:05</p>
+          <h3>Extraction interrompue</h3>
+          <p class="meta">Des fichiers restent dans le dossier temporaire.</p>
+        </div>
+        <span class="pill warn">Fichiers récupérables</span>
+        <div class="row-actions">
+          <button class="primary" type="button">Ouvrir les fichiers temporaires</button>
+          <button class="ghost" type="button">Abandonner (sans supprimer)</button>
+        </div>
+      </article>
+      <article class="card job">
+        <div>
+          <p class="meta">Lun. · 10:12</p>
+          <h3>Identification hors ligne</h3>
+          <p class="meta">Le réseau était indisponible.</p>
+        </div>
+        <span class="pill err">Échec</span>
+        <button class="ghost" type="button">Réessayer plus tard</button>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p>Références HTML isolées — le prototype exécutable PySide6 : <code>python prototypes/avm_06j/run.py</code></p>
+  </footer>
+  <script>
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.panel).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

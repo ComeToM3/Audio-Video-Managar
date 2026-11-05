@@ -1,0 +1,154 @@
+/* Design system prototype AVM-06J — premium minimaliste, chaleureux, musical */
+
+* {
+  font-family: "Segoe UI", sans-serif;
+}
+
+QMainWindow, QWidget#shell {
+  background: #F3F0E8;
+  color: #1A1F1C;
+}
+
+QWidget#navRail {
+  background: #FAF8F3;
+  border-right: 1px solid #E2DDD3;
+}
+
+QPushButton#navBtn {
+  text-align: left;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #3D453F;
+  font-size: 14px;
+  margin: 2px 10px;
+}
+QPushButton#navBtn:hover { background: #EDE8DC; }
+QPushButton#navBtn[active="true"] {
+  background: #DCEDE5;
+  color: #0A3D32;
+  font-weight: 600;
+}
+QPushButton#navBtn:focus {
+  border: 2px solid #1B7A5C;
+}
+
+QLabel#heroTitle {
+  font-size: 26px;
+  font-weight: 650;
+  color: #0A3D32;
+  letter-spacing: -0.3px;
+}
+QLabel#heroSub {
+  font-size: 14px;
+  color: #5A635C;
+}
+
+QFrame#card {
+  background: #FFFFFF;
+  border: 1px solid #E2DDD3;
+  border-radius: 14px;
+}
+
+QLabel#cardTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #14201A;
+}
+QLabel#muted { color: #5A635C; font-size: 13px; }
+QLabel#chip {
+  background: #E8F3EE;
+  color: #0A3D32;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+QLabel#chipWarn {
+  background: #F5EBD3;
+  color: #6B4E00;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+QLabel#chipErr {
+  background: #F4E0E0;
+  color: #7A1010;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+QPushButton#primary {
+  background: #1B7A5C;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 600;
+  font-size: 14px;
+  min-height: 36px;
+}
+QPushButton#primary:hover { background: #15684E; }
+QPushButton#primary:disabled { background: #A9C9BC; }
+QPushButton#primary:focus { border: 2px solid #063D2C; }
+
+QPushButton#ghost {
+  background: transparent;
+  border: 1px solid #D5CFC3;
+  border-radius: 10px;
+  padding: 9px 16px;
+  color: #2A322E;
+  min-height: 36px;
+}
+QPushButton#ghost:hover { background: #EDE8DC; }
+QPushButton#ghost:focus { border: 2px solid #1B7A5C; }
+
+QProgressBar {
+  border: none;
+  background: #E8E3D8;
+  border-radius: 6px;
+  min-height: 10px;
+  text-align: center;
+}
+QProgressBar::chunk {
+  background: #1B7A5C;
+  border-radius: 6px;
+}
+
+QListWidget#stepList, QListWidget#albumGrid, QTableWidget {
+  background: transparent;
+  border: none;
+  outline: none;
+}
+QListWidget#stepList::item {
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #5A635C;
+}
+QListWidget#stepList::item:selected {
+  background: #DCEDE5;
+  color: #0A3D32;
+  font-weight: 600;
+}
+
+QLineEdit#search {
+  background: #FFFFFF;
+  border: 1px solid #D5CFC3;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+QLineEdit#search:focus { border: 2px solid #1B7A5C; }
+
+QLabel#coverPlaceholder {
+  background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
+    stop:0 #2F6B57, stop:1 #0A3D32);
+  border-radius: 12px;
+  color: #E8F3EE;
+  font-size: 13px;
+  font-weight: 600;
+}

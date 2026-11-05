@@ -1,0 +1,4 @@
+platform=windows
+direction=A-atelier-nocturne
+using_qml_after_fallback=False
+captured_at=2026-11-03T23:31:31.538954+00:00

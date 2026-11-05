@@ -1,0 +1,4 @@
+platform=windows
+style=QCommonStyle
+narrow_breakpoint=900
+qt=python

@@ -1,0 +1,40 @@
+QCheckBox: Publier dans ma bibliothèque
+QLabel: AudioVideo Manager
+QLabel: Avertissement doublon avant extraction
+QLabel: Avertissement doublon disque
+QLabel: Détail album
+QLabel: Historique des opérations
+QLabel: Ma bibliothèque
+QLabel: Message de progression
+QLabel: Pochette album
+QLabel: Pochette de l’album
+QLabel: Résultat de l’archivage
+QLabel: Statut : Abandonné
+QLabel: Statut : Terminé
+QLabel: Statut : Échec · récupérable
+QLabel: Statut : —
+QLabel: Titre de l’étape
+QLineEdit: Recherche bibliothèque
+QListWidget: Cartes des opérations
+QListWidget: Liste des albums
+QListWidget: Navigation principale
+QListWidget: Sous-étapes d’archivage
+QProgressBar: Barre de progression
+QPushButton: Actualiser la bibliothèque
+QPushButton: Actualiser l’historique
+QPushButton: Aller à l’historique
+QPushButton: Annuler l’archivage
+QPushButton: Continuer vers l’étape suivante
+QPushButton: Ouvrir le dossier album
+QPushButton: Retour à l’étape précédente
+QPushButton: Étape 1 Disque
+QPushButton: Étape 2 Identification
+QPushButton: Étape 3 Approbation
+QPushButton: Étape 4 Extraction / publication
+QPushButton: Étape 5 Terminé
+QTableWidget: Liste des opérations
+QTableWidget: Pistes de l’album
+QTextEdit: Détails de l’opération
+QTextEdit: Détails du résultat
+QToolButton: Scroll Left
+QToolButton: Scroll Right

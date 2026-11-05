@@ -1,0 +1,105 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.tmp-avm-smoke/
+.capture_*/
+
+# Packaging / installers
+*.manifest
+*.spec
+pip-wheel-metadata/
+
+# Test / coverage
+.pytest_cache/
+.ci/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# Type checkers / linters
+.pytype/
+.pyre/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# Local / secrets / machine-specific
+.env
+.env.*
+!.env.example
+*.local
+local_settings.py
+secrets/
+credentials/
+
+# Application runtime data (local library index, logs, temp rips)
+data/
+!data/.gitkeep
+logs/
+tmp/
+temp/
+.cache/
+*.db
+*.sqlite
+*.sqlite3
+
+# Ripped / extracted media (never commit)
+library/
+exports/
+imports/
+*.flac
+*.wav
+*.aiff
+*.aif
+*.mp3
+*.m4a
+*.ogg
+*.opus
+*.mkv
+*.vob
+*.iso
+cover.jpg
+cover.png
+folder.jpg
+
+# fre:ac / external tool local config copies (if staged for debugging)
+freaccmd.ini
+*.freac
+
+# Jupyter (if ever used for experiments)
+.ipynb_checkpoints/
+
+# Cursor / agent local artifacts
+.cursor/
+agent-tools/

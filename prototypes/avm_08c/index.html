@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AVM-08C — Directions artistiques</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --ink:#1a1a1a; --muted:#5c5c5c; --line:#e5e5e5; --bg:#fafafa; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:"DM Sans",system-ui,sans-serif; background:var(--bg); color:var(--ink); }
+    header { padding:48px 7vw 24px; max-width:1200px; }
+    header h1 { font-family:"Fraunces",serif; font-weight:600; font-size:clamp(2rem,4vw,2.75rem); margin:0 0 8px; letter-spacing:-0.03em; }
+    header p { margin:0; color:var(--muted); max-width:42rem; line-height:1.5; }
+    .badge { display:inline-block; margin-top:16px; font-size:12px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; color:#7a5c00; background:#f5ebd3; padding:6px 10px; border-radius:999px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; padding:24px 7vw 64px; max-width:1200px; }
+    a.card { text-decoration:none; color:inherit; border-radius:16px; overflow:hidden; border:1px solid var(--line); background:#fff; display:flex; flex-direction:column; transition:transform .18s ease, box-shadow .18s ease; }
+    a.card:hover { transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,.08); }
+    .swatch { height:120px; display:flex; align-items:flex-end; padding:16px; gap:8px; }
+    .swatch i { width:28px; height:28px; border-radius:8px; border:1px solid rgba(255,255,255,.25); }
+    .body { padding:18px 18px 22px; }
+    .body h2 { margin:0 0 6px; font-size:1.25rem; }
+    .body .tag { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:8px; }
+    .body p { margin:0; color:var(--muted); font-size:14px; line-height:1.45; }
+    .meta { padding:0 7vw 80px; max-width:1200px; color:var(--muted); font-size:13px; }
+    .a .swatch { background:linear-gradient(145deg,#1C1917,#292524); }
+    .b .swatch { background:linear-gradient(145deg,#EEF2F6,#DCE7F0); }
+    .c .swatch { background:linear-gradient(145deg,#D4DDD6,#F0EBE3); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AVM-08C — Trois directions</h1>
+    <p>Maquettes haute fidélité isolées (hors production). Chaque direction propose Bibliothèque, Archivage et Historique en composition d’écran complet, avec variante étroite.</p>
+    <span class="badge">Direction choisie : A · Atelier nocturne</span>
+  </header>
+  <div class="grid">
+    <a class="card a" href="directions/a-atelier-nocturne/app.html">
+      <div class="swatch"><i style="background:#E8A54B"></i><i style="background:#FAFAF9"></i><i style="background:#44403C"></i></div>
+      <div class="body">
+        <div class="tag">Direction A · choisie</div>
+        <h2>Atelier nocturne</h2>
+        <p>Studio sombre, ambre, pochettes monumentales. Navigation flottante. Expérience « écoute privée ».</p>
+      </div>
+    </a>
+    <a class="card b" href="directions/b-clair-de-presse/app.html">
+      <div class="swatch"><i style="background:#0F766E"></i><i style="background:#0F172A"></i><i style="background:#fff"></i></div>
+      <div class="body">
+        <div class="tag">Direction B</div>
+        <h2>Clair de presse</h2>
+        <p>Jour nordique, barre supérieure, air abondant, typographie géométrique. Expérience « outil précis ».</p>
+      </div>
+    </a>
+    <a class="card c" href="directions/c-etagere-vinyle/app.html">
+      <div class="swatch"><i style="background:#B87333"></i><i style="background:#5F7A6A"></i><i style="background:#24302A"></i></div>
+      <div class="body">
+        <div class="tag">Direction C</div>
+        <h2>Étagère vinyle</h2>
+        <p>Mur sauge, dock bas, pochettes tangibles, chaleur sans formulaire. Expérience « collection chez soi ».</p>
+      </div>
+    </a>
+  </div>
+  <p class="meta">AVM-08C · prototypes/avm_08c · Widgets/QML de production non modifiés · ouvrir les liens ci-dessus dans le navigateur</p>
+</body>
+</html>

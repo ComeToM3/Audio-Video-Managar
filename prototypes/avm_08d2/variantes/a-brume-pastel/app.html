@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A · Brume pastel — AVM-08D.2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --amber:#F1B65C; --iris:#7D8FE8; --rose:#D782A6; --jade:#58B9AA; --anth:#17191F;
+      --ink:#2A2E3A; --muted:#5C6478; --surface:rgba(255,252,248,0.55); --elev:rgba(255,250,245,0.72);
+      --line:rgba(45,52,70,0.12); --rad:28px; --rad-sm:16px;
+      --font:"Outfit",system-ui,sans-serif; --display:"Fraunces",Georgia,serif;
+      --side:200px;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0; min-height:100vh; color:var(--ink); font-family:var(--font);
+      background:#17191F url("../../assets/paint-soft.jpg") center/cover no-repeat fixed;
+    }
+    .app {
+      display:grid; grid-template-columns:var(--side) 1fr; gap:18px;
+      max-width:1240px; margin:0 auto; padding:18px; min-height:100vh;
+    }
+    .rail {
+      border-radius:var(--rad); background:rgba(255,250,245,0.42);
+      border:1px solid var(--line); backdrop-filter:blur(18px);
+      padding:20px 14px; display:flex; flex-direction:column; gap:8px;
+      box-shadow:0 12px 40px rgba(23,25,31,0.08);
+    }
+    .brand { font-family:var(--display); font-size:1.15rem; font-weight:600; letter-spacing:-0.02em; margin:0 0 4px; }
+    .brand span { color:var(--amber); }
+    .sub { font-size:11px; color:var(--muted); margin:0 0 16px; }
+    .navbtn {
+      border:0; background:transparent; text-align:left; padding:12px 14px; border-radius:14px;
+      font:600 13px var(--font); color:var(--muted); cursor:pointer;
+    }
+    .navbtn.on { background:rgba(241,182,92,0.28); color:#6B4A12; }
+    .navbtn:hover:not(.on) { background:rgba(125,143,232,0.14); color:var(--ink); }
+    .rail .foot { margin-top:auto; font-size:11px; color:var(--muted); line-height:1.45; }
+
+    .stage {
+      border-radius:var(--rad); background:var(--surface); border:1px solid var(--line);
+      backdrop-filter:blur(16px); padding:28px 26px 22px;
+      box-shadow:0 16px 48px rgba(23,25,31,0.07); display:flex; flex-direction:column; gap:22px;
+      min-height:calc(100vh - 36px);
+    }
+    .tools { display:flex; justify-content:flex-end; gap:8px; }
+    .ghost {
+      border:1px solid var(--line); background:rgba(255,255,255,0.35); color:var(--muted);
+      border-radius:999px; padding:8px 12px; font:500 12px var(--font); cursor:pointer; text-decoration:none;
+    }
+    .hero { display:grid; grid-template-columns:1.15fr .85fr; gap:24px; align-items:end; }
+    .hero h1 {
+      font-family:var(--display); font-size:clamp(2rem,4vw,3.1rem); margin:0; line-height:1.05;
+      letter-spacing:-0.03em; font-weight:600; color:var(--anth);
+    }
+    .hero p { margin:10px 0 0; color:var(--muted); max-width:28rem; font-size:14px; line-height:1.45; }
+    .search {
+      background:var(--elev); border:1px solid var(--line); border-radius:18px; padding:14px 16px;
+      color:var(--muted); font-size:14px;
+    }
+    .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; flex:1; }
+    .cover {
+      aspect-ratio:1; border-radius:20px;
+      background:linear-gradient(145deg,#8B3A44,#C45C3A 45%,#F1B65C);
+      box-shadow:0 14px 28px rgba(23,25,31,0.18); position:relative;
+      transition:transform .2s ease;
+    }
+    .cover:nth-child(2) { background:linear-gradient(145deg,#3A4A8B,#7D8FE8); }
+    .cover:nth-child(3) { background:linear-gradient(145deg,#6A3A58,#D782A6); }
+    .cover:nth-child(4) { background:linear-gradient(145deg,#2A5A52,#58B9AA); }
+    .lp:hover .cover { transform:translateY(-4px) scale(1.02); }
+    .chip {
+      position:absolute; left:10px; bottom:10px; background:rgba(255,252,248,0.88);
+      color:#1F6B60; font-size:11px; font-weight:700; padding:5px 10px; border-radius:999px;
+    }
+    .meta { margin-top:10px; text-align:center; }
+    .meta strong { display:block; font-size:13px; }
+    .meta span { color:var(--muted); font-size:12px; }
+    .detail {
+      display:grid; grid-template-columns:112px 1fr auto; gap:18px; align-items:center;
+      background:var(--elev); border:1px solid var(--line); border-radius:24px; padding:16px 18px;
+    }
+    .detail .t { width:112px; height:112px; border-radius:18px; background:linear-gradient(145deg,#8B3A44,#F1B65C); }
+    .detail h3 { margin:0; font-family:var(--display); font-size:1.35rem; font-weight:600; }
+    .detail p { margin:6px 0 0; color:var(--muted); font-size:13px; }
+    .cta {
+      background:var(--amber); color:var(--anth); border:0; border-radius:16px;
+      padding:12px 18px; font:700 13px var(--font); cursor:pointer;
+    }
+
+    body.narrow { --side:78px; }
+    body.narrow .app { grid-template-columns:var(--side) 1fr; gap:12px; padding:12px; }
+    body.narrow .brand, body.narrow .sub, body.narrow .foot { display:none; }
+    body.narrow .navbtn { padding:12px 8px; font-size:11px; text-align:center; }
+    body.narrow .hero, body.narrow .detail, body.narrow .grid { grid-template-columns:1fr; }
+    body.narrow .grid { grid-template-columns:repeat(2,1fr); }
+    .note { font-size:12px; color:var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail" aria-label="Navigation principale">
+      <div class="brand">AudioVideo <span>Manager</span></div>
+      <p class="sub">Collection locale</p>
+      <button type="button" class="navbtn on">Bibliothèque</button>
+      <button type="button" class="navbtn">Archiver</button>
+      <button type="button" class="navbtn">Historique</button>
+      <button type="button" class="navbtn">Paramètres</button>
+      <div class="foot">Sans cloud · lecture douce</div>
+    </aside>
+    <main class="stage">
+      <div class="tools">
+        <button class="ghost" type="button" id="narrow">Vue 820 px</button>
+        <a class="ghost" href="../../index.html">← Variantes</a>
+      </div>
+      <div class="hero">
+        <div>
+          <h1>Votre collection,<br/>dans la brume.</h1>
+          <p>Pochettes d’abord. Surfaces teintées, jamais un mur noir — la couleur caresse le regard.</p>
+        </div>
+        <div class="search" role="search">Rechercher un artiste ou un album…</div>
+      </div>
+      <div class="grid">
+        <figure class="lp"><div class="cover"><span class="chip">Prêt</span></div><figcaption class="meta"><strong>Greatest Hits</strong><span>Queen · 1992</span></figcaption></figure>
+        <figure class="lp"><div class="cover"><span class="chip">Prêt</span></div><figcaption class="meta"><strong>Iris Night</strong><span>Demo · 2018</span></figcaption></figure>
+        <figure class="lp"><div class="cover"><span class="chip">Prêt</span></div><figcaption class="meta"><strong>Rose Garden</strong><span>Demo · 2009</span></figcaption></figure>
+        <figure class="lp"><div class="cover"><span class="chip" style="color:#8A4A20">Manquant</span></div><figcaption class="meta"><strong>Jade Mist</strong><span>Ghost · 2001</span></figcaption></figure>
+      </div>
+      <div class="detail">
+        <div class="t"></div>
+        <div>
+          <h3>Queen — Greatest Hits</h3>
+          <p>1992 · 17 pistes · Queen / Greatest Hits (1992)</p>
+        </div>
+        <button class="cta" type="button">Ouvrir le dossier</button>
+      </div>
+      <p class="note">Variante A · Brume pastel · intensité chromatique douce · prototype isolé AVM-08D.2</p>
+    </main>
+  </div>
+  <script>
+    document.getElementById('narrow').onclick = () => {
+      document.body.classList.toggle('narrow');
+      document.getElementById('narrow').textContent =
+        document.body.classList.contains('narrow') ? 'Vue large' : 'Vue 820 px';
+      document.querySelectorAll('.navbtn').forEach((b,i) => {
+        const full = ['Bibliothèque','Archiver','Historique','Paramètres'];
+        const short = ['Bibl.','Arch.','Histo.','Régl.'];
+        b.textContent = document.body.classList.contains('narrow') ? short[i] : full[i];
+      });
+    };
+  </script>
+</body>
+</html>

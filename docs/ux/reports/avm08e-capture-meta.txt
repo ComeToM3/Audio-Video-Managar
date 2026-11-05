@@ -1,0 +1,5 @@
+platform=windows
+mandate=AVM-08E
+direction=A-brume-pastel
+using_qml_after_fallback=False
+captured_at=2026-11-03T23:59:50.004112+00:00
