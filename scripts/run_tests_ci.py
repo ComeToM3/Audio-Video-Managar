@@ -57,6 +57,7 @@ DOMAIN_GLOBS = [
     "tests/test_config.py",
     "tests/test_logging.py",
     "tests/test_cd_ripper.py",
+    "tests/test_dvd_inspector.py",
     "tests/test_freaccmd.py",
     "tests/test_flac_integrity.py",
     "tests/test_integrity_10d.py",
