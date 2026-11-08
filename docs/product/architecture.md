@@ -28,7 +28,7 @@ Processus GUI unique ; outils externes en sous-processus. Pas de microservices.
            + trust      doublons  jobs+fiche
 ```
 
-\* DVD extract reporté (D-010) ; champs métadonnées DVD prévus. Spec fiche : [disc-metadata.md](../domain/disc-metadata.md).
+* AVM-11B autorise l'inspection DVD-Video en lecture seule pour les supports non protégés. L'archivage DVD reste non validé; DVD-Audio et contournement des protections sont hors périmètre (D-010). Modèle vidéo : [disc-metadata.md](../domain/disc-metadata.md).
 
 ## 2. Modules (package `audio_video_manager`)
 
@@ -37,7 +37,7 @@ Processus GUI unique ; outils externes en sous-processus. Pas de microservices.
 | `ui` | Présentation, confirmations Skip/Replace/Rename, reprise | Logique métier longue |
 | `orchestration` | Machine à états, checkpoints, reprise | I/O CD brut |
 | `extraction.cd` | Encapsulation `freaccmd` | MusicBrainz |
-| `extraction.dvd` | Réservé (D-010) | — |
+| `extraction.dvd` | Inspection DVD-Video lecture seule (`DvdInspector`) | Archivage, conversion et contournement des protections |
 | `metadata` | Modèle `DiscMetadata`, validation TOC, trust, (plus tard MB/CAA) | Rip |
 | `library` | Motif D-005, aperçu chemins, doublons, replace non destructif | Encodage |
 | `verification` | F-08a / F-08b distincts | Identification |

@@ -204,7 +204,9 @@ class MainWindow(QMainWindow):
         self.wizard.archive_busy_changed.connect(self._on_busy)
         self.wizard.request_navigate.connect(self.navigate_to)
         self.wizard.library_changed.connect(self._on_library_changed)
+        self.wizard.open_video_library.connect(self._open_video_library)
         self.page_library = LibraryHost(config, db)
+        self.page_library.busy_changed.connect(self._on_busy)
         self.page_history = HistoryPage(
             db,
             config=config,
@@ -251,6 +253,7 @@ class MainWindow(QMainWindow):
             self.wizard.is_busy()
             or self._tech_thread is not None
             or self.page_history.is_recovery_busy()
+            or self.page_library.is_busy()
         )
 
     def showEvent(self, event) -> None:  # noqa: N802
@@ -310,6 +313,9 @@ class MainWindow(QMainWindow):
     def _on_nav(self, row: int) -> None:
         if row < 0:
             return
+        if self.page_library.is_busy() and row != 1:
+            self._sync_nav_widgets(1)
+            return
         if self.page_history.is_recovery_busy() and row != 2:
             QMessageBox.information(
                 self,
@@ -353,12 +359,12 @@ class MainWindow(QMainWindow):
             busy
             or self._tech_thread is not None
             or self.page_history.is_recovery_busy()
+            or self.page_library.is_busy()
         )
         self.nav.setEnabled(not locked)
         self.tab_bar.setEnabled(not locked)
         for btn in self._side_buttons.values():
             btn.setEnabled(not locked)
-
     def closeEvent(self, event) -> None:  # noqa: N802
         if self._operation_busy():
             reply = QMessageBox.question(
@@ -373,7 +379,8 @@ class MainWindow(QMainWindow):
             ok_tech = shutdown_worker_thread(self._tech_thread, self._tech_worker)
             ok_wiz = self.wizard.shutdown_background_work()
             ok_hist = self.page_history.shutdown_background_work()
-            if not (ok_tech and ok_wiz and ok_hist):
+            ok_lib = self.page_library.shutdown_background_work()
+            if not (ok_tech and ok_wiz and ok_hist and ok_lib):
                 QMessageBox.warning(
                     self,
                     "Arrêt incomplet",
@@ -399,6 +406,12 @@ class MainWindow(QMainWindow):
 
     def _on_library_changed(self) -> None:
         self.page_library.refresh()
+
+    def _open_video_library(self) -> None:
+        if self._operation_busy():
+            return
+        self.page_library.media_tabs.setCurrentIndex(1)
+        self.navigate_to(1)
 
     def _on_config_saved(self, config: AppConfig) -> None:
         self._config = config
@@ -471,15 +484,20 @@ class MainWindow(QMainWindow):
 
     def _on_tech_finished(self, report: object) -> None:
         assert isinstance(report, RipJobReport)
+        non_publish = (
+            "Mode : test technique (technical_test)\n"
+            "Publication bibliothèque : aucune; les fichiers restent dans le dossier temporaire.\n"
+        )
         if report.rip.success:
             msg = (
-                f"Test terminé : {len(report.rip.flac_files)} fichier(s) audio "
-                f"dans le dossier temporaire.\n{report.workdir}"
+                non_publish
+                + f"Test terminé : {len(report.rip.flac_files)} fichier(s) audio.\n"
+                + f"Dossier temporaire : {report.workdir}"
             )
         else:
             msg = (
-                "Le test d’extraction n’a pas abouti. "
-                "Consultez l’historique pour le détail."
+                non_publish
+                + "Le test d’extraction n’a pas abouti. Consultez l’historique pour le détail."
             )
         QMessageBox.information(self, "Test technique", msg)
         self._refresh_reader_status()

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PySide6.QtCore import QSize, Qt, QUrl
+from PySide6.QtCore import QSize, Qt, QUrl, Signal
 from PySide6.QtGui import QDesktopServices, QIcon, QPixmap
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (
 )
 
 from audio_video_manager.config import AppConfig
-from audio_video_manager.storage.catalog import ReleaseRow, list_releases, list_tracks_for_release
+from audio_video_manager.storage.catalog import ReleaseRow, list_releases, list_tracks_for_release, list_videos
 from audio_video_manager.storage.database import Database
 from audio_video_manager.ui.path_labels import friendly_path_label, path_tooltip
 from audio_video_manager.ui.widgets import empty_state_card, make_card, make_chip
@@ -29,6 +29,196 @@ from audio_video_manager.ui.widgets import empty_state_card, make_card, make_chi
 _COVER_NAMES = ("cover.jpg", "cover.png", "folder.jpg", "Folder.jpg")
 _NARROW = 900
 _WIDE = 1400
+
+
+class VideoLibraryPage(QWidget):
+    busy_changed = Signal(bool)
+
+    def __init__(self, db: Database, config: AppConfig, parent=None) -> None:
+        super().__init__(parent)
+        self._db = db
+        self._config = config
+        self._rows = []
+        self._thread = None
+        self._worker = None
+        root = QVBoxLayout(self)
+        root.setContentsMargins(28, 20, 28, 20)
+        title = QLabel("Vidéos et audio DVD archivés")
+        title.setObjectName("pageTitle")
+        root.addWidget(title)
+        self.table = QTableWidget(0, 4)
+        self.table.setHorizontalHeaderLabels(["Fichier", "Durée", "Validation", "État"])
+        self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
+        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.table.setAccessibleName("Vidéos et audio DVD archivés")
+        self.table.itemSelectionChanged.connect(self._selection_changed)
+        self.table.cellDoubleClicked.connect(lambda *_args: self._open_video())
+        root.addWidget(self.table, 1)
+        self.detail = QLabel("Sélectionnez un média.")
+        self.detail.setWordWrap(True)
+        self.detail.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        root.addWidget(self.detail)
+        actions = QHBoxLayout()
+        self.btn_refresh = QPushButton("Actualiser")
+        self.btn_refresh.clicked.connect(self.refresh)
+        self.btn_cancel = QPushButton("Annuler la vérification")
+        self.btn_cancel.clicked.connect(self._cancel_reconcile)
+        self.btn_cancel.hide()
+        self.btn_reconcile = QPushButton("Vérifier la publication en attente")
+        self.btn_reconcile.clicked.connect(self._reconcile)
+        self.btn_remove_pending = QPushButton("Retirer l'entrée manquante")
+        self.btn_remove_pending.clicked.connect(self._remove_pending)
+        self.btn_open = QPushButton("Ouvrir le média")
+        self.btn_open.setProperty("primary", True)
+        self.btn_open.clicked.connect(self._open_video)
+        actions.addWidget(self.btn_refresh)
+        actions.addWidget(self.btn_cancel)
+        actions.addStretch(1)
+        actions.addWidget(self.btn_open)
+        root.addLayout(actions)
+        recovery_actions = QHBoxLayout()
+        recovery_actions.addWidget(self.btn_reconcile)
+        recovery_actions.addWidget(self.btn_remove_pending)
+        recovery_actions.addStretch(1)
+        root.addLayout(recovery_actions)
+        self.refresh()
+
+    def is_busy(self) -> bool:
+        return self._thread is not None
+
+    def set_config(self, config: AppConfig) -> None:
+        self._config = config
+
+    def shutdown_background_work(self, *, timeout_ms: int = 12_000) -> bool:
+        from audio_video_manager.ui.thread_lifecycle import shutdown_worker_thread
+        return shutdown_worker_thread(self._thread, self._worker, timeout_ms=timeout_ms)
+
+    def refresh(self) -> None:
+        self._rows = list_videos(self._db)
+        self.table.setRowCount(len(self._rows))
+        for index, row in enumerate(self._rows):
+            seconds = int(row.duration_seconds)
+            duration = f"{seconds // 3600:02d}:{seconds % 3600 // 60:02d}:{seconds % 60:02d}"
+            validation = {"decodable": "Décodable, source non vérifiée", "source_verified": "Vérifiée avec la source", "incomplete": "Validation incomplète"}.get(row.validation_status, "Validation inconnue")
+            if row.publication_state == "pending" or not row.path_matches:
+                validation = "Validation incomplète"
+            state = "Publication en attente" if row.publication_state == "pending" else (
+                "Fichier manquant" if not row.path_exists else "Disponible" if row.path_matches else "Fichier modifié"
+            )
+            for column, value in enumerate((Path(row.path).name, duration, validation, state)):
+                self.table.setItem(index, column, QTableWidgetItem(value))
+        self._selection_changed()
+
+    def _selected_video(self):
+        row = self.table.currentRow()
+        return self._rows[row] if 0 <= row < len(self._rows) else None
+
+    def _selection_changed(self) -> None:
+        import json
+
+        row = self._selected_video()
+        self.btn_reconcile.setVisible(bool(row and row.path_exists and (row.publication_state == "pending" or not row.path_matches)))
+        self.btn_reconcile.setText("Vérifier la publication en attente" if row and row.publication_state == "pending" else "Vérifier le fichier modifié")
+        self.btn_remove_pending.setVisible(bool(row and row.publication_state == "pending" and not row.path_exists))
+        self.btn_open.setEnabled(bool(row and row.publication_state == "published" and row.path_matches and not self.is_busy()))
+        self.btn_reconcile.setEnabled(bool(row and row.path_exists and (row.publication_state == "pending" or not row.path_matches) and not self.is_busy()))
+        self.btn_remove_pending.setEnabled(bool(row and row.publication_state == "pending" and not row.path_exists and not self.is_busy()))
+        if row is None:
+            self.detail.setText("Sélectionnez un média.")
+            return
+        try:
+            streams = json.loads(row.streams_json)
+            chapters = json.loads(row.chapters_json)
+            stream_text = ", ".join(f"{stream.get('codec_type', '?')} : {stream.get('codec_name', '?')}" for stream in streams)
+            validation = self.table.item(self.table.currentRow(), 2).text()
+            self.detail.setText(f"{row.path}\n{validation} · {row.format} · {stream_text} · {len(chapters)} chapitre(s)")
+        except (ValueError, TypeError, AttributeError):
+            self.detail.setText(f"{row.path}\nMétadonnées illisibles dans le catalogue.")
+
+    def _open_video(self) -> None:
+        row = self._selected_video()
+        if not row or row.publication_state != "published":
+            return
+        if not row.path_exists:
+            self.refresh()
+            QMessageBox.warning(self, "Vidéo manquante", "Le fichier n'est plus présent à son emplacement enregistré.")
+            return
+        if not row.path_matches:
+            self.refresh()
+            QMessageBox.warning(self, "Vidéo modifiée", "Le fichier a changé depuis sa validation; son ouverture est suspendue.")
+            return
+        if not QDesktopServices.openUrl(QUrl.fromLocalFile(row.path)):
+            QMessageBox.warning(self, "Lecture", "Le lecteur système n'a pas pu ouvrir ce fichier.")
+
+    def _reconcile(self) -> None:
+        row = self._selected_video()
+        if row is None or self.is_busy():
+            return
+        from audio_video_manager.ui.thread_lifecycle import attach_worker_thread
+        from audio_video_manager.ui.video_worker import VideoReconcileWorker
+
+        if row.sha256.startswith("intent:"):
+            if QMessageBox.question(
+                self, "Vérifier le média",
+                "Une opération a été interrompue. Vérifier le fichier présent et l'ajouter au catalogue ?\n\n"
+                "Sa provenance et sa fidélité au disque ne seront pas établies.",
+            ) != QMessageBox.StandardButton.Yes:
+                return
+            from audio_video_manager.ui.dvd_worker import DvdTaskWorker
+
+            self._worker = DvdTaskWorker(
+                config=self._config, task="index", source=row.path, db_path=self._db.path,
+            )
+            self.btn_cancel.show()
+        else:
+            self._worker = VideoReconcileWorker(self._db.path, row.id)
+        self._thread = attach_worker_thread(
+            self._worker, on_finished=self._reconcile_finished,
+            on_failed=self._reconcile_failed, on_cleared=self._reconcile_cleared,
+            progress_slot=self._on_reconcile_progress,
+        )
+        self._selection_changed()
+        self.detail.setText("Vérification de l'empreinte du fichier en cours…")
+        self.busy_changed.emit(True)
+        self._thread.start()
+
+    def _cancel_reconcile(self) -> None:
+        if self._worker is not None and hasattr(self._worker, "cancel"):
+            self._worker.cancel()
+            self.btn_cancel.setEnabled(False)
+            self.detail.setText("Annulation demandée; le fichier reste intact.")
+
+    def _on_reconcile_progress(self, message: str, _fraction: object) -> None:
+        self.detail.setText(message)
+
+    def _remove_pending(self) -> None:
+        row = self._selected_video()
+        if row is None or self.is_busy():
+            return
+        if QMessageBox.question(self, "Retirer l'entrée", "Retirer cette entrée en attente sans fichier du catalogue ?") != QMessageBox.StandardButton.Yes:
+            return
+        from audio_video_manager.library.video_archive import remove_missing_pending_video
+        try:
+            remove_missing_pending_video(self._db, row.id)
+        except (OSError, ValueError) as exc:
+            QMessageBox.warning(self, "Entrée en attente", str(exc))
+        self.refresh()
+
+    def _reconcile_finished(self, _result: object) -> None:
+        self.detail.setText("Publication vérifiée et indexée.")
+
+    def _reconcile_failed(self, message: str) -> None:
+        QMessageBox.warning(self, "Publication en attente", message)
+
+    def _reconcile_cleared(self) -> None:
+        self._thread = None
+        self._worker = None
+        self.btn_cancel.hide()
+        self.btn_cancel.setEnabled(True)
+        self.refresh()
+        self.busy_changed.emit(False)
 
 
 def _album_cover_path(album_dir: str | None) -> Path | None:

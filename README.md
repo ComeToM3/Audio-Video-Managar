@@ -1,6 +1,6 @@
 # AudioVideoManager
 
-Application Windows locale, gratuite et open source (**GPL-3.0-or-later**) pour l’importation automatisée de collections de **CD audio** (DVD musicaux reportés).
+Application Windows locale, gratuite et open source (**GPL-3.0-or-later**) pour l’archivage de **CD audio**. Le parcours DVD-Video expérimental propose l’inspection, un MKV maître sans réencodage et un MKA audio seul; seuls les supports dont la reproduction est autorisée sont à utiliser. Aucun contournement CSS n’est pris en charge.
 
 Flux cible : disque → identification → extraction **FLAC** → métadonnées / pochettes → organisation → contrôles → disque suivant.
 
@@ -21,7 +21,7 @@ Flux cible : disque → identification → extraction **FLAC** → métadonnées
 | D-007 | Sidecar JSON reporté |
 | D-008 | Produit AudioVideoManager ; package `audio_video_manager` |
 | D-009 | Jamais d’écrasement silencieux |
-| D-010 | DVD extraction reportée |
+| D-010 | DVD expérimental; usage protégé et archivage physique restent sous réserve |
 | D-011…D-015 | Gate meta, anti-placeholders, mode test, sélection intelligente éditions |
 
 Détail : [docs/product/decisions.md](docs/product/decisions.md).

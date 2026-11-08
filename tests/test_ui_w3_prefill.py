@@ -66,6 +66,8 @@ def _queen_sheet(*, tracks: int = 17):
 
 def test_w2_to_w3_prefills_edition_and_tracks(page) -> None:
     sheet = _queen_sheet()
+    sheet.disc.disc_number = 2
+    sheet.disc.disc_total = 3
     page._sheet = sheet  # noqa: SLF001
     # Simule Continuer depuis Identification
     page._set_step(2)  # noqa: SLF001
@@ -77,6 +79,8 @@ def test_w2_to_w3_prefills_edition_and_tracks(page) -> None:
     assert page.edit_label.text() == "Hollywood Records"
     assert page.edit_catalog.text() == "CD 61265"
     assert page.edit_country.text() == "CA"
+    assert page.spin_disc_number.value() == 2
+    assert page.spin_disc_total.value() == 3
     assert page.table.rowCount() == 17
     assert page.table.item(0, 1).text() == "We Will Rock You"
     assert page.table.item(16, 1).text() == "I Want to Break Free"
@@ -128,7 +132,12 @@ def test_manual_edit_after_prefill_updates_sheet(page) -> None:
     page._sheet = _queen_sheet()  # noqa: SLF001
     page._set_step(2)  # noqa: SLF001
     page.edit_album.setText("Greatest Hits (remaster)")
+    page.spin_disc_number.setValue(2)
+    page.spin_disc_total.setValue(3)
     assert page.sheet().edition.album_title == "Greatest Hits (remaster)"
+    assert page.sheet().disc.disc_number == 2
+    assert page.sheet().disc.disc_total == 3
+    assert page.sheet().disc.field_meta["disc_number"].provenance == MetadataProvenance.USER_CORRECTION
 
 
 def test_unrelated_edit_preserves_unconfirmed_compilation(page) -> None:
@@ -208,6 +217,9 @@ def test_prefill_then_a3_revoke_on_edit(page) -> None:
     approve_sheet(page.sheet(), note="test F1")
     page._approved_fp = compute_approval_fingerprint(page.sheet())  # noqa: SLF001
     assert page.sheet().approval == ApprovalState.APPROVED
+    page.spin_disc_number.setValue(2)
+    assert page.sheet().approval == ApprovalState.PENDING
+    assert page.approval_fingerprint() is None
     page.edit_album.setText("Autre titre")
     assert page.sheet().approval == ApprovalState.PENDING
     assert page.approval_fingerprint() is None

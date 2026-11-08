@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QButtonGroup,
     QCheckBox,
     QComboBox,
+    QFileDialog,
     QFormLayout,
     QHBoxLayout,
     QLabel,
@@ -77,6 +78,7 @@ from audio_video_manager.orchestration.archive_job import ArchiveJobReport
 from audio_video_manager.storage.database import Database
 from audio_video_manager.ui.archive_worker import ArchiveWorker
 from audio_video_manager.ui.cover_cache import fetch_cover_to_cache
+from audio_video_manager.ui.dvd_extraction_dialog import DvdArchivePanel
 from audio_video_manager.ui.identify_worker import IdentifyWorker
 from audio_video_manager.ui.thread_lifecycle import (
     attach_worker_thread,
@@ -98,6 +100,7 @@ STEP_LABELS = (
     "4 Extraction / publication",
     "5 Terminé",
 )
+DVD_STEP_LABELS = ("Disque", "Titres et pistes", "Options", "Extraction", "Terminé")
 
 
 def _confirmed() -> FieldMeta:
@@ -111,6 +114,7 @@ class ArchiveWizardPage(QWidget):
     archive_busy_changed = Signal(bool)
     request_navigate = Signal(int)
     library_changed = Signal()  # publication réussie → rafraîchir Bibliothèque
+    open_video_library = Signal()
 
     def __init__(
         self,
@@ -138,6 +142,7 @@ class ArchiveWizardPage(QWidget):
         self._advisory_warnings: list[str] = []
         self._confirmed_rearchive = False
         self._lbl_dup_w1: QLabel | None = None
+        self._dvd_step = 0
 
         root = QVBoxLayout(self)
         root.setContentsMargins(28, 20, 28, 20)
@@ -168,12 +173,30 @@ class ArchiveWizardPage(QWidget):
         root.addWidget(self._title)
         root.addWidget(self._help)
 
+        media_row = QHBoxLayout()
+        self.media_label = QLabel("Type de disque :")
+        media_row.addWidget(self.media_label)
+        self.media_combo = QComboBox()
+        self.media_combo.setAccessibleName("Type de disque")
+        self.media_combo.addItems(["CD audio", "DVD-Video"])
+        media_row.addWidget(self.media_combo)
+        media_row.addStretch(1)
+        root.addLayout(media_row)
+
         self._stack = QStackedWidget()
         self._stack.addWidget(self._build_w1())
         self._stack.addWidget(self._build_w2())
         self._stack.addWidget(self._build_w3())
         self._stack.addWidget(self._build_w4())
         self._stack.addWidget(self._build_w5())
+        self.dvd = DvdArchivePanel(config, self, db_path=db.path)
+        self.dvd.busy_changed.connect(self._on_dvd_busy)
+        self.dvd.extraction_finished.connect(self._on_dvd_finished)
+        self.dvd.catalog_changed.connect(self.library_changed.emit)
+        self.dvd.open_library_requested.connect(self.open_video_library.emit)
+        self.dvd.finalize_existing_requested.connect(self._finalize_existing_video)
+        self._stack.addWidget(self.dvd)
+        self.media_combo.currentIndexChanged.connect(self._on_media_changed)
         root.addWidget(self._stack, 1)
 
         nav = QHBoxLayout()
@@ -195,6 +218,7 @@ class ArchiveWizardPage(QWidget):
     # --- public ---
     def set_config(self, config: AppConfig) -> None:
         self._config = config
+        self.dvd.set_config(config)
         self.refresh_drives()
 
     def is_busy(self) -> bool:
@@ -204,7 +228,7 @@ class ArchiveWizardPage(QWidget):
         return list(self._drives)
 
     def current_step(self) -> int:
-        return self._stack.currentIndex()
+        return self._dvd_step if self.media_combo.currentIndex() == 1 else self._stack.currentIndex()
 
     def approval_fingerprint(self) -> str | None:
         return self._approved_fp
@@ -245,7 +269,12 @@ class ArchiveWizardPage(QWidget):
 
     # --- step chrome ---
     def _set_step(self, index: int) -> None:
+        if self.media_combo.currentIndex() == 1:
+            self._set_dvd_step(index)
+            return
         self._stack.setCurrentIndex(index)
+        self.media_combo.setVisible(index == 0)
+        self.media_label.setVisible(index == 0)
         titles = [
             ("Disque", "Confirmez le lecteur et le CD à archiver."),
             ("Identification", "Vérifiez l’édition proposée."),
@@ -256,6 +285,8 @@ class ArchiveWizardPage(QWidget):
         self._title.setText(titles[index][0])
         self._help.setText(titles[index][1])
         for i, btn in enumerate(self._step_buttons):
+            btn.setText(STEP_LABELS[i].split(" ", 1)[-1])
+            btn.setAccessibleName(f"Étape {STEP_LABELS[i]}")
             btn.setEnabled(False)
             btn.setProperty("active", "true" if i == index else "false")
             btn.setProperty("done", "true" if i < index else "false")
@@ -277,8 +308,105 @@ class ArchiveWizardPage(QWidget):
             self.btn_next.setText("Continuer →")
             self.btn_next.setEnabled(not self._busy)
 
+    def _on_media_changed(self, _index: int) -> None:
+        self._set_step(0)
+
+    def _set_dvd_step(self, index: int) -> None:
+        self._dvd_step = index
+        self._stack.setCurrentWidget(self.dvd)
+        self.media_combo.setVisible(index == 0)
+        self.media_label.setVisible(index == 0)
+        self.dvd.set_step(index)
+        titles = (
+            ("Disque", "Choisissez et inspectez la source DVD-Video."),
+            ("Titres et pistes", "Choisissez le titre et l’angle, puis vérifiez les pistes."),
+            ("Options", "Choisissez le format et la destination, puis confirmez vos droits."),
+            ("Extraire", "Confirmez l’extraction et suivez sa progression."),
+            ("Terminé", "Résultat de l’extraction DVD."),
+        )
+        self._title.setText(titles[index][0])
+        self._help.setText(titles[index][1])
+        for position, btn in enumerate(self._step_buttons):
+            btn.setText(DVD_STEP_LABELS[position])
+            btn.setAccessibleName(f"Étape {position + 1} {DVD_STEP_LABELS[position]}")
+            btn.setProperty("active", "true" if position == index else "false")
+            btn.setProperty("done", "true" if position < index else "false")
+            btn.style().unpolish(btn)
+            btn.style().polish(btn)
+        self.btn_back.setEnabled(0 < index < 4 and not self._busy)
+        self.btn_next.setEnabled(not self._busy)
+        self.btn_next.setText(
+            "Archiver un autre disque" if index == 4 else
+            "Lancer l’extraction" if index == 3 else
+            "Inspecter le disque" if index == 0 and self.dvd._inspection is None else "Continuer →"
+        )
+
+    def _on_dvd_busy(self, busy: bool) -> None:
+        self._busy = busy
+        self.media_combo.setEnabled(not busy)
+        self.archive_busy_changed.emit(busy)
+        self._set_dvd_step(self._dvd_step)
+
+    def _on_dvd_finished(self) -> None:
+        self._set_dvd_step(4)
+
+    def _finalize_existing_video(self) -> None:
+        if self._busy:
+            return
+        source, _ = QFileDialog.getOpenFileName(self, "Choisir un MKV existant", "", "Vidéo Matroska (*.mkv)")
+        if not source:
+            return
+        destination, _ = QFileDialog.getSaveFileName(
+            self, "Destination de la vidéo", str(Path(self._config.library_root) / Path(source).name),
+            "Vidéo Matroska (*.mkv)",
+        )
+        if not destination:
+            return
+        if QMessageBox.question(
+            self, "Confirmer la finalisation",
+            f"Copier et valider :\n{source}\n\nVers :\n{destination}\n\n"
+            "La source restera intacte. La lecture sera vérifiée, mais pas la fidélité au DVD.",
+        ) != QMessageBox.StandardButton.Yes:
+            return
+        from audio_video_manager.ui.video_worker import VideoFinalizeWorker
+
+        worker = VideoFinalizeWorker(self._db.path, source, destination, self._config.ffmpeg_path)
+        self._worker = worker
+        self.dvd.pages.setEnabled(False)
+        self.dvd.status_label.setText("Copie et vérification de la vidéo en cours…")
+        self._on_dvd_busy(True)
+        self._thread = attach_worker_thread(
+            worker, on_finished=self._on_video_finalized,
+            on_failed=self._on_video_finalize_failed, on_cleared=self._on_video_finalize_cleared,
+        )
+        self._thread.start()
+
+    def _on_video_finalized(self, destination: object) -> None:
+        self.dvd._result_path = Path(str(destination))
+        self.dvd._cataloged = True
+        self.dvd.btn_open_result.setEnabled(True)
+        self.dvd.progress.setValue(100)
+        self.dvd.status_label.setText(
+            f"Vidéo décodable publiée : {destination}\nFidélité à la source DVD non vérifiée."
+        )
+        self.library_changed.emit()
+        self._set_dvd_step(4)
+
+    def _on_video_finalize_failed(self, message: str) -> None:
+        self.dvd.status_label.setText(f"Finalisation non terminée : {message}")
+        self.library_changed.emit()
+
+    def _on_video_finalize_cleared(self) -> None:
+        self._clear_thread()
+        self.dvd.pages.setEnabled(True)
+        self._on_dvd_busy(False)
+
     def _go_back(self) -> None:
         if self._busy:
+            return
+        if self.media_combo.currentIndex() == 1:
+            if self._dvd_step > 0:
+                self._set_dvd_step(self._dvd_step - 1)
             return
         cur = self._stack.currentIndex()
         if cur <= 0:
@@ -287,6 +415,9 @@ class ArchiveWizardPage(QWidget):
         self._set_step(cur - 1)
 
     def _go_next(self) -> None:
+        if self.media_combo.currentIndex() == 1:
+            self._go_next_dvd()
+            return
         if self._busy and self._stack.currentIndex() != 4:
             return
         cur = self._stack.currentIndex()
@@ -311,6 +442,31 @@ class ArchiveWizardPage(QWidget):
         elif cur == 4:
             self._reset_session()
             self._set_step(0)
+
+    def _go_next_dvd(self) -> None:
+        if self._busy:
+            return
+        if self._dvd_step == 0 and self.dvd._inspection is None:
+            self.dvd._inspect()
+        elif self._dvd_step == 1 and self.dvd._title_inspection is None:
+            self.dvd._inspect_selected_title()
+        elif self._dvd_step == 2 and not self.dvd.btn_start.isEnabled():
+            self.dvd.status_label.setText("Choisissez la destination, les pistes audio et confirmez vos droits.")
+        elif self._dvd_step < 3:
+            self._set_dvd_step(self._dvd_step + 1)
+            if self._dvd_step == 1 and self.dvd._title_inspection is None:
+                self.dvd._inspect_selected_title()
+        elif self._dvd_step == 3:
+            self.dvd._start_extraction()
+        else:
+            self.dvd._result_path = None
+            self.dvd._cataloged = False
+            self.dvd.btn_open_result.setEnabled(False)
+            self.dvd.btn_retry_index.hide()
+            self.dvd._invalidate_inspection()
+            self.dvd.progress.setValue(0)
+            self.dvd.rights_check.setChecked(False)
+            self._set_dvd_step(0)
 
     # --- W1 ---
     def _build_w1(self) -> QWidget:
@@ -643,6 +799,12 @@ class ArchiveWizardPage(QWidget):
         self.edit_label = QLineEdit()
         self.edit_catalog = QLineEdit()
         self.edit_country = QLineEdit()
+        self.spin_disc_number = QSpinBox()
+        self.spin_disc_number.setRange(1, 99)
+        self.spin_disc_number.setAccessibleName("Numéro du disque dans le coffret")
+        self.spin_disc_total = QSpinBox()
+        self.spin_disc_total.setRange(1, 99)
+        self.spin_disc_total.setAccessibleName("Nombre total de disques du coffret")
         form.addRow("Artiste album *", self.edit_artist)
         form.addRow("Titre album *", self.edit_album)
         form.addRow("Année", self.spin_year)
@@ -652,6 +814,8 @@ class ArchiveWizardPage(QWidget):
         form.addRow("Label", self.edit_label)
         form.addRow("N° catalogue", self.edit_catalog)
         form.addRow("Pays", self.edit_country)
+        form.addRow("Disque dans le coffret", self.spin_disc_number)
+        form.addRow("Nombre de disques", self.spin_disc_total)
         v.addLayout(form)
         for wdg in (
             self.edit_artist,
@@ -662,6 +826,8 @@ class ArchiveWizardPage(QWidget):
         ):
             wdg.textChanged.connect(self._on_sheet_edited)
         self.spin_year.valueChanged.connect(self._on_sheet_edited)
+        self.spin_disc_number.valueChanged.connect(self._on_sheet_edited)
+        self.spin_disc_total.valueChanged.connect(self._on_sheet_edited)
         self.chk_year_unavailable.toggled.connect(self._on_year_unavailable_toggled)
         self.edit_year_unavailable_reason.textChanged.connect(self._on_sheet_edited)
         self.chk_compilation.stateChanged.connect(self._on_sheet_edited)
@@ -711,6 +877,8 @@ class ArchiveWizardPage(QWidget):
             self.edit_label,
             self.edit_catalog,
             self.edit_country,
+            self.spin_disc_number,
+            self.spin_disc_total,
             self.table,
         ]
 
@@ -751,6 +919,8 @@ class ArchiveWizardPage(QWidget):
             self.edit_label.setText(s.edition.label or "")
             self.edit_catalog.setText(s.edition.catalog_number or "")
             self.edit_country.setText(s.edition.country or "")
+            self.spin_disc_number.setValue(s.disc.disc_number)
+            self.spin_disc_total.setValue(s.disc.disc_total)
             self.table.setRowCount(0)
             for t in sorted(s.tracks, key=lambda x: x.number):
                 r = self.table.rowCount()
@@ -892,6 +1062,24 @@ class ArchiveWizardPage(QWidget):
             ("country", "country", self.edit_country.text().strip() or None),
         ):
             apply_manual_value(attr, value, key)
+        for attr, key, value in (
+            ("disc_number", "disc_number", self.spin_disc_number.value()),
+            ("disc_total", "disc_total", self.spin_disc_total.value()),
+        ):
+            old = getattr(s.disc, attr)
+            if old != value:
+                s.record_correction(
+                    f"disc.{attr}",
+                    old,
+                    value,
+                    note="Modification du formulaire",
+                    provenance=MetadataProvenance.USER_CORRECTION,
+                )
+                setattr(s.disc, attr, value)
+                s.disc.field_meta[key] = FieldMeta(
+                    trust=FieldTrust.CONFIRMED,
+                    provenance=MetadataProvenance.USER_CORRECTION,
+                )
         if s.edition.cover_status == CoverStatus.MISSING and s.edition.cover_path_or_url:
             s.edition.cover_status = CoverStatus.CONFIRMED
             s.edition.field_meta["cover_status"] = _confirmed()
@@ -1159,8 +1347,11 @@ class ArchiveWizardPage(QWidget):
         ed = self._sheet.edition
         self.lbl_w4_recap.setText(
             f"{ed.album_artist} — {ed.album_title} "
-            f"({ed.year or '?'}, {ed.country or '?'})"
+            f"({ed.year or '?'}, {ed.country or '?'})\n"
+            "Mode : archivage CD normal\n"
+            f"Destination bibliothèque : {self._config.library_root}"
         )
+        self.lbl_w4_recap.setToolTip(self._config.library_root)
         # Miroir pochette W2 → W4
         if self.cover_label.pixmap() and not self.cover_label.pixmap().isNull():
             self.lbl_w4_cover.setPixmap(
@@ -1341,8 +1532,11 @@ class ArchiveWizardPage(QWidget):
         self.lbl_w4_recap.setText(
             f"{self._sheet.edition.album_artist} — {self._sheet.edition.album_title} "
             f"({self._sheet.edition.year or '?'}, {self._sheet.edition.country or '?'}) "
-            f"[{self._sheet.approval.value}]"
+            f"[{self._sheet.approval.value}]\n"
+            "Mode : archivage CD normal\n"
+            f"Destination bibliothèque : {self._config.library_root}"
         )
+        self.lbl_w4_recap.setToolTip(self._config.library_root)
         self._set_busy(True)
         self.btn_cancel.setEnabled(True)
         self.progress.setValue(0)
@@ -1383,6 +1577,8 @@ class ArchiveWizardPage(QWidget):
 
     def shutdown_background_work(self, *, timeout_ms: int = 12_000) -> bool:
         """Annule et attend le worker identify/archive (fermeture fenêtre)."""
+        if not self.dvd.shutdown_background_work(timeout_ms=timeout_ms):
+            return False
         ok = shutdown_worker_thread(self._thread, self._worker, timeout_ms=timeout_ms)
         if ok:
             self._clear_thread()
@@ -1451,8 +1647,11 @@ class ArchiveWizardPage(QWidget):
             path = report.publish.album_dir if report.publish else None
             self.lbl_done.setText("Album ajouté à votre bibliothèque.")
             lines = [
+                "Mode : archivage CD normal",
+                "Publication et indexation SQLite : réussies",
+                f"Racine bibliothèque : {self._config.library_root}",
                 f"État : {report.state}",
-                f"Dossier : {path}",
+                f"Dossier album publié : {path}",
                 "",
                 "Les fichiers FLAC s’ouvrent dans n’importe quel lecteur compatible.",
                 "",
@@ -1466,13 +1665,21 @@ class ArchiveWizardPage(QWidget):
             self.lbl_done.setProperty("role", "error")
             self.lbl_done.setText(
                 f"Archivage non terminé ({report.state}). "
-                "« Terminé » n’affiche un succès qu’après publication réussie."
+                "Aucun album n’est déclaré archivé sans publication réussie."
             )
-            self.txt_done.setPlainText(
-                (report.error or report.state)
-                + "\n"
-                + "\n".join(report.warnings)
+            publication = (
+                "Publication : ignorée (doublon déjà présent)"
+                if report.publish and report.publish.skipped
+                else "Publication : non effectuée"
             )
+            lines = [
+                "Mode : archivage CD normal",
+                f"Racine bibliothèque visée : {self._config.library_root}",
+                publication,
+                report.error or report.state,
+                *report.warnings,
+            ]
+            self.txt_done.setPlainText("\n".join(lines))
             self.btn_open_folder.setEnabled(False)
         self.progress.setValue(100 if published else self.progress.value())
         self._set_step(4)

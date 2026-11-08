@@ -13,7 +13,13 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QApplication, QScrollArea, QStyleFactory
 
-from audio_video_manager.config import AppConfig
+from audio_video_manager.config import AppConfig, load_config
+from audio_video_manager.extraction.cd_ripper import RipResult
+from audio_video_manager.library.publish import CollisionPolicy, PublishResult
+from audio_video_manager.metadata.enums import JobMode
+from audio_video_manager.metadata.factories import make_approvable_sheet
+from audio_video_manager.orchestration.archive_job import ArchiveJobReport
+from audio_video_manager.orchestration.rip_job import RipJobReport
 from audio_video_manager.storage import Database
 from audio_video_manager.ui.main_window import MainWindow, NAV_ARCHIVE
 from audio_video_manager.ui.path_labels import friendly_path_label, path_tooltip
@@ -159,6 +165,90 @@ def test_settings_scroll_area(qapp, config) -> None:
     assert scrolls, "Paramètres doit avoir une QScrollArea"
     assert scrolls[0].widgetResizable()
     assert scrolls[0].accessibleName()
+
+
+def test_settings_library_destination_persists_and_reaches_workflow(
+    qapp, config, db, tmp_path, monkeypatch
+) -> None:
+    from PySide6.QtWidgets import QMessageBox
+
+    data_dir = tmp_path / "app-data"
+    selected_root = tmp_path / "Permanent Music Library"
+    monkeypatch.setenv("AVM_DATA_DIR", str(data_dir))
+    monkeypatch.setattr(QMessageBox, "information", lambda *_args: None)
+    win = MainWindow(config, db)
+    win.page_settings.edit_library.setText(str(selected_root))
+
+    win.page_settings._save()  # noqa: SLF001
+
+    assert load_config().library_root == str(selected_root)
+    assert win.wizard._config.library_root == str(selected_root)  # noqa: SLF001
+    assert win.page_library._config.library_root == str(selected_root)  # noqa: SLF001
+    assert not selected_root.exists()
+
+
+def test_wizard_displays_normal_destination_and_publish_result(qapp, config, db, tmp_path) -> None:
+    wizard = ArchiveWizardPage(config, db)
+    wizard._sheet = make_approvable_sheet()  # noqa: SLF001
+    wizard._refresh_w4_preview()  # noqa: SLF001
+    assert "Mode : archivage CD normal" in wizard.lbl_w4_recap.text()
+    assert str(config.library_root) in wizard.lbl_w4_recap.text()
+
+    album_dir = Path(config.library_root) / "Demo Artist" / "Demo Album (1999)"
+    report = ArchiveJobReport(
+        job_id="job-normal",
+        workdir=tmp_path / "jobs" / "job-normal",
+        mode=JobMode.NORMAL,
+        metadata_id=wizard.sheet().id,
+        publish=PublishResult(
+            published=True,
+            policy=CollisionPolicy.RENAME,
+            album_dir=album_dir,
+        ),
+        state="Completed",
+    )
+    wizard._on_archive_finished(report)  # noqa: SLF001
+    details = wizard.txt_done.toPlainText()
+    assert "Publication et indexation SQLite : réussies" in details
+    assert str(config.library_root) in details
+    assert str(album_dir) in details
+    assert "Album ajouté à votre bibliothèque" in wizard.lbl_done.text()
+
+    report.publish = None
+    report.state = "AwaitingPublishConfirmation"
+    wizard._on_archive_finished(report)  # noqa: SLF001
+    assert "Publication : non effectuée" in wizard.txt_done.toPlainText()
+    assert "Album ajouté à votre bibliothèque" not in wizard.lbl_done.text()
+
+
+def test_technical_rip_result_explicitly_says_unpublished(qapp, config, db, tmp_path, monkeypatch) -> None:
+    from PySide6.QtWidgets import QMessageBox
+
+    messages = []
+    monkeypatch.setattr(
+        QMessageBox, "information", lambda _parent, _title, message: messages.append(message)
+    )
+    win = MainWindow(config, db)
+    report = RipJobReport(
+        job_id="job-test",
+        workdir=tmp_path / "jobs" / "job-test" / "rip",
+        rip=RipResult(
+            success=True,
+            cancelled=False,
+            returncode=0,
+            argv=(),
+            stdout="",
+            stderr="",
+            flac_files=[tmp_path / "jobs" / "job-test" / "rip" / "01.flac"],
+        ),
+        mode=JobMode.TECHNICAL_TEST,
+    )
+
+    win._on_tech_finished(report)  # noqa: SLF001
+
+    assert "technical_test" in messages[0]
+    assert "Publication bibliothèque : aucune" in messages[0]
+    assert "archivé" not in messages[0].casefold()
 
 
 def test_history_detail_uses_friendly_paths(qapp, db, tmp_path) -> None:

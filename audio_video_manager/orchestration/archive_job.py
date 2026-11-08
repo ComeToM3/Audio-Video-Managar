@@ -20,7 +20,11 @@ from audio_video_manager.extraction.cd_ripper import (
     RipResult,
     create_job_workdir,
 )
-from audio_video_manager.orchestration.rip_lock import clear_rip_lock, write_rip_lock
+from audio_video_manager.orchestration.rip_lock import (
+    RipLockHeldError,
+    clear_rip_lock,
+    write_rip_lock,
+)
 from audio_video_manager.library.cover import (
     CoverMaterial,
     resolve_cover_for_sheet,
@@ -44,6 +48,7 @@ from audio_video_manager.library.transfer import transfer_file
 from audio_video_manager.logging_setup import get_logger
 from audio_video_manager.metadata.enums import JobMode
 from audio_video_manager.metadata.models import DiscMetadata
+from audio_video_manager.metadata.path_preview import sanitize_segment
 from audio_video_manager.metadata.toc_reader import DiscReadResult, read_disc_toc
 from audio_video_manager.metadata.validation import (
     ApprovalError,
@@ -379,7 +384,26 @@ def run_archive_job(
             flac_compression=flac_compression,
             eject_after_rip=eject_after_rip,
         )
-        write_rip_lock(rip_dir, job_id=job_id)
+        try:
+            write_rip_lock(rip_dir, job_id=job_id)
+        except RipLockHeldError as exc:
+            err = format_user_error(
+                kind=FailureKind.EXTRACTION,
+                summary="Extraction déjà en cours sur ce dossier de travail.",
+                technical=str(exc),
+                action="Attendez la fin de l’extraction en cours ou réessayez plus tard.",
+            )
+            _finish_failed(db, job_id, "Failed", err)
+            return ArchiveJobReport(
+                job_id=job_id,
+                workdir=workdir,
+                mode=JobMode.NORMAL,
+                metadata_id=meta_id,
+                state="Failed",
+                error=err,
+                failure_kind=FailureKind.EXTRACTION,
+                warnings=warnings,
+            )
         try:
             with perf.span("freac_rip") as meta:
                 rip = ripper.rip(
@@ -627,10 +651,20 @@ def run_archive_job(
                     warnings=warnings,
                     perf=perf.summary(),
                 )
-            dest_name = f"{track.number:02d} - {track.title}.flac"
-            # sanitize filename lightly
-            dest_name = re.sub(r'[<>:"/\\|?*]', "_", dest_name)
+            title_part = sanitize_segment(track.title or "", fallback="_")
+            dest_name = f"{track.number:02d} - {title_part}.flac"
             dest = tagged_dir / dest_name
+            if dest.exists():
+                # Collision (numéro dupliqué ou titres convergents après
+                # sanitisation) — jamais d'écrasement silencieux d'un FLAC déjà
+                # tagué (AVM-19 P1-9).
+                n = 2
+                while True:
+                    candidate = tagged_dir / f"{track.number:02d} - {title_part} ({n}).flac"
+                    if not candidate.exists():
+                        dest = candidate
+                        break
+                    n += 1
             # Copie physique : le tagging mutagen réécrit le fichier (pas de hardlink).
             shutil.copy2(flac_src, dest)
             apply_flac_tags(

@@ -5,13 +5,14 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QUrl
+from PySide6.QtCore import Qt, QUrl, Signal
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QMessageBox,
     QPushButton,
     QStackedWidget,
+    QTabBar,
     QVBoxLayout,
     QWidget,
 )
@@ -19,7 +20,7 @@ from PySide6.QtWidgets import (
 from audio_video_manager.config import AppConfig
 from audio_video_manager.logging_setup import get_logger
 from audio_video_manager.storage.database import Database
-from audio_video_manager.ui.sections.library_page import LibraryPage
+from audio_video_manager.ui.sections.library_page import LibraryPage, VideoLibraryPage
 
 log = get_logger("ui.library_host")
 
@@ -31,8 +32,8 @@ def resolve_library_ui_mode(config: AppConfig) -> str:
     env = (os.environ.get(ENV_FORCE) or "").strip().lower()
     if env in {"qml", "widgets"}:
         return env
-    mode = (getattr(config, "library_ui_mode", None) or "qml").strip().lower()
-    return mode if mode in {"qml", "widgets"} else "qml"
+    mode = (getattr(config, "library_ui_mode", None) or "widgets").strip().lower()
+    return mode if mode in {"qml", "widgets"} else "widgets"
 
 
 class LibraryHost(QWidget):
@@ -41,6 +42,8 @@ class LibraryHost(QWidget):
     - Mode QML : QQuickWidget + bridge sur Database partagée
     - Mode Widgets : LibraryPage 06L (repli explicite)
     """
+
+    busy_changed = Signal(bool)
 
     def __init__(self, config: AppConfig, db: Database, parent=None) -> None:
         super().__init__(parent)
@@ -67,8 +70,19 @@ class LibraryHost(QWidget):
         bar.addWidget(self.btn_toggle)
         root.addLayout(bar)
 
+        self.media_tabs = QTabBar()
+        self.media_tabs.addTab("Albums")
+        self.media_tabs.addTab("Vidéos / audio DVD")
+        self.media_tabs.setAccessibleName("Type de bibliothèque")
+        root.addWidget(self.media_tabs)
+        self._media_stack = QStackedWidget()
+        root.addWidget(self._media_stack, 1)
         self._stack = QStackedWidget()
-        root.addWidget(self._stack, 1)
+        self._media_stack.addWidget(self._stack)
+        self.video_page = VideoLibraryPage(db, config)
+        self.video_page.busy_changed.connect(self.busy_changed.emit)
+        self._media_stack.addWidget(self.video_page)
+        self.media_tabs.currentChanged.connect(self._media_stack.setCurrentIndex)
 
         # Widgets always available as fallback / test surface
         self.widgets_page = LibraryPage(config, db)
@@ -116,12 +130,20 @@ class LibraryHost(QWidget):
     def set_config(self, config: AppConfig) -> None:
         self._config = config
         self.widgets_page.set_config(config)
+        self.video_page.set_config(config)
 
     def refresh(self) -> None:
         self.widgets_page.refresh()
+        self.video_page.refresh()
         if self._bridge is not None:
             self._bridge.refresh()
             self._sync_qml_selection()
+
+    def is_busy(self) -> bool:
+        return self.video_page.is_busy()
+
+    def shutdown_background_work(self, *, timeout_ms: int = 12_000) -> bool:
+        return self.video_page.shutdown_background_work(timeout_ms=timeout_ms)
 
     def _sync_qml_selection(self) -> None:
         if self._bridge is None or self._quick is None:

@@ -37,6 +37,43 @@ class TrackRow:
 
 
 @dataclass(frozen=True)
+class VideoRow:
+    id: int
+    path: str
+    sha256: str
+    size_bytes: int
+    mtime_ns: int
+    format: str
+    duration_seconds: float
+    streams_json: str
+    chapters_json: str
+    validation_status: str
+    publication_state: str
+
+    @property
+    def path_exists(self) -> bool:
+        return Path(self.path).is_file()
+
+    @property
+    def path_matches(self) -> bool:
+        try:
+            stat = Path(self.path).stat()
+            return Path(self.path).is_file() and stat.st_size == self.size_bytes and stat.st_mtime_ns == self.mtime_ns
+        except OSError:
+            return False
+
+
+def list_videos(db: Database) -> list[VideoRow]:
+    rows = db.connect().execute("SELECT * FROM videos ORDER BY imported_at DESC, id DESC").fetchall()
+    return [VideoRow(
+        id=row["id"], path=row["path"], sha256=row["sha256"], size_bytes=row["size_bytes"], mtime_ns=row["mtime_ns"], format=row["format"],
+        duration_seconds=row["duration_seconds"], streams_json=row["streams_json"],
+        chapters_json=row["chapters_json"], validation_status=row["validation_status"],
+        publication_state=row["publication_state"],
+    ) for row in rows]
+
+
+@dataclass(frozen=True)
 class JobRow:
     id: str
     state: str

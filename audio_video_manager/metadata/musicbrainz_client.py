@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import socket
 import time
+from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any, Callable, Iterator
 
 from audio_video_manager.logging_setup import get_logger
 from audio_video_manager.metadata.musicbrainz_identity import (
@@ -17,6 +19,12 @@ log = get_logger("metadata.musicbrainz")
 
 # MusicBrainz : 1 req/s pour les apps anonymes — on reste conservateur
 MIN_INTERVAL_SEC = 1.1
+
+# Délai réseau borné — évite un blocage indéfini si la connexion est lente/perdue.
+DEFAULT_TIMEOUT_SEC = 15.0
+# Attente max acceptée pour un Retry-After (429) avant nouvel essai unique ;
+# au-delà, on échoue plutôt que d'attendre indéfiniment.
+MAX_RETRY_AFTER_SEC = 10.0
 
 
 class MusicBrainzError(RuntimeError):
@@ -94,6 +102,35 @@ def _rate_limit() -> None:
     if wait > 0:
         time.sleep(wait)
     _last_call_monotonic = time.monotonic()
+
+
+@contextmanager
+def _bounded_socket_timeout(seconds: float) -> Iterator[None]:
+    """Borne le délai réseau par défaut pendant l'appel (restauré ensuite)."""
+    previous = socket.getdefaulttimeout()
+    socket.setdefaulttimeout(seconds)
+    try:
+        yield
+    finally:
+        socket.setdefaulttimeout(previous)
+
+
+def _retry_after_seconds(exc: Exception) -> float | None:
+    """Extrait un en-tête ``Retry-After`` numérique de l'exception HTTP sous-jacente."""
+    cause = getattr(exc, "cause", None)
+    headers = getattr(cause, "headers", None)
+    if headers is None:
+        return None
+    try:
+        raw = headers.get("Retry-After")
+    except AttributeError:
+        return None
+    if not raw:
+        return None
+    try:
+        return float(raw)
+    except (TypeError, ValueError):
+        return None
 
 
 def _artist_credit_str(credit: Any) -> str:
@@ -205,12 +242,17 @@ def lookup_releases_by_discid(
     import musicbrainzngs
 
     fn = get_releases_fn or musicbrainzngs.get_releases_by_discid
+
+    def _call() -> dict[str, Any]:
+        with _bounded_socket_timeout(DEFAULT_TIMEOUT_SEC):
+            return fn(
+                disc_id,
+                includes=["artists", "recordings", "labels", "release-groups"],
+            )
+
     _rate_limit()
     try:
-        raw = fn(
-            disc_id,
-            includes=["artists", "recordings", "labels", "release-groups"],
-        )
+        raw = _call()
     except musicbrainzngs.ResponseError as exc:  # type: ignore[attr-defined]
         code = getattr(exc, "cause", None)
         status = getattr(code, "code", None) if code is not None else None
@@ -222,9 +264,38 @@ def lookup_releases_by_discid(
                 message="Aucun release MusicBrainz pour ce Disc ID (404).",
                 ambiguous=False,
             )
-        raise MusicBrainzError(f"Erreur MusicBrainz: {exc}") from exc
+        if status == 429:
+            retry_after = _retry_after_seconds(exc)
+            if retry_after is not None and 0 <= retry_after <= MAX_RETRY_AFTER_SEC:
+                log.info(
+                    "MusicBrainz 429 — attente %.1fs (Retry-After) puis nouvel essai unique",
+                    retry_after,
+                )
+                time.sleep(retry_after)
+                _rate_limit()
+                try:
+                    raw = _call()
+                except Exception as exc2:  # noqa: BLE001
+                    raise MusicBrainzError(
+                        f"MusicBrainz limite de débit (429) persistante après attente: {exc2}"
+                    ) from exc2
+            else:
+                suffix = (
+                    f" (Retry-After={retry_after:.0f}s, au-delà du délai accepté)"
+                    if retry_after is not None
+                    else ""
+                )
+                raise MusicBrainzError(
+                    f"MusicBrainz limite de débit (429) — réessayez plus tard{suffix}"
+                ) from exc
+        else:
+            raise MusicBrainzError(f"Erreur MusicBrainz: {exc}") from exc
     except musicbrainzngs.NetworkError as exc:  # type: ignore[attr-defined]
         raise MusicBrainzError(f"Réseau MusicBrainz: {exc}") from exc
+    except TimeoutError as exc:
+        raise MusicBrainzError(
+            f"Délai MusicBrainz dépassé ({DEFAULT_TIMEOUT_SEC:.0f}s): {exc}"
+        ) from exc
     except Exception as exc:  # noqa: BLE001
         raise MusicBrainzError(f"MusicBrainz: {exc}") from exc
 

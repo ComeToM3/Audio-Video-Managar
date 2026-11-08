@@ -21,6 +21,9 @@ class AppConfig:
 
     freaccmd_path: str = ""
     freac_install_dir: str = ""
+    # DVD-Video tools are optional and remain user-configured.
+    ffmpeg_path: str = ""
+    dvdnav_library_dir: str = ""
     library_root: str = field(default_factory=lambda: str(default_library_root()))
     jobs_dir: str = field(default_factory=lambda: str(default_jobs_dir()))
     log_dir: str = field(default_factory=lambda: str(default_log_dir()))
@@ -32,8 +35,8 @@ class AppConfig:
     preferred_release_country: str = "CA"
     # Futur : auto-approbation haute confiance — désactivé par défaut (D-015)
     auto_approve_high_confidence: bool = False
-    # AVM-08B — bibliothèque : "qml" (défaut) ou "widgets" (repli)
-    library_ui_mode: str = "qml"
+    # AVM-08B — Widgets par défaut; QML reste sélectionnable explicitement.
+    library_ui_mode: str = "widgets"
 
     def resolved_freaccmd(self) -> Path | None:
         raw = (self.freaccmd_path or "").strip()

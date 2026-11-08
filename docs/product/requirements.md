@@ -43,7 +43,7 @@ Archiver localement des **CD** (puis DVD) **originaux** en **FLAC**, dans une bi
 
 ### Hors MVP / reporté
 
-- Extraction DVD (D-010) — **métadonnées DVD** spécifiées dans [disc-metadata.md](../domain/disc-metadata.md) §7.
+- Archivage DVD (D-010) — inspection et services DVD-Video → MKV/MKA disponibles expérimentalement depuis AVM-11C/11D; validation sur DVD-Video synthétique uniquement. Extraction physique et DVD protégés restent sous réserve; aucun contournement CSS. Modèle esquissé dans [disc-metadata.md](../domain/disc-metadata.md) §7.
 - Contournement DRM, cloud, AcoustID, multi-lecteurs parallèles.
 - Sidecar `.avm-import.json` (D-007).
 

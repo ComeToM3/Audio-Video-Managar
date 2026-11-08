@@ -174,13 +174,14 @@ Transitions **interdites** en mode normal : `TocRead|Identifying → Ripping` sa
 
 ## 5. Interface
 
-1. Affichage TOC + candidats MusicBrainz + formulaire éditable (`DiscMetadataDialog`).
-2. Badges de confiance par champ (`confirmed` / `ambiguous` / `missing` / `unavailable`).
-3. Liste d’erreurs bloquantes vs avertissements.
-4. **Aperçu exact** des chemins fichiers/dossiers futurs (zone C), calculés depuis la fiche — caractères déjà sanitisés.
-5. Boutons : **Lire TOC + chercher MusicBrainz** · Appliquer l’édition · Enregistrer brouillon · Approuver · Refuser.
-6. Tant que non approuvé : bouton rip normal **désactivé**.
-7. Pochette : statut CAA + URL d’aperçu (pas d’auto-approve).
+Le parcours courant est le wizard de `audio_video_manager/ui/wizard/archive_wizard.py`; il n’ouvre pas de dialogue de métadonnées indépendant.
+
+1. Lecture TOC et identification asynchrone; à défaut de résultat en ligne, la fiche reste corrigeable manuellement.
+2. Choix d’une édition parmi les candidats MusicBrainz, avec aperçu de la pochette disponible.
+3. Étape de vérification éditable : artiste/titre d’album, année ou justification d’indisponibilité, compilation, label, catalogue, pays, numéro/total du disque et titre/artiste des pistes.
+4. Affichage des erreurs, avertissements, propositions de sources et **aperçu des chemins** futurs dans la bibliothèque.
+5. Enregistrement de brouillon ou approbation explicite; une modification après approbation révoque celle-ci. Le wizard ne propose pas de rejet séparé : l’utilisateur peut revenir à la sélection ou quitter le parcours.
+6. La pochette CAA peut être prévisualisée; une pochette absente peut être déclarée indisponible. Le wizard ne propose pas de saisie d’un chemin de pochette local.
 
 ---
 

@@ -133,15 +133,53 @@ def _pid_alive(pid: int) -> bool | None:
         return None
 
 
+class RipLockHeldError(RuntimeError):
+    """Un verrou de rip actif existe déjà pour ce dossier (autre processus vivant)."""
+
+
 def write_rip_lock(rip_dir: Path, *, job_id: str) -> Path:
+    """
+    Acquiert le verrou de rip de façon atomique (``O_CREAT|O_EXCL``).
+
+    AVM-19 (P1-3) : l'ancienne implémentation écrivait le verrou via
+    ``Path.write_text`` sans exclusivité OS — deux processus pouvaient chacun
+    écrire le fichier et se croire propriétaires. Un verrou existant dont le
+    détenteur est mort (ou dont l'identité PID ne correspond plus, cf. réutilisation
+    de PID) est repris automatiquement, comme pour le verrou de récupération
+    (``try_acquire_recovery_file_lock``). Un verrou détenu par un processus
+    actif lève ``RipLockHeldError`` plutôt que d'être silencieusement écrasé.
+    """
     path = lock_path_for_rip_dir(rip_dir)
+    path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "pid": os.getpid(),
         "job_id": job_id,
         "started_at": _utc_now(),
         "create_time": current_process_create_time(),
     }
-    path.write_text(json.dumps(payload, ensure_ascii=False) + "\n", encoding="utf-8")
+    flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+    try:
+        fd = os.open(str(path), flags)
+    except FileExistsError:
+        info = _parse_lock_file(path)
+        if is_lock_holder_active(info):
+            raise RipLockHeldError(
+                f"Verrou de rip déjà détenu (pid={info.pid}, job={info.job_id}) : {path}"
+            ) from None
+        try:
+            path.unlink()
+        except OSError:
+            pass
+        try:
+            fd = os.open(str(path), flags)
+        except FileExistsError:
+            raise RipLockHeldError(
+                f"Impossible d'acquérir le verrou de rip (contention) : {path}"
+            ) from None
+    try:
+        os.write(fd, (json.dumps(payload, ensure_ascii=False) + "\n").encode("utf-8"))
+    finally:
+        os.close(fd)
     return path
 
 

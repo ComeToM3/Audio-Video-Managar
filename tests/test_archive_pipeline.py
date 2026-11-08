@@ -228,8 +228,10 @@ def test_archive_pipeline_publish(tmp_path: Path) -> None:
     row = conn.execute("SELECT state, selected_release_mbid FROM jobs WHERE id=?", (report.job_id,)).fetchone()
     assert row["state"].startswith("Completed")
     assert row["selected_release_mbid"] == "mbid-release-test"
-    rel = conn.execute("SELECT album FROM releases").fetchone()
+    rel = conn.execute("SELECT album, path FROM releases").fetchone()
     assert rel["album"] == "Demo Album"
+    assert Path(rel["path"]) == album
+    assert album.is_dir()
     db.close()
 
 

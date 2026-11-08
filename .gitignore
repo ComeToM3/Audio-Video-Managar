@@ -76,6 +76,9 @@ temp/
 
 # Ripped / extracted media (never commit)
 library/
+!/audio_video_manager/library/
+/audio_video_manager/library/*
+!/audio_video_manager/library/video_archive.py
 exports/
 imports/
 *.flac

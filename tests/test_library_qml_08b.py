@@ -76,12 +76,19 @@ def _seed(db: Database, album: Path) -> None:
 
 def test_resolve_mode_env_and_config(config, monkeypatch) -> None:
     monkeypatch.delenv("AVM_LIBRARY_UI", raising=False)
+    default_config = AppConfig()
+    assert default_config.library_ui_mode == "widgets"
+    assert resolve_library_ui_mode(default_config) == "widgets"
+    config.library_ui_mode = "qml"
     assert resolve_library_ui_mode(config) == "qml"
     config.library_ui_mode = "widgets"
     assert resolve_library_ui_mode(config) == "widgets"
     monkeypatch.setenv("AVM_LIBRARY_UI", "widgets")
     config.library_ui_mode = "qml"
     assert resolve_library_ui_mode(config) == "widgets"
+    monkeypatch.setenv("AVM_LIBRARY_UI", "qml")
+    config.library_ui_mode = "widgets"
+    assert resolve_library_ui_mode(config) == "qml"
 
 
 def test_bridge_loads_shared_db(qapp, config, db, tmp_path) -> None:

@@ -26,7 +26,7 @@ Précisions AVM-03 : distinguer **identification disque** (TOC/Disc ID) et **éd
 
 ### D-009 — Doublons — `ACCEPTÉ` — jamais d’écrasement silencieux
 
-### D-010 — DVD extraction — `REPORTÉ` — métadonnées DVD prévues en doc (AVM-02B), pas d’extract
+### D-010 — DVD-Video — `ACCEPTÉ SOUS RÉSERVE` — inspection en lecture seule et développement du moteur autorisés pour les supports non protégés dont l'accès est autorisé. Aucun contournement de protection. DVD-Audio hors périmètre; archivage opérationnel non autorisé avant validation matérielle distincte.
 
 ---
 
@@ -97,3 +97,4 @@ Précisions AVM-03 : distinguer **identification disque** (TOC/Disc ID) et **éd
 | 2026-11-03 | **AVM-04B** : ID réelle Queen GH ; mapping fre:ac≠lettre ; GO AVM-05 |
 | 2026-11-03 | **AVM-04C** : D-015 sélection intelligente ; préférence CA ; pas d’auto-approve |
 | 2026-11-03 | **AVM-05** : pipeline archive A→B→C ; mutagen ; SQLite v3 ; GO rip contrôlé |
+| 2026-11-06 | **AVM-11B** : D-010 autorise l’inspection DVD-Video non protégée en lecture seule; archivage opérationnel, DVD-Audio et contournement de protections restent hors périmètre. Backend local `dvdvideo` absent, inspection physique non validée. |

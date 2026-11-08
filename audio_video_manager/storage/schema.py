@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 SCHEMA_SQL_V1 = """
 CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -94,6 +94,27 @@ SCHEMA_SQL_V4 = """
 -- jobs.disc_id + index MBID (doublons AVM-06K) via migration Python ALTER
 CREATE INDEX IF NOT EXISTS idx_releases_mbid ON releases(mbid);
 CREATE INDEX IF NOT EXISTS idx_jobs_disc_id ON jobs(disc_id);
+"""
+
+SCHEMA_SQL_V5 = """
+CREATE TABLE IF NOT EXISTS videos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    path TEXT NOT NULL UNIQUE,
+    sha256 TEXT NOT NULL UNIQUE,
+    size_bytes INTEGER NOT NULL,
+    mtime_ns INTEGER NOT NULL,
+    format TEXT NOT NULL,
+    duration_seconds REAL NOT NULL,
+    streams_json TEXT NOT NULL,
+    chapters_json TEXT NOT NULL,
+    validation_status TEXT NOT NULL CHECK (
+        validation_status IN ('decodable', 'source_verified', 'incomplete')
+    ),
+    publication_state TEXT NOT NULL CHECK (
+        publication_state IN ('pending', 'published')
+    ),
+    imported_at TEXT NOT NULL
+);
 """
 
 # Conservé pour compat tests anciens imports

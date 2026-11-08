@@ -78,10 +78,14 @@ class SettingsPage(QWidget):
         self._config = config
         self.edit_library.setText(config.library_root)
         self.edit_library.setToolTip(path_tooltip(config.library_root))
-        mode = (config.library_ui_mode or "qml").strip().lower()
-        self.combo_lib_ui.setCurrentIndex(0 if mode != "widgets" else 1)
+        mode = (config.library_ui_mode or "widgets").strip().lower()
+        self.combo_lib_ui.setCurrentIndex(0 if mode == "qml" else 1)
         self.edit_freaccmd.setText(config.freaccmd_path)
         self.edit_freaccmd.setToolTip(path_tooltip(config.freaccmd_path))
+        self.edit_ffmpeg.setText(config.ffmpeg_path)
+        self.edit_ffmpeg.setToolTip(path_tooltip(config.ffmpeg_path))
+        self.edit_dvdnav.setText(config.dvdnav_library_dir)
+        self.edit_dvdnav.setToolTip(path_tooltip(config.dvdnav_library_dir))
         self.edit_jobs.setText(config.jobs_dir)
         self.edit_jobs.setToolTip(path_tooltip(config.jobs_dir))
         self.edit_logs.setText(config.log_dir)
@@ -114,12 +118,18 @@ class SettingsPage(QWidget):
         browse = QPushButton("…")
         browse.setAccessibleName("Parcourir le dossier bibliothèque")
         browse.clicked.connect(self._browse_lib)
-        form.addRow("Dossier :", self._path_row(self.edit_library, browse))
+        form.addRow("Destination des albums :", self._path_row(self.edit_library, browse))
+        library_hint = QLabel(
+            "Les albums CD archivés seront publiés ici. Les fichiers de travail restent dans le dossier temporaire."
+        )
+        library_hint.setWordWrap(True)
+        library_hint.setProperty("role", "muted")
+        form.addRow(library_hint)
         self.combo_lib_ui = QComboBox()
         self.combo_lib_ui.addItem("Interface moderne (QML)", "qml")
         self.combo_lib_ui.addItem("Interface classique (Widgets)", "widgets")
-        mode = (self._config.library_ui_mode or "qml").strip().lower()
-        self.combo_lib_ui.setCurrentIndex(0 if mode != "widgets" else 1)
+        mode = (self._config.library_ui_mode or "widgets").strip().lower()
+        self.combo_lib_ui.setCurrentIndex(0 if mode == "qml" else 1)
         self.combo_lib_ui.setAccessibleName("Mode d’affichage de la bibliothèque")
         form.addRow("Affichage :", self.combo_lib_ui)
         hint = QLabel(
@@ -161,6 +171,25 @@ class SettingsPage(QWidget):
         hint.setProperty("role", "muted")
         hint.setWordWrap(True)
         form.addRow(hint)
+        self.edit_ffmpeg = QLineEdit(self._config.ffmpeg_path)
+        self.edit_ffmpeg.setToolTip(path_tooltip(self._config.ffmpeg_path))
+        ffmpeg_browse = QPushButton("…")
+        ffmpeg_browse.setAccessibleName("Parcourir ffmpeg pour DVD-Video")
+        ffmpeg_browse.clicked.connect(self._browse_ffmpeg)
+        form.addRow("FFmpeg DVD-Video :", self._path_row(self.edit_ffmpeg, ffmpeg_browse))
+        self.edit_dvdnav = QLineEdit(self._config.dvdnav_library_dir)
+        self.edit_dvdnav.setToolTip(path_tooltip(self._config.dvdnav_library_dir))
+        dvdnav_browse = QPushButton("…")
+        dvdnav_browse.setAccessibleName("Parcourir les DLL libdvdnav/libdvdread")
+        dvdnav_browse.clicked.connect(self._browse_dvdnav)
+        form.addRow("Bibliothèques DVD :", self._path_row(self.edit_dvdnav, dvdnav_browse))
+        dvd_hint = QLabel(
+            "Utilisez un build FFmpeg avec dvdvideo et des DLL libdvdnav/libdvdread "
+            "CSS-off. Aucun déchiffrement n’est pris en charge."
+        )
+        dvd_hint.setWordWrap(True)
+        dvd_hint.setProperty("role", "muted")
+        form.addRow(dvd_hint)
         self.spin_flac = QSpinBox()
         self.spin_flac.setRange(0, 8)
         self.spin_flac.setValue(int(self._config.flac_compression))
@@ -186,8 +215,9 @@ class SettingsPage(QWidget):
         chk.setEnabled(False)
         form.addRow(chk)
 
-        dvd = QLabel("DVD : prévu ultérieurement (non disponible).")
+        dvd = QLabel("DVD-Video : choisissez ce type de disque dans Archiver.")
         dvd.setProperty("role", "muted")
+        dvd.setWordWrap(True)
         form.addRow(dvd)
 
         tech = QPushButton("Lancer un test technique (zone temporaire uniquement)…")
@@ -224,10 +254,33 @@ class SettingsPage(QWidget):
             self.edit_freaccmd.setText(path)
             self.edit_freaccmd.setToolTip(path)
 
+    def _browse_ffmpeg(self) -> None:
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            "ffmpeg.exe",
+            self.edit_ffmpeg.text() or str(Path.home()),
+            "Exécutables (*.exe);;Tous (*.*)",
+        )
+        if path:
+            self.edit_ffmpeg.setText(path)
+            self.edit_ffmpeg.setToolTip(path)
+
+    def _browse_dvdnav(self) -> None:
+        path = QFileDialog.getExistingDirectory(
+            self,
+            "Dossier contenant libdvdnav-4.dll et libdvdread-8.dll",
+            self.edit_dvdnav.text() or str(Path.home()),
+        )
+        if path:
+            self.edit_dvdnav.setText(path)
+            self.edit_dvdnav.setToolTip(path)
+
     def _read(self) -> AppConfig:
         c = self._config
         c.library_root = self.edit_library.text().strip()
         c.freaccmd_path = self.edit_freaccmd.text().strip()
+        c.ffmpeg_path = self.edit_ffmpeg.text().strip()
+        c.dvdnav_library_dir = self.edit_dvdnav.text().strip()
         c.jobs_dir = self.edit_jobs.text().strip()
         c.log_dir = self.edit_logs.text().strip()
         c.flac_compression = int(self.spin_flac.value())
@@ -235,7 +288,7 @@ class SettingsPage(QWidget):
         pref = (self.edit_pref.text() or "CA").strip().upper()
         c.preferred_release_country = pref or "CA"
         c.auto_approve_high_confidence = False
-        c.library_ui_mode = self.combo_lib_ui.currentData() or "qml"
+        c.library_ui_mode = self.combo_lib_ui.currentData() or "widgets"
         return c
 
     def _save(self) -> None:

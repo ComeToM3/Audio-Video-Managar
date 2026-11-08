@@ -28,7 +28,6 @@ WIN_ACCESS_VIOLATION = 0xC0000005  # 3221225477
 WIN_STACK_BUFFER = 0xC0000409  # 3221226505
 
 UI_FILES = [
-    "tests/test_metadata_dialog_sources.py",
     "tests/test_history_06n.py",
     "tests/test_ux_06o.py",
     "tests/test_ui_design_06l.py",
@@ -63,6 +62,9 @@ DOMAIN_GLOBS = [
     "tests/test_rip_check.py",
     "tests/test_rip_job.py",
     "tests/test_disc_metadata.py",
+    "tests/test_dvd_inspector_11b.py",
+    "tests/test_dvd_extractor_11c.py",
+    "tests/test_video_archive_15.py",
     "tests/test_musicbrainz_identify.py",
     "tests/test_edition_ranker.py",
     "tests/test_approval_fingerprint.py",
@@ -71,6 +73,7 @@ DOMAIN_GLOBS = [
     "tests/test_drives.py",
     "tests/test_cover_cache.py",
     "tests/test_progress_labels.py",
+    "tests/test_avm19_stabilization.py",
 ]
 
 

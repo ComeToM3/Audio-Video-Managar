@@ -18,7 +18,7 @@ Spec fiche : [disc-metadata.md](../domain/disc-metadata.md).
 | **4c** | **UI-0 + UI-1** | **Livré** (AVM-06) | Coquille 4 sections + wizard 5 étapes · [rapport](../ux/reports/AVM-06-UI-0-UI-1.md) — **attendre validation avant rip réel** |
 | **4d** | **Premier rip réel** | Bloqué | Mandat **AVM-06C** après GO UI-1 |
 | 5 | Qualité rip avancée | Plus tard | AccurateRip / secure |
-| 6 | DVD | Reporté D-010 | Métadonnées déjà esquissées ; extraction plus tard |
+| 6 | DVD-Video | Service MKV/MKA + interface expérimentale (AVM-11C/11D); test synthétique validé | Valider extraction sur média optique autorisé avant usage opérationnel; DVD protégés hors périmètre sans avis juridique; aucun contournement CSS |
 
 ```text
 AVANT (implicite AVM-02) :  rip → (meta plus tard)
