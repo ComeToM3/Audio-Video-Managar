@@ -67,6 +67,7 @@ class DiscogsReleaseEvidence:
     tracks: tuple[DiscogsTrack, ...]
     data_quality: str | None
     copyright_notice_years: tuple[int, ...] = ()
+    cover_url: str | None = None
 
 
 @dataclass(frozen=True)
@@ -251,6 +252,21 @@ def _parse_release(data: dict[str, Any]) -> DiscogsReleaseEvidence:
         for description in [fmt.get("name"), *(fmt.get("descriptions") or [])]
         if description
     )
+    images = [item for item in data.get("images", []) if isinstance(item, dict)]
+    primary_image = next(
+        (item for item in images if str(item.get("type", "")).casefold() == "primary"),
+        images[0] if images else None,
+    )
+    cover_url = None
+    if primary_image is not None:
+        image_url = str(primary_image.get("uri") or primary_image.get("uri150") or "")
+        parsed_image_url = urlsplit(image_url)
+        if (
+            parsed_image_url.scheme == "https"
+            and parsed_image_url.hostname
+            and parsed_image_url.hostname.casefold().endswith(".discogs.com")
+        ):
+            cover_url = image_url
     tracks: list[DiscogsTrack] = []
     for item in data.get("tracklist", []):
         if not isinstance(item, dict) or item.get("type_") not in (None, "track"):
@@ -296,6 +312,7 @@ def _parse_release(data: dict[str, Any]) -> DiscogsReleaseEvidence:
         tracks=tuple(tracks),
         data_quality=str(data["data_quality"]) if data.get("data_quality") else None,
         copyright_notice_years=copyright_years,
+        cover_url=cover_url,
     )
 
 
@@ -369,6 +386,29 @@ def _normal_title(value: str) -> str:
         )
         .split()
     )
+
+
+def verified_discogs_cover_url(
+    candidate: ReleaseCandidate,
+    lookup: DiscogsLookup | None,
+) -> str | None:
+    """Use a Discogs image only when an exact-barcode release also matches the candidate."""
+    if lookup is None or lookup.status != "matched" or lookup.release is None:
+        return None
+    release = lookup.release
+    if (
+        not release.cover_url
+        or _digits(candidate.barcode) != _digits(release.barcode)
+        or not _normal_title(candidate.title)
+        or _normal_title(candidate.title) != _normal_title(release.title)
+    ):
+        return None
+    if candidate.track_titles and release.tracks:
+        candidate_titles = [_normal_title(title) for title in candidate.track_titles]
+        release_titles = [_normal_title(track.title) for track in release.tracks]
+        if candidate_titles != release_titles:
+            return None
+    return release.cover_url
 
 
 def build_enrichment_report(
@@ -507,6 +547,18 @@ def build_enrichment_report(
         return result
 
     confidence = "faible" if (release.data_quality or "").casefold() == "needs vote" else "moyenne"
+    if release.cover_url:
+        result.proposals.append(
+            MetadataEvidence(
+                field="cover_url",
+                value=release.cover_url,
+                source="Discogs",
+                source_url=release.source_url,
+                confidence=confidence,
+                note="Image issue d’un résultat au code-barres exact; l’édition et la tracklist sont comparées à MusicBrainz.",
+                retrieved_at=now,
+            )
+        )
     result.proposals.extend(
         [
             MetadataEvidence(

@@ -78,6 +78,7 @@ class DiscReadResult:
     toc: TocSnapshot
     device: str
     submission_url: str | None = None
+    toc_string: str | None = None
 
 
 def read_disc_toc(device: str | None = None) -> DiscReadResult:
@@ -128,6 +129,7 @@ def read_disc_toc(device: str | None = None) -> DiscReadResult:
         toc=toc,
         device=str(device or discid.get_default_device()),
         submission_url=getattr(disc, "submission_url", None),
+        toc_string=str(getattr(disc, "toc_string", "") or "") or None,
     )
     log.info(
         "TOC lue device=%s disc_id=%s tracks=%s",

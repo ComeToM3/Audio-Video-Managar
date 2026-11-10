@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import uuid
 from pathlib import Path
 
 from PySide6.QtCore import QSize, Qt, QUrl, Signal
-from PySide6.QtGui import QDesktopServices, QIcon, QPixmap
+from PySide6.QtGui import QDesktopServices, QIcon, QImage, QPixmap
 from PySide6.QtWidgets import (
+    QFileDialog,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -352,12 +354,23 @@ class LibraryPage(QWidget):
         self.chip_status.hide()
         meta_col.addWidget(self.chip_status, 0, Qt.AlignmentFlag.AlignLeft)
         head.addLayout(meta_col, 1)
+        actions = QHBoxLayout()
+        self.btn_cover = QPushButton("Ajouter/remplacer la pochette")
+        self.btn_cover.setAccessibleName("Ajouter ou remplacer la pochette de l’album")
+        self.btn_cover.setToolTip(
+            "Choisir une image locale et la conserver dans le dossier de cet album."
+        )
+        self.btn_cover.setEnabled(False)
+        self.btn_cover.clicked.connect(self._choose_cover)
+        actions.addWidget(self.btn_cover)
+        actions.addStretch(1)
         self.btn_open_album = QPushButton("Ouvrir le dossier album")
         self.btn_open_album.setEnabled(False)
         self.btn_open_album.setProperty("primary", True)
         self.btn_open_album.clicked.connect(self._open_album)
-        head.addWidget(self.btn_open_album, 0, Qt.AlignmentFlag.AlignTop)
+        actions.addWidget(self.btn_open_album)
         dv.addLayout(head)
+        dv.addLayout(actions)
 
         self.tbl_tracks = QTableWidget(0, 3)
         self.tbl_tracks.setHorizontalHeaderLabels(["#", "Titre", "Durée"])
@@ -482,6 +495,7 @@ class LibraryPage(QWidget):
             self.lbl_detail.setText("Aucun album à afficher.")
             self.tbl_tracks.setRowCount(0)
             self.btn_open_album.setEnabled(False)
+            self.btn_cover.setEnabled(False)
             self.cover_label.clear()
             self.cover_label.setText("—")
             self.chip_status.hide()
@@ -537,6 +551,70 @@ class LibraryPage(QWidget):
             self.tbl_tracks.setItem(i, 1, QTableWidgetItem(title))
             self.tbl_tracks.setItem(i, 2, QTableWidgetItem(dur))
         self.btn_open_album.setEnabled(row.path_exists)
+        self.btn_cover.setEnabled(row.path_exists)
+
+    def _choose_cover(self) -> None:
+        row = self._selected
+        if row is None or not row.path:
+            return
+        album_dir = Path(row.path)
+        if not album_dir.is_dir():
+            QMessageBox.warning(self, "Pochette", "Le dossier de cet album est introuvable.")
+            return
+        selected, _filter = QFileDialog.getOpenFileName(
+            self,
+            "Choisir la pochette de l’album",
+            "",
+            "Images (*.jpg *.jpeg *.png)",
+        )
+        if not selected:
+            return
+        source = Path(selected)
+        try:
+            image_data = source.read_bytes()
+        except OSError as exc:
+            QMessageBox.warning(self, "Pochette", f"Lecture de l’image impossible : {exc}")
+            return
+        if not image_data or QImage.fromData(image_data).isNull():
+            QMessageBox.warning(
+                self,
+                "Pochette",
+                "Le fichier choisi n’est pas une image décodable par AVM.",
+            )
+            return
+
+        existing = _album_cover_path(str(album_dir))
+        if existing is not None:
+            answer = QMessageBox.question(
+                self,
+                "Remplacer la pochette",
+                "Une pochette existe déjà. La remplacer par l’image choisie ?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No,
+            )
+            if answer != QMessageBox.StandardButton.Yes:
+                return
+
+        destination = album_dir / "cover.jpg"
+        temporary = album_dir / f".cover-{uuid.uuid4().hex}.tmp"
+        try:
+            temporary.write_bytes(image_data)
+            temporary.replace(destination)
+        except OSError as exc:
+            QMessageBox.warning(self, "Pochette", f"Écriture dans la bibliothèque impossible : {exc}")
+            return
+        finally:
+            try:
+                temporary.unlink(missing_ok=True)
+            except OSError:
+                pass
+
+        self.refresh()
+        for index in range(self.list.count()):
+            item = self.list.item(index)
+            if int(item.data(Qt.ItemDataRole.UserRole)) == row.id:
+                self.list.setCurrentItem(item)
+                break
 
     def _open_album(self) -> None:
         row = self._selected

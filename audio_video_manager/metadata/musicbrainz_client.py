@@ -58,6 +58,16 @@ class ReleaseCandidate:
     release_group_secondary_types: list[str] = field(default_factory=list)
     score_notes: list[str] = field(default_factory=list)
     toc_match: str = "unknown"  # exact | partial | mismatch | unknown
+    match_source: str = "discid"  # discid | toc | cdstub
+    is_cdstub: bool = False
+    disc_id: str | None = None
+    medium_track_count: int | None = None
+
+    @property
+    def selection_key(self) -> str:
+        if self.is_cdstub:
+            return f"cdstub:{self.disc_id or self.title or self.artist_credit}"
+        return self.release_id
 
 
 @dataclass
@@ -231,6 +241,7 @@ def lookup_releases_by_discid(
     disc_id: str,
     *,
     toc_durations_ms: list[int] | None = None,
+    toc_string: str | None = None,
     get_releases_fn: Callable[..., dict[str, Any]] | None = None,
 ) -> DiscLookupResult:
     """
@@ -243,43 +254,38 @@ def lookup_releases_by_discid(
 
     fn = get_releases_fn or musicbrainzngs.get_releases_by_discid
 
-    def _call() -> dict[str, Any]:
+    def _call(**query: Any) -> dict[str, Any]:
         with _bounded_socket_timeout(DEFAULT_TIMEOUT_SEC):
             return fn(
                 disc_id,
                 includes=["artists", "recordings", "labels", "release-groups"],
+                **query,
             )
 
-    _rate_limit()
-    try:
-        raw = _call()
-    except musicbrainzngs.ResponseError as exc:  # type: ignore[attr-defined]
-        code = getattr(exc, "cause", None)
-        status = getattr(code, "code", None) if code is not None else None
-        if status == 404:
-            return DiscLookupResult(
-                disc_id=disc_id,
-                candidates=[],
-                raw_release_count=0,
-                message="Aucun release MusicBrainz pour ce Disc ID (404).",
-                ambiguous=False,
-            )
-        if status == 429:
-            retry_after = _retry_after_seconds(exc)
-            if retry_after is not None and 0 <= retry_after <= MAX_RETRY_AFTER_SEC:
-                log.info(
-                    "MusicBrainz 429 — attente %.1fs (Retry-After) puis nouvel essai unique",
-                    retry_after,
-                )
-                time.sleep(retry_after)
-                _rate_limit()
-                try:
-                    raw = _call()
-                except Exception as exc2:  # noqa: BLE001
-                    raise MusicBrainzError(
-                        f"MusicBrainz limite de débit (429) persistante après attente: {exc2}"
-                    ) from exc2
-            else:
+    def _request(**query: Any) -> dict[str, Any] | None:
+        _rate_limit()
+        try:
+            return _call(**query)
+        except musicbrainzngs.ResponseError as exc:  # type: ignore[attr-defined]
+            cause = getattr(exc, "cause", None)
+            status = getattr(cause, "code", None) if cause is not None else None
+            if status == 404:
+                return None
+            if status == 429:
+                retry_after = _retry_after_seconds(exc)
+                if retry_after is not None and 0 <= retry_after <= MAX_RETRY_AFTER_SEC:
+                    log.info(
+                        "MusicBrainz 429 — attente %.1fs puis nouvel essai unique",
+                        retry_after,
+                    )
+                    time.sleep(retry_after)
+                    _rate_limit()
+                    try:
+                        return _call(**query)
+                    except Exception as retry_exc:  # noqa: BLE001
+                        raise MusicBrainzError(
+                            f"MusicBrainz limite de débit (429) persistante après attente: {retry_exc}"
+                        ) from retry_exc
                 suffix = (
                     f" (Retry-After={retry_after:.0f}s, au-delà du délai accepté)"
                     if retry_after is not None
@@ -288,27 +294,48 @@ def lookup_releases_by_discid(
                 raise MusicBrainzError(
                     f"MusicBrainz limite de débit (429) — réessayez plus tard{suffix}"
                 ) from exc
-        else:
             raise MusicBrainzError(f"Erreur MusicBrainz: {exc}") from exc
-    except musicbrainzngs.NetworkError as exc:  # type: ignore[attr-defined]
-        raise MusicBrainzError(f"Réseau MusicBrainz: {exc}") from exc
-    except TimeoutError as exc:
-        raise MusicBrainzError(
-            f"Délai MusicBrainz dépassé ({DEFAULT_TIMEOUT_SEC:.0f}s): {exc}"
-        ) from exc
-    except Exception as exc:  # noqa: BLE001
-        raise MusicBrainzError(f"MusicBrainz: {exc}") from exc
+        except musicbrainzngs.NetworkError as exc:  # type: ignore[attr-defined]
+            raise MusicBrainzError(f"Réseau MusicBrainz: {exc}") from exc
+        except TimeoutError as exc:
+            raise MusicBrainzError(
+                f"Délai MusicBrainz dépassé ({DEFAULT_TIMEOUT_SEC:.0f}s): {exc}"
+            ) from exc
+        except Exception as exc:  # noqa: BLE001
+            raise MusicBrainzError(f"MusicBrainz: {exc}") from exc
 
-    # Format: {'disc': {... 'release-list': [...]}} ou {'release-list': ...}
-    disc_block = raw.get("disc") if isinstance(raw, dict) else None
-    release_list: list[dict[str, Any]]
-    if isinstance(disc_block, dict) and "release-list" in disc_block:
-        release_list = list(disc_block.get("release-list") or [])
-    else:
-        release_list = list((raw or {}).get("release-list") or [])
+    def _release_list(raw: dict[str, Any] | None) -> list[dict[str, Any]]:
+        disc_block = raw.get("disc") if isinstance(raw, dict) else None
+        if isinstance(disc_block, dict) and "release-list" in disc_block:
+            return list(disc_block.get("release-list") or [])
+        return list((raw or {}).get("release-list") or [])
+
+    exact_raw = _request()
+    exact_releases = _release_list(exact_raw)
+    stub_data = (exact_raw or {}).get("cdstub")
+    release_list = exact_releases
+    match_source = "discid"
+    fuzzy_error: str | None = None
+    if not exact_releases and toc_string:
+        try:
+            fuzzy_raw = _request(toc=toc_string, cdstubs=False)
+        except MusicBrainzError as exc:
+            if stub_data is None:
+                raise
+            fuzzy_error = str(exc)
+        else:
+            release_list = _release_list(fuzzy_raw)
+            if release_list:
+                match_source = "toc"
 
     candidates: list[ReleaseCandidate] = []
+    seen_release_ids: set[str] = set()
     for rel in release_list:
+        release_id = str(rel.get("id", ""))
+        if release_id and release_id in seen_release_ids:
+            continue
+        if release_id:
+            seen_release_ids.add(release_id)
         labels, catalogs = _extract_labels(rel)
         date = rel.get("date")
         mediums = rel.get("medium-list") or []
@@ -322,7 +349,22 @@ def lookup_releases_by_discid(
                 matched_pos = int(med.get("position") or 1)
                 break
         if chosen is None and mediums:
-            chosen = mediums[0]
+            if toc_durations_ms is None:
+                chosen = mediums[0]
+            else:
+                def medium_score(medium: dict[str, Any]) -> tuple[int, int]:
+                    _, _, durations, _ = _medium_tracks(medium)
+                    match, _ = compare_toc_to_medium(toc_durations_ms, durations)
+                    priority = {"exact": 0, "partial": 1, "mismatch": 2, "unknown": 3}
+                    delta = sum(
+                        abs(source - target)
+                        for source, target in zip(toc_durations_ms, durations)
+                        if target is not None
+                    )
+                    delta += abs(len(toc_durations_ms) - len(durations)) * 1_000_000
+                    return priority[match], delta
+
+                chosen = min(mediums, key=medium_score)
             matched_pos = int(chosen.get("position") or 1)
 
         titles: list[str] = []
@@ -366,21 +408,78 @@ def lookup_releases_by_discid(
                 ],
                 score_notes=notes,
                 toc_match=toc_match,
+                match_source=match_source,
+                disc_id=disc_id,
+                medium_track_count=len(titles),
             )
         )
 
-    ambiguous = len(candidates) > 1
-    if not candidates:
-        msg = "MusicBrainz: Disc ID connu sans release-list exploitable."
-    elif ambiguous:
+    if isinstance(stub_data, dict):
+        raw_tracks = stub_data.get("track-list") or []
+        if isinstance(raw_tracks, dict):
+            raw_tracks = raw_tracks.get("track") or raw_tracks.get("track-list") or []
+        if not isinstance(raw_tracks, list):
+            raw_tracks = []
+        track_titles = [str(track.get("title") or "") for track in raw_tracks]
+        track_artists = [
+            _artist_credit_str(track.get("artist-credit") or track.get("artist") or "")
+            for track in raw_tracks
+        ]
+        track_durations: list[int | None] = []
+        for track in raw_tracks:
+            try:
+                track_durations.append(int(track["length"]) if track.get("length") is not None else None)
+            except (TypeError, ValueError):
+                track_durations.append(None)
+        stub_id = str(stub_data.get("id") or disc_id)
+        candidates.append(
+            ReleaseCandidate(
+                release_id="",
+                title=str(stub_data.get("title") or ""),
+                artist_credit=str(stub_data.get("artist") or ""),
+                barcode=str(stub_data["barcode"]) if stub_data.get("barcode") else None,
+                track_titles=track_titles,
+                track_artists=track_artists,
+                track_durations_ms=track_durations,
+                match_source="cdstub",
+                is_cdstub=True,
+                disc_id=stub_id,
+                medium_track_count=(
+                    len(raw_tracks)
+                    or int(stub_data.get("count") or stub_data.get("track-count") or 0)
+                    or None
+                ),
+            )
+        )
+
+    release_candidates = [candidate for candidate in candidates if not candidate.is_cdstub]
+    has_stub = any(candidate.is_cdstub for candidate in candidates)
+    ambiguous = len(release_candidates) > 1 or has_stub
+    if release_candidates and match_source == "toc":
+        msg = f"{len(release_candidates)} édition(s) trouvée(s) par correspondance TOC."
+    elif release_candidates and len(release_candidates) > 1:
         msg = (
-            f"{len(candidates)} éditions candidates — sélection manuelle requise "
+            f"{len(release_candidates)} éditions candidates — sélection manuelle requise "
             "(rééditions / pays / labels possibles)."
         )
-    else:
+    elif release_candidates:
         msg = "1 édition candidate MusicBrainz."
+    elif has_stub:
+        msg = "CD stub MusicBrainz disponible; métadonnées provisoires, sans édition confirmée."
+        if fuzzy_error:
+            msg += f" Recherche TOC indisponible : {fuzzy_error}"
+    elif toc_string:
+        msg = "Aucune édition MusicBrainz pour ce Disc ID ni pour la TOC."
+    else:
+        msg = "Aucun release MusicBrainz pour ce Disc ID (404)."
 
-    log.info("MB discid=%s candidates=%s", disc_id, len(candidates))
+    log.info(
+        "MB discid=%s source=%s releases=%s stubs=%s",
+        disc_id,
+        match_source,
+        len(release_candidates),
+        int(has_stub),
+    )
     return DiscLookupResult(
         disc_id=disc_id,
         candidates=candidates,

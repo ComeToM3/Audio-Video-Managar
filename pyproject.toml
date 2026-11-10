@@ -34,8 +34,6 @@ audio_video_manager = [
     "ui/fonts/*.ttf",
     "ui/fonts/*.txt",
     "ui/assets/*",
-    "ui/qml/*.qml",
-    "ui/qml/AvmLibrary/*",
 ]
 
 [tool.pytest.ini_options]

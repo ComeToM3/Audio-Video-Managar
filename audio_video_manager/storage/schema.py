@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 
 SCHEMA_SQL_V1 = """
 CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -115,6 +115,29 @@ CREATE TABLE IF NOT EXISTS videos (
     ),
     imported_at TEXT NOT NULL
 );
+"""
+
+SCHEMA_SQL_V6 = """
+CREATE TABLE IF NOT EXISTS android_transfers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_serial TEXT NOT NULL,
+    track_id INTEGER NOT NULL REFERENCES tracks(id) ON DELETE RESTRICT,
+    source_path TEXT NOT NULL,
+    source_sha256 TEXT NOT NULL,
+    source_size_bytes INTEGER NOT NULL CHECK (source_size_bytes >= 0),
+    source_mtime_ns INTEGER NOT NULL,
+    destination_path TEXT NOT NULL,
+    staging_path TEXT,
+    status TEXT NOT NULL CHECK (status IN ('pending', 'succeeded', 'failed')),
+    attempted_at TEXT NOT NULL,
+    verified_at TEXT,
+    error_summary TEXT,
+    UNIQUE (device_serial, track_id, source_sha256),
+    UNIQUE (device_serial, destination_path)
+);
+
+CREATE INDEX IF NOT EXISTS idx_android_transfers_device_track
+    ON android_transfers(device_serial, track_id, attempted_at DESC);
 """
 
 # Conservé pour compat tests anciens imports

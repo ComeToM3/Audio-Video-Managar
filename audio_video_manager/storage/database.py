@@ -13,6 +13,7 @@ from audio_video_manager.storage.schema import (
     SCHEMA_SQL_V2,
     SCHEMA_SQL_V4,
     SCHEMA_SQL_V5,
+    SCHEMA_SQL_V6,
     SCHEMA_VERSION,
 )
 
@@ -80,6 +81,10 @@ class Database:
         if current < 5:
             self._migrate_to_v5(conn)
             current = 5
+
+        if current < 6:
+            self._migrate_to_v6(conn)
+            current = 6
 
         if current < SCHEMA_VERSION:
             raise RuntimeError(
@@ -167,5 +172,14 @@ class Database:
         conn.execute(
             "INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)",
             (5, _utc_now()),
+        )
+        conn.commit()
+
+    def _migrate_to_v6(self, conn: sqlite3.Connection) -> None:
+        log.info("Migration SQLite v5 → v6 (transferts Android)")
+        conn.executescript(SCHEMA_SQL_V6)
+        conn.execute(
+            "INSERT INTO schema_migrations(version, applied_at) VALUES (?, ?)",
+            (6, _utc_now()),
         )
         conn.commit()

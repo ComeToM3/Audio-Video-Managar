@@ -7,7 +7,6 @@ import os
 import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-os.environ.setdefault("QT_QUICK_CONTROLS_STYLE", "Basic")
 
 from PySide6.QtWidgets import QApplication
 
@@ -53,7 +52,6 @@ def test_shutdown_all_after_mainwindow(qapp, tmp_path) -> None:
         library_root=str(tmp_path / "lib"),
         jobs_dir=str(tmp_path / "jobs"),
         log_dir=str(tmp_path / "logs"),
-        library_ui_mode="qml",
     )
     win = MainWindow(cfg, db)
     win.show()

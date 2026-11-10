@@ -18,7 +18,12 @@ from audio_video_manager.metadata.approval_fingerprint import compute_approval_f
 from audio_video_manager.metadata.validation import approve_sheet
 from audio_video_manager.storage import Database
 from audio_video_manager.ui.dvd_extraction_dialog import DvdArchivePanel
-from audio_video_manager.ui.main_window import NAV_ARCHIVE, MainWindow, NARROW_BREAKPOINT
+from audio_video_manager.ui.main_window import (
+    NAV_ARCHIVE,
+    MainWindow,
+    NARROW_BREAKPOINT,
+    _is_volume_device_change,
+)
 from audio_video_manager.ui.wizard.archive_wizard import STEP_LABELS, ArchiveWizardPage
 
 
@@ -39,7 +44,6 @@ def config(tmp_path):
         freaccmd_path="",
         preferred_release_country="CA",
         auto_approve_high_confidence=False,
-        library_ui_mode="widgets",  # évite QML dans tests shell (repli 08B)
     )
 
 
@@ -61,6 +65,229 @@ def test_main_window_four_sections(qapp, config, db) -> None:
     assert "Archiver" in win.nav.item(0).text()
     # Pas de probes au lancement
     assert win.wizard.current_step() == 0
+
+
+def test_native_device_filter_only_accepts_volume_arrival_and_removal() -> None:
+    assert _is_volume_device_change(0x0219, 0x8000, 0x2)
+    assert _is_volume_device_change(0x0219, 0x8004, 0x2)
+    assert not _is_volume_device_change(0x0219, 0x8000, 0x5)
+    assert not _is_volume_device_change(0x0210, 0x8000, 0x2)
+
+
+def test_native_event_ignores_non_windows_message_before_reading_pointer(
+    qapp, config, db, monkeypatch
+) -> None:
+    import audio_video_manager.ui.main_window as main_window_module
+
+    monkeypatch.setattr(main_window_module.sys, "platform", "win32")
+    win = MainWindow(config, db)
+
+    assert win.nativeEvent(b"not-a-windows-message", 1) == (False, 0)
+
+
+def test_native_event_schedules_scan_for_synthetic_volume_messages(
+    qapp, config, db, monkeypatch
+) -> None:
+    import ctypes
+    from ctypes import wintypes
+    import audio_video_manager.ui.main_window as main_window_module
+
+    class DeviceBroadcastHeader(ctypes.Structure):
+        _fields_ = [
+            ("size", wintypes.DWORD),
+            ("device_type", wintypes.DWORD),
+            ("reserved", wintypes.DWORD),
+        ]
+
+    header = DeviceBroadcastHeader(ctypes.sizeof(DeviceBroadcastHeader), 2, 0)
+    message = wintypes.MSG()
+    message.message = 0x0219
+    message.lParam = ctypes.addressof(header)
+    monkeypatch.setattr(main_window_module.sys, "platform", "win32")
+    win = MainWindow(config, db)
+    scans = []
+    monkeypatch.setattr(
+        win.wizard,
+        "schedule_optical_scan",
+        lambda **kwargs: scans.append(kwargs),
+    )
+
+    for event in (0x8000, 0x8004):
+        message.wParam = event
+        assert win.nativeEvent(
+            b"windows_generic_MSG", ctypes.addressof(message)
+        ) == (False, 0)
+    assert scans == [{"auto_identify": True}, {"auto_identify": True}]
+
+    win.navigate_to(1)
+    message.wParam = 0x8000
+    win.nativeEvent(b"windows_generic_MSG", ctypes.addressof(message))
+    assert len(scans) == 2
+
+
+def test_native_event_schedules_volume_scan_only_in_archive(
+    qapp, config, db, monkeypatch
+) -> None:
+    import ctypes
+    from ctypes import wintypes
+    import audio_video_manager.ui.main_window as main_window_module
+
+    class DeviceBroadcastHeader(ctypes.Structure):
+        _fields_ = [
+            ("size", wintypes.DWORD),
+            ("device_type", wintypes.DWORD),
+            ("reserved", wintypes.DWORD),
+        ]
+
+    header = DeviceBroadcastHeader(ctypes.sizeof(DeviceBroadcastHeader), 2, 0)
+    message = wintypes.MSG()
+    message.message = 0x0219
+    message.wParam = 0x8000
+    message.lParam = ctypes.addressof(header)
+    monkeypatch.setattr(main_window_module.sys, "platform", "win32")
+    win = MainWindow(config, db)
+    scans = []
+    monkeypatch.setattr(
+        win.wizard,
+        "schedule_optical_scan",
+        lambda **kwargs: scans.append(kwargs),
+    )
+
+    assert win.nativeEvent(b"windows_generic_MSG", ctypes.addressof(message)) == (False, 0)
+    assert scans == [{"auto_identify": True}]
+
+    win.navigate_to(1)
+    win.nativeEvent(b"windows_generic_MSG", ctypes.addressof(message))
+    assert scans == [{"auto_identify": True}]
+
+
+def test_ambiguous_reader_pair_requires_confirmation(qapp, config, db, monkeypatch) -> None:
+    from PySide6.QtWidgets import QMessageBox
+    from audio_video_manager.extraction.drives import CdDrive
+    from audio_video_manager.metadata.toc_reader import DiscReadResult
+    from audio_video_manager.ui.wizard.archive_wizard import ArchiveWizardPage
+
+    wizard = ArchiveWizardPage(config, db)
+    sheet = make_approvable_sheet()
+    approve_sheet(sheet, note="synthetic reader-pair test")
+    wizard._sheet = sheet  # noqa: SLF001
+    wizard._disc_read = DiscReadResult(
+        sheet.identity.disc_id,
+        sheet.identity.toc,
+        "D:",
+    )  # type: ignore[arg-type]
+    wizard._drives = [
+        CdDrive(0, "1:0:0", "Optical drive one"),
+        CdDrive(1, "2:0:0", "Optical drive two"),
+    ]  # noqa: SLF001
+    wizard._reader_pair_required = True  # noqa: SLF001
+    wizard.chk_reader_pair.setChecked(False)
+    warnings = []
+    monkeypatch.setattr(
+        QMessageBox, "warning", lambda *_args: warnings.append(_args[2])
+    )
+
+    wizard._start_archive()  # noqa: SLF001
+
+    assert len(warnings) == 1
+    assert "Confirmez que le lecteur fre:ac choisi" in warnings[0]
+
+
+def test_detected_cd_starts_identification_without_reading_hardware(
+    qapp, config, db, monkeypatch
+) -> None:
+    from audio_video_manager.extraction.drives import CdDrive
+    from audio_video_manager.metadata.models import TocSnapshot
+    from audio_video_manager.metadata.toc_reader import DiscReadResult
+    from audio_video_manager.ui.identify_worker import OpticalScanResult
+
+    wizard = ArchiveWizardPage(config, db)
+    toc = TocSnapshot(
+        first_track=1,
+        last_track=1,
+        track_offsets_sectors=[0],
+        track_durations_ms=[180_000],
+        audio_track_count=1,
+        raw_source="synthetic-test",
+    )
+    disc = DiscReadResult("disc-detected", toc, "D:")
+    starts = []
+    monkeypatch.setattr(wizard, "_start_identify", lambda: starts.append(True))
+    wizard._active_scan_auto_identify = True  # noqa: SLF001
+
+    wizard._on_optical_scan_finished(  # noqa: SLF001
+        OpticalScanResult(
+            drives=(CdDrive(0, "1:0:0", "Test optical drive"),),
+            devices=("D:",),
+            discs=(disc,),
+            read_errors=(),
+        )
+    )
+
+    assert wizard._disc_read == disc  # noqa: SLF001
+    assert wizard.current_step() == 1
+    assert starts == [True]
+
+
+def test_cd_removal_invalidates_approved_sheet(qapp, config, db) -> None:
+    from audio_video_manager.extraction.drives import CdDrive
+    from audio_video_manager.metadata.approval_fingerprint import compute_approval_fingerprint
+    from audio_video_manager.metadata.enums import ApprovalState
+    from audio_video_manager.metadata.models import TocSnapshot
+    from audio_video_manager.metadata.toc_reader import DiscReadResult
+    from audio_video_manager.ui.identify_worker import OpticalScanResult
+
+    wizard = ArchiveWizardPage(config, db)
+    sheet = make_approvable_sheet()
+    approve_sheet(sheet, note="synthetic removal test")
+    wizard._sheet = sheet  # noqa: SLF001
+    wizard._approved_fp = compute_approval_fingerprint(sheet)  # noqa: SLF001
+    wizard._disc_read = DiscReadResult(  # noqa: SLF001
+        sheet.identity.disc_id,
+        TocSnapshot(
+            first_track=1,
+            last_track=1,
+            track_offsets_sectors=[0],
+            track_durations_ms=[180_000],
+            audio_track_count=1,
+            raw_source="synthetic-test",
+        ),
+        "D:",
+    )
+    wizard._set_step(2)  # noqa: SLF001
+
+    wizard._on_optical_scan_finished(  # noqa: SLF001
+        OpticalScanResult(
+            drives=(CdDrive(0, "1:0:0", "Test optical drive"),),
+            devices=("D:",),
+            discs=(),
+            read_errors=("D:: aucun disque",),
+        )
+    )
+
+    assert wizard._disc_read is None  # noqa: SLF001
+    assert wizard.sheet().approval == ApprovalState.PENDING
+    assert wizard.approval_fingerprint() is None
+    assert "retiré" in wizard.lbl_id_warn.text().casefold()
+
+
+def test_identification_failure_keeps_cd_available_for_manual_metadata(
+    qapp, config, db
+) -> None:
+    from audio_video_manager.metadata.toc_reader import DiscReadResult
+
+    wizard = ArchiveWizardPage(config, db)
+    wizard._disc_read = DiscReadResult(  # noqa: SLF001
+        "offline-disc",
+        make_approvable_sheet(tracks=1).identity.toc,
+        "D:",
+    )
+
+    wizard._on_identify_fail("Réseau indisponible")  # noqa: SLF001
+
+    assert wizard.sheet() is not None
+    assert wizard.sheet().identity.disc_id == "offline-disc"
+    assert "compléter la fiche manuellement" in wizard.lbl_id_status.text().casefold()
 
 
 def test_video_library_displays_and_opens_indexed_file(qapp, config, db, tmp_path, monkeypatch) -> None:
@@ -619,9 +846,9 @@ def test_navigate_preserves_wizard_approval(qapp, config, db) -> None:
     assert win.wizard.approval_fingerprint() is not None
 
 
-def test_wizard_five_steps_and_no_dvd(qapp, config, db) -> None:
+def test_wizard_four_cd_steps_and_no_dvd(qapp, config, db) -> None:
     page = ArchiveWizardPage(config, db)
-    assert len(STEP_LABELS) == 5
+    assert len(STEP_LABELS) == 4
     assert page.current_step() == 0
     text = page.lbl_disc.text().casefold()
     assert "dvd" not in text
@@ -637,17 +864,26 @@ def test_settings_tech_test_in_advanced_only(qapp, config, db) -> None:
     settings = win.page_settings
     boxes = settings.findChildren(QCheckBox)
     auto = [b for b in boxes if "auto-approuver" in b.text().casefold()]
-    assert auto and not auto[0].isEnabled() and not auto[0].isChecked()
+    assert not auto
+    assert settings.chk_eject.text() == "Éjecter le CD après extraction"
+    assert settings.advanced_content.isHidden()
+    assert not settings.advanced_content.isAncestorOf(settings.edit_library)
+    assert not settings.advanced_content.isAncestorOf(settings.chk_eject)
     tech = [
         b
         for b in settings.findChildren(QPushButton)
         if "test technique" in b.text().casefold()
     ]
     assert len(tech) == 1
+    assert settings.advanced_content.isAncestorOf(tech[0])
     dvd_fields = [edit for edit in settings.findChildren(QLineEdit) if edit is settings.edit_ffmpeg or edit is settings.edit_dvdnav]
     assert len(dvd_fields) == 2
-    dvd_labels = [l for l in settings.findChildren(QLabel) if "dvd-video" in l.text().casefold()]
-    assert dvd_labels
+    assert settings.advanced_content.isAncestorOf(settings.edit_pref)
+    assert settings.advanced_content.isAncestorOf(settings.edit_jobs)
+    settings.advanced_toggle.click()
+    assert not settings.advanced_content.isHidden()
+    settings.advanced_toggle.click()
+    assert settings.advanced_content.isHidden()
 
 
 def test_narrow_shows_tabs(qapp, config, db) -> None:
@@ -688,7 +924,7 @@ def test_wizard_edit_after_approve_revokes(qapp, config, db) -> None:
     approve_sheet(sheet, note="ui")
     page._sheet = sheet  # noqa: SLF001
     page._approved_fp = compute_approval_fingerprint(sheet)  # noqa: SLF001
-    page._set_step(2)  # noqa: SLF001
+    page._set_step(page.PAGE_REVIEW)  # noqa: SLF001
     page.edit_album.setText("Titre changé après approbation")
     qapp.processEvents()
     assert page.sheet().approval == ApprovalState.PENDING

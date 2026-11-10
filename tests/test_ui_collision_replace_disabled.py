@@ -23,15 +23,12 @@ def qapp():
     return app
 
 
-def test_replace_disabled_defaults_to_rename(qapp, tmp_path) -> None:
+def test_collision_policy_defaults_to_rename_without_replace_controls(qapp, tmp_path) -> None:
     cfg = AppConfig(library_root=str(tmp_path / "lib"), jobs_dir=str(tmp_path / "jobs"))
     db = Database(tmp_path / "t.sqlite3")
     db.initialize()
     page = ArchiveWizardPage(cfg, db)
-    assert page.radio_rename.isChecked()
-    assert not page.radio_replace.isEnabled()
-    assert page._collision_policy() == CollisionPolicy.RENAME  # noqa: SLF001
-    # même si on force le radio (ne devrait pas arriver via UI)
-    page.radio_replace.setChecked(True)
+    assert not hasattr(page, "radio_rename")
+    assert not hasattr(page, "radio_replace")
     assert page._collision_policy() == CollisionPolicy.RENAME  # noqa: SLF001
     db.close()

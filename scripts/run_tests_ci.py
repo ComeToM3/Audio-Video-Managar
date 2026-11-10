@@ -165,7 +165,6 @@ def _run_pytest(
         argv.extend(extra_args)
     run_env = os.environ.copy()
     run_env.setdefault("QT_QPA_PLATFORM", "offscreen")
-    run_env.setdefault("QT_QUICK_CONTROLS_STYLE", "Basic")
     # Fermeture naturelle par défaut ; AVM_QT_SAFE_EXIT=1 reste un secours CI
     run_env.setdefault("AVM_QT_SAFE_EXIT", "0")
     if env:

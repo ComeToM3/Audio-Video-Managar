@@ -12,6 +12,7 @@ from audio_video_manager.metadata.enrichment import (
     DiscogsTrack,
     build_enrichment_report,
     lookup_discogs_by_barcode,
+    verified_discogs_cover_url,
 )
 from audio_video_manager.metadata.musicbrainz_client import ReleaseCandidate
 
@@ -35,6 +36,13 @@ def _discogs_payload(*, year=0, formats=None, data_quality="Needs Vote") -> dict
             {
                 "name": "CD",
                 "descriptions": formats or ["Compilation", "Reissue", "Remastered"],
+            }
+        ],
+        "images": [
+            {
+                "type": "primary",
+                "uri": "https://i.discogs.com/cover.jpg",
+                "uri150": "https://i.discogs.com/cover-150.jpg",
             }
         ],
         "tracklist": [
@@ -88,6 +96,7 @@ def test_discogs_lookup_requires_exact_barcode_and_uses_api_headers(monkeypatch)
     assert result.release.year is None
     assert result.release.catalog_numbers == ("72435-38486-2-0",)
     assert result.release.copyright_notice_years == (2002,)
+    assert result.release.cover_url == "https://i.discogs.com/cover.jpg"
     assert result.release.tracks == (DiscogsTrack(1, "Emmenez-Moi", 214_000),)
     assert len(calls) == 2
     assert calls[0].get_header("Authorization") == "Discogs token=test-token"
@@ -115,6 +124,53 @@ def test_discogs_ambiguous_barcode_never_selects_a_release(monkeypatch) -> None:
     assert result.status == "ambiguous"
     assert result.release is None
     assert calls == 1
+
+
+def test_discogs_cover_requires_same_exact_candidate() -> None:
+    candidate = ReleaseCandidate(
+        release_id="mb-release",
+        title="Album",
+        artist_credit="Artist",
+        barcode=BARCODE,
+        track_titles=["Track One", "Track Two"],
+    )
+    release = DiscogsReleaseEvidence(
+        release_id=42,
+        source_url=RELEASE_URL,
+        title="Album",
+        country="Canada",
+        barcode=BARCODE,
+        year=2002,
+        labels=(),
+        catalog_numbers=(),
+        formats=("CD",),
+        tracks=(DiscogsTrack(1, "Track One", None), DiscogsTrack(2, "Track Two", None)),
+        data_quality="Complete and Correct",
+        cover_url="https://i.discogs.com/cover.jpg",
+    )
+    lookup = DiscogsLookup("matched", release)
+
+    assert verified_discogs_cover_url(candidate, lookup) == release.cover_url
+    assert verified_discogs_cover_url(
+        ReleaseCandidate(
+            release_id="other-release",
+            title="Other Album",
+            artist_credit="Artist",
+            barcode=BARCODE,
+            track_titles=candidate.track_titles,
+        ),
+        lookup,
+    ) is None
+    assert verified_discogs_cover_url(
+        ReleaseCandidate(
+            release_id="other-tracklist",
+            title="Album",
+            artist_credit="Artist",
+            barcode=BARCODE,
+            track_titles=["Track One", "Different Track"],
+        ),
+        lookup,
+    ) is None
 
 
 def test_discogs_requires_auth_after_documented_cutoff() -> None:

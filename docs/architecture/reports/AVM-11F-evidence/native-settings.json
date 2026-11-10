@@ -1,0 +1,19 @@
+{
+  "profile": "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-11F-yafam1m1",
+  "personal_config_before": "b37a325e1835e5e1c7a943c933c0d54fa103d90c597ee5ac26dcdcea76797c50",
+  "personal_config_after": "b37a325e1835e5e1c7a943c933c0d54fa103d90c597ee5ac26dcdcea76797c50",
+  "results": [
+    {
+      "phase": "save",
+      "returncode": 0,
+      "stdout": "{\"phase\": \"save\", \"platform\": \"windows\", \"config_path\": \"C:\\\\Users\\\\ComeToM3\\\\AppData\\\\Local\\\\Temp\\\\AVM-11F-yafam1m1\\\\data\\\\config.json\", \"save_message\": \"Enregistr\\u00e9s.\\nC:\\\\Users\\\\ComeToM3\\\\AppData\\\\Local\\\\Temp\\\\AVM-11F-yafam1m1\\\\data\\\\config.json\", \"persisted\": true, \"paths\": {\"ffmpeg_path\": \"C:\\\\Users\\\\ComeToM3\\\\AppData\\\\Local\\\\Temp\\\\AVM-11B2\\\\ffmpeg\\\\unpacked\\\\ffmpeg-9.0.2-full_build\\\\bin\\\\ffmpeg.exe\", \"dvdnav_library_dir\": \"C:\\\\Users\\\\ComeToM3\\\\AppData\\\\Local\\\\Temp\\\\AVM-11B2\\\\msys64\\\\ucrt64\\\\bin\"}}\n",
+      "stderr": ""
+    },
+    {
+      "phase": "reload",
+      "returncode": 0,
+      "stdout": "{\"phase\": \"reload\", \"platform\": \"windows\", \"config_path\": \"C:\\\\Users\\\\ComeToM3\\\\AppData\\\\Local\\\\Temp\\\\AVM-11F-yafam1m1\\\\data\\\\config.json\", \"reloaded_fields\": true, \"derived_ffprobe\": \"C:\\\\Users\\\\ComeToM3\\\\AppData\\\\Local\\\\Temp\\\\AVM-11B2\\\\ffmpeg\\\\unpacked\\\\ffmpeg-9.0.2-full_build\\\\bin\\\\ffprobe.exe\", \"inspection\": {\"status\": \"inspected\", \"titles\": 2, \"streams\": 2}, \"dependency_cases\": [{\"case\": \"absent\", \"message\": \"Op\\u00e9ration non termin\\u00e9e : ffprobe introuvable; aucun backend DVD-Video disponible.\", \"start_enabled\": false}, {\"case\": \"invalid_path\", \"message\": \"Op\\u00e9ration non termin\\u00e9e : ffprobe introuvable; aucun backend DVD-Video disponible.\", \"start_enabled\": false}, {\"case\": \"incompatible_demuxer\", \"message\": \"Op\\u00e9ration non termin\\u00e9e : Ce build ffprobe n'expose pas dvdvideo; il peut manquer libdvdread/libdvdnav.\", \"start_enabled\": false}, {\"case\": \"missing_dll\", \"message\": \"Op\\u00e9ration non termin\\u00e9e : libdvdnav n'a pas pu \\u00e9num\\u00e9rer les titres; aucune protection n'est d\\u00e9duite.\", \"start_enabled\": false}, {\"case\": \"invalid_executable\", \"message\": \"Op\\u00e9ration non termin\\u00e9e : Sonde ffprobe impossible : OSError.\", \"start_enabled\": false}, {\"case\": \"invalid_dll\", \"message\": \"Op\\u00e9ration non termin\\u00e9e : libdvdnav n'a pas pu \\u00e9num\\u00e9rer les titres; aucune protection n'est d\\u00e9duite.\", \"start_enabled\": false}]}\n",
+      "stderr": ""
+    }
+  ]
+}

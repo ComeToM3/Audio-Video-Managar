@@ -202,6 +202,7 @@ def run_archive_job(
     cover_bytes: bytes | None = None,
     cover_urlopen_fn: Callable[..., object] | None = None,
     confirmed_rearchive: bool = False,
+    job_id: str | None = None,
     on_progress: ProgressCallback | None = None,
     cancel_event: threading.Event | None = None,
 ) -> ArchiveJobReport:
@@ -236,7 +237,7 @@ def run_archive_job(
     # Rip réel : TOUJOURS relecture TOC (un disc_read stale ne doit pas masquer un CD remplacé).
     # Staging : pas d’optique ; disc_read optionnel vs fiche seulement.
     if not skip_disc_match:
-        progress("Vérification Disc ID / TOC…", 0.02)
+        progress("Vérification Disc ID / TOC…")
         with perf.span("disc_match") as meta:
             try:
                 if staged_flac_files is not None:
@@ -269,7 +270,7 @@ def run_archive_job(
                     f"CD présent ≠ fiche approuvée — rip/archivage refusé. {exc}"
                 ) from exc
 
-    job_id, rip_dir = create_job_workdir(jobs_root)
+    job_id, rip_dir = create_job_workdir(jobs_root, job_id)
     workdir = rip_dir.parent
     started = _utc_now()
     meta_id = metadata.id
@@ -345,7 +346,7 @@ def run_archive_job(
 
     # 2) Rip ou staging
     if staged_flac_files is not None:
-        progress("Copie staging injecté → zone A…", 0.1)
+        progress("Copie staging injecté → zone A…")
         flacs = []
         with perf.span("staging_to_zone_a", items=len(staged_flac_files)) as meta:
             bytes_out = 0
@@ -374,7 +375,7 @@ def run_archive_job(
             raise ApprovalError("freaccmd requis pour rip archive (ou fournir staged_flac_files)")
         if cancel_event and cancel_event.is_set():
             raise ApprovalError("Annulé avant rip")
-        progress("Extraction fre:ac → zone A…", 0.15)
+        progress("Extraction fre:ac → zone A…")
         _checkpoint(db, job_id, "Ripping", {"drive": drive_number})
         ripper = FreacCdRipper(freaccmd)
         request = RipRequest(
@@ -414,6 +415,25 @@ def run_archive_job(
                 meta["bytes_out"] = sum(
                     p.stat().st_size for p in rip.flac_files if p.is_file()
                 )
+        except FileExistsError as exc:
+            err = format_user_error(
+                kind=FailureKind.EXTRACTION,
+                summary="Le dossier de travail d’extraction n’est pas vide; fre:ac n’a pas été lancé.",
+                technical=str(exc),
+                action="Conservez les fichiers existants et réessayez avec un nouveau dossier de travail.",
+            )
+            _finish_failed(db, job_id, "Failed", err)
+            return ArchiveJobReport(
+                job_id=job_id,
+                workdir=workdir,
+                mode=JobMode.NORMAL,
+                metadata_id=meta_id,
+                state="Failed",
+                error=err,
+                failure_kind=FailureKind.EXTRACTION,
+                warnings=warnings,
+                perf=perf.summary(),
+            )
         finally:
             clear_rip_lock(rip_dir)
         flacs = list(rip.flac_files)
@@ -452,7 +472,7 @@ def run_archive_job(
             )
 
     # 3) Intégrité structurelle + décodage intégral si outil présent
-    progress("Contrôle d’intégrité des fichiers…", 0.4)
+    progress("Contrôle d’intégrité des fichiers…")
     try:
         ordered = match_flacs_to_tracks(flacs, len(metadata.tracks))
     except ApprovalError as exc:
@@ -593,7 +613,7 @@ def run_archive_job(
     )
 
     # 4) Cover
-    progress("Pochette…", 0.5)
+    progress("Pochette…")
     with perf.span("cover_resolve") as meta:
         cover = resolve_cover_for_sheet(
             metadata, urlopen_fn=cover_urlopen_fn, injected=cover_bytes
@@ -620,7 +640,7 @@ def run_archive_job(
     embed_mime = cover.mime if cover.status == "ok" else None
 
     # 5) Tagging — copie rip→tagged obligatoire (zone A conservée pour récupération)
-    progress("Écriture tags mutagen…", 0.6)
+    progress("Écriture tags mutagen…")
     _checkpoint(db, job_id, "Tagging", {"tracks": len(ordered)})
     tracks_sorted = sorted(metadata.tracks, key=lambda t: t.number)
     tagged_dir = workdir / "tagged"
@@ -683,7 +703,7 @@ def run_archive_job(
         staged_cover = write_cover_jpg(tagged_dir / "cover.jpg", cover)
 
     # 6) Inbox B (toujours pour traçabilité) — hardlink si même volume
-    progress("Zone B inbox…", 0.75)
+    progress("Zone B inbox…")
     inbox = inbox_job_dir(library_root, job_id)
     inbox.mkdir(parents=True, exist_ok=True)
     with perf.span("inbox_transfer", items=len(tagged_files)) as meta:
@@ -706,7 +726,7 @@ def run_archive_job(
 
     # 7) Publish C — revalidation doublons juste avant publication
     if confirm_publish:
-        progress("Contrôle doublons avant publication…", 0.88)
+        progress("Contrôle doublons avant publication…")
         dup_pre_pub = assess_from_sheet(db, metadata, exclude_job_id=job_id)
         try:
             assert_archive_allowed(
@@ -740,7 +760,7 @@ def run_archive_job(
                 perf=perf.summary(),
             )
 
-        progress("Publication bibliothèque C…", 0.9)
+        progress("Publication bibliothèque C…")
         try:
             with perf.span("publish_c", items=len(tagged_files)) as meta:
                 publish_result = publish_album(
@@ -855,7 +875,7 @@ def run_archive_job(
         )
         conn.commit()
 
-    progress("Terminé.", 1.0)
+    progress("Terminé.")
     return ArchiveJobReport(
         job_id=job_id,
         workdir=workdir,

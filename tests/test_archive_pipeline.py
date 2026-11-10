@@ -205,6 +205,7 @@ def test_archive_pipeline_publish(tmp_path: Path) -> None:
         metadata=sheet,
         library_root=lib,
         jobs_root=jobs,
+        job_id="job-specific",
         db=db,
         confirm_publish=True,
         collision_policy=CollisionPolicy.RENAME,
@@ -212,6 +213,7 @@ def test_archive_pipeline_publish(tmp_path: Path) -> None:
         cover_bytes=_JPEG,
         skip_disc_match=True,
     )
+    assert report.job_id == "job-specific"
     assert report.state in ("Completed", "CompletedWithWarnings")
     assert report.publish and report.publish.published
     assert report.inbox_dir and report.inbox_dir.is_dir()
@@ -233,6 +235,52 @@ def test_archive_pipeline_publish(tmp_path: Path) -> None:
     assert Path(rel["path"]) == album
     assert album.is_dir()
     db.close()
+
+
+def test_archive_stage_events_do_not_claim_global_progress(tmp_path: Path) -> None:
+    sheet = _approved_sheet(tracks=1)
+    staged = [write_minimal_flac(tmp_path / "01.flac")]
+    progress: list[tuple[str, float | None]] = []
+
+    report = run_archive_job(
+        metadata=sheet,
+        library_root=tmp_path / "Music",
+        jobs_root=tmp_path / "jobs",
+        staged_flac_files=staged,
+        cover_bytes=_JPEG,
+        skip_disc_match=True,
+        confirm_publish=True,
+        on_progress=lambda message, fraction: progress.append((message, fraction)),
+    )
+
+    assert report.state in {"Completed", "CompletedWithWarnings"}
+    assert progress
+    assert all(fraction is None for _, fraction in progress)
+    assert any("intégrité" in message.casefold() for message, _ in progress)
+    assert any("publication" in message.casefold() for message, _ in progress)
+
+
+def test_archive_stage_events_do_not_claim_global_progress(tmp_path: Path) -> None:
+    sheet = _approved_sheet(tracks=1)
+    staged = [write_minimal_flac(tmp_path / "01.flac")]
+    progress: list[tuple[str, float | None]] = []
+
+    report = run_archive_job(
+        metadata=sheet,
+        library_root=tmp_path / "Music",
+        jobs_root=tmp_path / "jobs",
+        staged_flac_files=staged,
+        cover_bytes=_JPEG,
+        skip_disc_match=True,
+        confirm_publish=True,
+        on_progress=lambda message, fraction: progress.append((message, fraction)),
+    )
+
+    assert report.state in {"Completed", "CompletedWithWarnings"}
+    assert progress
+    assert all(fraction is None for _, fraction in progress)
+    assert any("intégrité" in message.casefold() for message, _ in progress)
+    assert any("publication" in message.casefold() for message, _ in progress)
 
 
 def test_archive_without_publish_stays_inbox(tmp_path: Path) -> None:
@@ -284,3 +332,38 @@ def test_disc_match_blocks_archive(tmp_path: Path) -> None:
             disc_read=bad,
             confirm_publish=False,
         )
+
+
+def test_archive_rip_launch_refusal_finishes_job_as_failed(tmp_path: Path, monkeypatch) -> None:
+    sheet = _approved_sheet(tracks=1)
+    db = Database(tmp_path / "avm.sqlite3")
+    db.initialize()
+
+    def refuse_before_launch(*_args, **_kwargs):
+        raise FileExistsError("workdir non vide")
+
+    monkeypatch.setattr(
+        "audio_video_manager.orchestration.archive_job.FreacCdRipper.rip",
+        refuse_before_launch,
+    )
+    report = run_archive_job(
+        metadata=sheet,
+        library_root=tmp_path / "Music",
+        jobs_root=tmp_path / "jobs",
+        freaccmd=tmp_path / "freaccmd.exe",
+        db=db,
+        confirm_publish=True,
+        skip_disc_match=True,
+    )
+
+    row = db.connect().execute(
+        "SELECT state, finished_at, error_summary FROM jobs WHERE id=?",
+        (report.job_id,),
+    ).fetchone()
+    assert report.state == "Failed"
+    assert "fre:ac n’a pas été lancé" in report.error
+    assert row["state"] == "Failed"
+    assert row["finished_at"] is not None
+    assert "workdir non vide" in row["error_summary"]
+    assert not (report.workdir / "rip" / ".avm-rip.lock").exists()
+    db.close()

@@ -79,6 +79,7 @@ library/
 !/audio_video_manager/library/
 /audio_video_manager/library/*
 !/audio_video_manager/library/video_archive.py
+!/audio_video_manager/library/android_export.py
 exports/
 imports/
 *.flac

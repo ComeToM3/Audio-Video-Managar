@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QPushButton,
+    QProgressBar,
     QSizePolicy,
     QStackedWidget,
     QTabBar,
@@ -48,6 +49,19 @@ from audio_video_manager.ui.thread_lifecycle import (
 from audio_video_manager.ui.wizard.archive_wizard import ArchiveWizardPage
 
 log = get_logger("ui")
+
+_WM_DEVICECHANGE = 0x0219
+_DBT_DEVICEARRIVAL = 0x8000
+_DBT_DEVICEREMOVECOMPLETE = 0x8004
+_DBT_DEVTYP_VOLUME = 0x00000002
+
+
+def _is_volume_device_change(message: int, event: int, device_type: int) -> bool:
+    return (
+        message == _WM_DEVICECHANGE
+        and event in {_DBT_DEVICEARRIVAL, _DBT_DEVICEREMOVECOMPLETE}
+        and device_type == _DBT_DEVTYP_VOLUME
+    )
 
 # Ordre stack / API tests (inchangé)
 NAV_LABELS = (
@@ -202,6 +216,7 @@ class MainWindow(QMainWindow):
         self.wizard = ArchiveWizardPage(config, db)
         self.wizard.status_message.connect(self._on_status)
         self.wizard.archive_busy_changed.connect(self._on_busy)
+        self.wizard.archive_status_changed.connect(self._on_archive_status)
         self.wizard.request_navigate.connect(self.navigate_to)
         self.wizard.library_changed.connect(self._on_library_changed)
         self.wizard.open_video_library.connect(self._open_video_library)
@@ -223,6 +238,19 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.page_settings)
         content_lay.addWidget(self.stack, 1)
         root.addWidget(content, 1)
+
+        self.archive_status_label = QLabel("")
+        self.archive_status_label.setProperty("role", "muted")
+        self.archive_status_label.setAccessibleName("État permanent de l’archivage CD")
+        self.archive_status_progress = QProgressBar()
+        self.archive_status_progress.setRange(0, 1)
+        self.archive_status_progress.setTextVisible(False)
+        self.archive_status_progress.setFixedWidth(170)
+        self.archive_status_progress.setAccessibleName("Progression de l’archivage CD")
+        self.statusBar().addWidget(self.archive_status_label, 1)
+        self.statusBar().addPermanentWidget(self.archive_status_progress)
+        self.archive_status_label.hide()
+        self.archive_status_progress.hide()
 
         self._refresh_reader_status()
         self._sync_side_styles(NAV_ARCHIVE)
@@ -251,6 +279,7 @@ class MainWindow(QMainWindow):
     def _operation_busy(self) -> bool:
         return (
             self.wizard.is_busy()
+            or self.wizard.is_media_scan_busy()
             or self._tech_thread is not None
             or self.page_history.is_recovery_busy()
             or self.page_library.is_busy()
@@ -332,7 +361,11 @@ class MainWindow(QMainWindow):
             )
             self._sync_nav_widgets(3)
             return
-        if self.wizard.is_busy() and row != NAV_ARCHIVE:
+        if (
+            self.wizard.is_busy()
+            and not self.wizard.is_archive_active()
+            and row != NAV_ARCHIVE
+        ):
             QMessageBox.information(
                 self,
                 "Archivage en cours",
@@ -349,14 +382,102 @@ class MainWindow(QMainWindow):
             self.page_library.refresh()
         elif row == 2:
             self.page_history.refresh()
+        elif row == NAV_ARCHIVE and not self.wizard.is_archive_active():
+            self.wizard.schedule_optical_scan(auto_identify=True)
+
+    def nativeEvent(self, event_type, message):  # noqa: N802
+        if sys.platform != "win32":
+            return False, 0
+        try:
+            event_name = bytes(event_type)
+        except (TypeError, ValueError):
+            return False, 0
+        if event_name not in {b"windows_generic_MSG", b"windows_dispatcher_MSG"}:
+            return False, 0
+
+        try:
+            import ctypes
+            from ctypes import wintypes
+
+            message_pointer = int(message)
+            if not message_pointer:
+                return False, 0
+            native_message = ctypes.cast(
+                message_pointer, ctypes.POINTER(wintypes.MSG)
+            ).contents
+            if (
+                self.stack.currentIndex() == NAV_ARCHIVE
+                and native_message.message == _WM_DEVICECHANGE
+                and native_message.wParam
+                in {_DBT_DEVICEARRIVAL, _DBT_DEVICEREMOVECOMPLETE}
+                and native_message.lParam
+            ):
+                class DeviceBroadcastHeader(ctypes.Structure):
+                    _fields_ = [
+                        ("size", wintypes.DWORD),
+                        ("device_type", wintypes.DWORD),
+                        ("reserved", wintypes.DWORD),
+                    ]
+
+                header = DeviceBroadcastHeader.from_address(
+                    int(native_message.lParam)
+                )
+                if (
+                    header.size >= ctypes.sizeof(DeviceBroadcastHeader)
+                    and _is_volume_device_change(
+                        int(native_message.message),
+                        int(native_message.wParam),
+                        int(header.device_type),
+                    )
+                ):
+                    self.wizard.schedule_optical_scan(auto_identify=True)
+        except Exception as exc:  # noqa: BLE001
+            log.debug("Notification optique Windows ignorée : %s", exc)
+        return False, 0
 
     def _on_status(self, message: str) -> None:
         if self.stack.currentIndex() == NAV_ARCHIVE:
             self.lbl_reader.setText(message)
 
+    def _on_archive_status(
+        self, message: str, fraction: object, active: bool
+    ) -> None:
+        self.archive_status_label.setText(message)
+        self.archive_status_label.setVisible(bool(message))
+        try:
+            measured = float(fraction)
+        except (TypeError, ValueError):
+            measured = -1.0
+        if active and 0.0 <= measured <= 1.0:
+            self.archive_status_progress.setRange(0, 100)
+            self.archive_status_progress.setValue(round(measured * 100))
+            self.archive_status_progress.setTextVisible(True)
+            self.archive_status_progress.setFormat("fre:ac %p%")
+            self.archive_status_progress.setToolTip(
+                "Valeur rapportée par fre:ac; les autres étapes ne sont pas incluses."
+            )
+            self.archive_status_progress.show()
+        elif active:
+            self.archive_status_progress.setRange(0, 0)
+            self.archive_status_progress.setTextVisible(False)
+            self.archive_status_progress.setToolTip(
+                "Progression chiffrée indisponible; activité en cours."
+            )
+            self.archive_status_progress.show()
+        elif fraction is not None and measured == 1.0:
+            self.archive_status_progress.setRange(0, 100)
+            self.archive_status_progress.setValue(100)
+            self.archive_status_progress.setTextVisible(True)
+            self.archive_status_progress.setFormat("Archivé")
+            self.archive_status_progress.show()
+        else:
+            self.archive_status_progress.hide()
+
     def _on_busy(self, busy: bool) -> None:
+        archive_active = self.wizard.is_archive_active()
         locked = (
-            busy
+            (busy and not archive_active)
+            or (self.wizard.is_busy() and not archive_active)
             or self._tech_thread is not None
             or self.page_history.is_recovery_busy()
             or self.page_library.is_busy()
@@ -370,7 +491,7 @@ class MainWindow(QMainWindow):
             reply = QMessageBox.question(
                 self,
                 "Opération en cours",
-                "Une extraction, identification ou récupération est en cours.\n"
+                "Une détection de disque, extraction, identification ou récupération est en cours.\n"
                 "Voulez-vous l’annuler et quitter ?",
             )
             if reply != QMessageBox.StandardButton.Yes:
@@ -391,18 +512,7 @@ class MainWindow(QMainWindow):
                 return
             self._tech_thread = None
             self._tech_worker = None
-        # AVM-10C.1 — teardown QML/QObject avant accept (évite survivants Shiboken)
-        self._shutdown_ui_surfaces()
         event.accept()
-
-    def _shutdown_ui_surfaces(self) -> None:
-        lib = getattr(self, "page_library", None)
-        shutdown = getattr(lib, "shutdown_ui", None)
-        if callable(shutdown):
-            try:
-                shutdown()
-            except RuntimeError:
-                pass
 
     def _on_library_changed(self) -> None:
         self.page_library.refresh()
@@ -536,15 +646,19 @@ class MainWindow(QMainWindow):
 
 def run_app(argv: list[str] | None = None) -> int:
     args = argv if argv is not None else sys.argv
-    import os
-
-    os.environ.setdefault("QT_QUICK_CONTROLS_STYLE", "Basic")
     config = load_config()
     ensure_app_dirs(
         jobs_dir=Path(config.jobs_dir) if config.jobs_dir else None,
         log_dir=Path(config.log_dir) if config.log_dir else None,
     )
     setup_logging(Path(config.log_dir) if config.log_dir else None)
+    log.info(
+        "AVM28E_TRACE startup executable=%s main_window=%s archive_wizard=%s "
+        "ui=Widgets",
+        sys.executable,
+        Path(__file__).resolve(),
+        Path(__file__).parent / "wizard" / "archive_wizard.py",
+    )
     db = Database()
     db.initialize()
 

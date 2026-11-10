@@ -25,6 +25,7 @@ def test_initialize_schema(avm_home: Path) -> None:
         assert "job_checkpoints" in tables
         assert "schema_migrations" in tables
         assert "videos" in tables
+        assert "android_transfers" in tables
 
 
 def test_initialize_idempotent(avm_home: Path) -> None:
@@ -41,10 +42,20 @@ def test_video_migration_preserves_existing_releases(avm_home: Path) -> None:
     db.initialize()
     conn = db.connect()
     conn.execute("INSERT INTO releases(album, path) VALUES (?, ?)", ("Album", "local"))
+    release_id = conn.execute("SELECT id FROM releases").fetchone()[0]
+    conn.execute(
+        "INSERT INTO tracks(release_id, number, path) VALUES (?, ?, ?)",
+        (release_id, 1, "local/01.flac"),
+    )
+    track_id = conn.execute("SELECT id FROM tracks").fetchone()[0]
+    conn.execute("DELETE FROM schema_migrations WHERE version = 6")
+    conn.execute("DROP TABLE android_transfers")
     conn.execute("DELETE FROM schema_migrations WHERE version = 5")
     conn.execute("DROP TABLE videos")
     conn.commit()
     assert db.initialize() == SCHEMA_VERSION
     assert conn.execute("SELECT album FROM releases").fetchone()[0] == "Album"
+    assert conn.execute("SELECT path FROM tracks WHERE id = ?", (track_id,)).fetchone()[0] == "local/01.flac"
     assert conn.execute("SELECT COUNT(*) FROM videos").fetchone()[0] == 0
+    assert conn.execute("SELECT COUNT(*) FROM android_transfers").fetchone()[0] == 0
     db.close()

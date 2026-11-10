@@ -483,21 +483,23 @@ def rank_and_select_releases(
             ),
         )
 
-    # Non équivalents musicalement → jamais d'auto-sélection (éviter faux positifs)
+    # Non équivalents: proposer le meilleur candidat viable, sans auto-approbation.
+    # L'utilisateur garde le choix des alternatives et doit approuver la fiche.
     sig = [
         d.message
         for d in pairwise
         if d.severity in (DiffSeverity.SIGNIFICANT, DiffSeverity.BLOCKING)
     ]
     return SelectionDecision(
-        selected=None,
+        selected=viable[0].candidate,
         auto_selected=False,
         require_manual_choice=True,
         preferred_country=pref,
         ranked=ranked,
         pairwise_diffs=pairwise,
         summary=(
-            f"{len(candidates)} éditions non équivalentes — sélection manuelle requise."
+            f"{len(viable)} éditions non équivalentes — proposition la mieux classée présélectionnée; "
+            "vérifiez-la ou choisissez une autre édition avant d’approuver."
         ),
         warnings=sig or [d.message for d in pairwise[:6]],
         high_confidence_for_future_auto_approve=False,

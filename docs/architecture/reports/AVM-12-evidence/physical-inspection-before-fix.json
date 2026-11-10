@@ -1,0 +1,870 @@
+{
+  "source": "D:\\",
+  "profile": "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-12-_qpzdo37",
+  "source_header": "DVDVIDEO-VMG",
+  "ifo_files": [
+    {
+      "name": "VIDEO_TS.IFO",
+      "size": 14336
+    },
+    {
+      "name": "VTS_01_0.IFO",
+      "size": 30720
+    },
+    {
+      "name": "VTS_02_0.IFO",
+      "size": 75776
+    }
+  ],
+  "native_files": [
+    {
+      "name": "libdvdnav-4.dll",
+      "sha256": "33b0c2131d6447c0ff5b66f3aacd8614b7ff42c2403bf3b2bd56ca195244c542"
+    },
+    {
+      "name": "libdvdread-8.dll",
+      "sha256": "2066e90e736c3df2aea66a29fd43fa876afdf681918ee70bab23f351c0d84f3e"
+    }
+  ],
+  "css_dll_search_dirs": [
+    "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-11B2\\ffmpeg\\unpacked\\ffmpeg-9.0.2-full_build\\bin",
+    "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-12-_qpzdo37",
+    "C:\\WINDOWS",
+    "C:\\WINDOWS\\System32"
+  ],
+  "calls": [
+    {
+      "argv": [
+        "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-11B2\\ffmpeg\\unpacked\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+        "-version"
+      ],
+      "returncode": 0,
+      "stdout": "ffprobe version 9.0.2-full_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers\nbuilt with gcc 16.2.0 (Rev3, Built by MSYS2 project)\nconfiguration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-cairo --enable-fontconfig --enable-iconv --enable-gnutls --enable-lcms2 --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-libsnappy --enable-zlib --enable-librist --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-sdl2 --enable-libaribb24 --enable-libaribcaption --enable-libdav1d --enable-libdavs2 --enable-libopenjpeg --enable-libquirc --enable-libuavs3d --enable-libxevd --enable-libzvbi --enable-liboapv --enable-libqrencode --enable-librav1e --enable-libsvtav1 --enable-libvvenc --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxeve --enable-libxvid --enable-libaom --enable-libjxl --enable-libsvtjpegxs --enable-libvpx --enable-mediafoundation --enable-libass --enable-frei0r --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-openal --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint --enable-whisper\nlibavutil      61.  1.102 / 61.  1.102\nlibavcodec     63.  1.102 / 63.  1.102\nlibavformat    63.  1.102 / 63.  1.102\nlibavdevice    63.  1.102 / 63.  1.102\nlibavfilter    12.  1.102 / 12.  1.102\nlibswscale     10.  1.102 / 10.  1.102\nlibswresample   7.  1.102 /  7.  1.102\n",
+      "stderr": "",
+      "duration_seconds": 0.125
+    },
+    {
+      "argv": [
+        "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-11B2\\ffmpeg\\unpacked\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+        "-hide_banner",
+        "-demuxers"
+      ],
+      "returncode": 0,
+      "stdout": "Formats:\n D.. = Demuxing supported\n .E. = Muxing supported\n ..d = Is a device\n ---\n D   3dostr          3DO STR\n D   4xm             4X Technologies\n D   aa              Audible AA format files\n D   aac             raw ADTS AAC (Advanced Audio Coding)\n D   aax             CRI AAX\n D   ac3             raw AC-3\n D   ac4             raw AC-4\n D   ace             tri-Ace Audio Container\n D   acm             Interplay ACM\n D   act             ACT Voice file format\n D   adf             Artworx Data Format\n D   adp             ADP\n D   ads             Sony PS2 ADS\n D   adx             CRI ADX\n D   aea             MD STUDIO audio\n D   afc             AFC\n D   aiff            Audio IFF\n D   aix             CRI AIX\n D   alaw            PCM A-law\n D   alias_pix       Alias/Wavefront PIX image\n D   alp             LEGO Racers ALP\n D   amr             3GPP AMR\n D   amrnb           raw AMR-NB\n D   amrwb           raw AMR-WB\n D   anm             Deluxe Paint Animation\n D   apac            raw APAC\n D   apc             CRYO APC\n D   ape             Monkey's Audio\n D   apm             Ubisoft Rayman 2 APM\n D   apng            Animated Portable Network Graphics\n D   aptx            raw aptX\n D   aptx_hd         raw aptX HD\n D   apv             APV raw bitstream\n D   aqtitle         AQTitle subtitles\n D   argo_asf        Argonaut Games ASF\n D   argo_brp        Argonaut Games BRP\n D   argo_cvg        Argonaut Games CVG\n D   asf             ASF (Advanced / Active Streaming Format)\n D   asf_o           ASF (Advanced / Active Streaming Format)\n D   ass             SSA (SubStation Alpha) subtitle\n D   ast             AST (Audio Stream)\n D   au              Sun AU\n D   av1             AV1 Annex B\n D   avi             AVI (Audio Video Interleaved)\n D   avisynth        AviSynth script\n D   avr             AVR (Audio Visual Research)\n D   avs             Argonaut Games Creature Shock\n D   avs2            raw AVS2-P2/IEEE1857.4\n D   avs3            raw AVS3-P2/IEEE1857.10\n D   bethsoftvid     Bethesda Softworks VID\n D   bfi             Brute Force & Ignorance\n D   bfstm           BFSTM (Binary Cafe Stream)\n D   bin             Binary text\n D   bink            Bink\n D   binka           Bink Audio\n D   bit             G.729 BIT file format\n D   bitpacked       Bitpacked\n D   bmp_pipe        piped bmp sequence\n D   bmv             Discworld II BMV\n D   boa             Black Ops Audio\n D   bonk            raw Bonk\n D   brender_pix     BRender PIX image\n D   brstm           BRSTM (Binary Revolution Stream)\n D   c93             Interplay C93\n D   caf             Apple CAF (Core Audio Format)\n D   cavsvideo       raw Chinese AVS (Audio Video Standard)\n D   cdg             CD Graphics\n D   cdxl            Commodore CDXL video\n D   cine            Phantom Cine\n D   codec2          codec2 .c2 demuxer\n D   codec2raw       raw codec2 demuxer\n D   concat          Virtual concatenation script\n D   cri_pipe        piped cri sequence\n D   dash            Dynamic Adaptive Streaming over HTTP\n D   data            raw data\n D   daud            D-Cinema audio\n D   dcstr           Sega DC STR\n D   dds_pipe        piped dds sequence\n D   derf            Xilam DERF\n D   dfa             Chronomaster DFA\n D   dfpwm           raw DFPWM1a\n D   dhav            Video DAV\n D   dirac           raw Dirac\n D   dnxhd           raw DNxHD (SMPTE VC-3)\n D   dpx_pipe        piped dpx sequence\n D   dsf             DSD Stream File (DSF)\n D d dshow           DirectShow capture\n D   dsicin          Delphine Software International CIN\n D   dss             Digital Speech Standard (DSS)\n D   dts             raw DTS\n D   dtshd           raw DTS-HD\n D   dv              DV (Digital Video)\n D   dvbsub          raw dvbsub\n D   dvbtxt          dvbtxt\n D   dvdvideo        DVD-Video\n D   dxa             DXA\n D   ea              Electronic Arts Multimedia\n D   ea_cdata        Electronic Arts cdata\n D   eac3            raw E-AC-3\n D   epaf            Ensoniq Paris Audio File\n D   evc             EVC Annex B\n D   exr_pipe        piped exr sequence\n D   f32be           PCM 32-bit floating-point big-endian\n D   f32le           PCM 32-bit floating-point little-endian\n D   f64be           PCM 64-bit floating-point big-endian\n D   f64le           PCM 64-bit floating-point little-endian\n D   ffmetadata      FFmpeg metadata in text\n D   film_cpk        Sega FILM / CPK\n D   filmstrip       Adobe Filmstrip\n D   fits            Flexible Image Transport System\n D   flac            raw FLAC\n D   flic            FLI/FLC/FLX animation\n D   flv             FLV (Flash Video)\n D   frm             Megalux Frame\n D   fsb             FMOD Sample Bank\n D   fwse            Capcom's MT Framework sound\n D   g722            raw G.722\n D   g723_1          G.723.1\n D   g726            raw big-endian G.726 (\"left aligned\")\n D   g726le          raw little-endian G.726 (\"right aligned\")\n D   g728            raw G.728\n D   g729            G.729 raw format demuxer\n D d gdigrab         GDI API Windows frame grabber\n D   gdv             Gremlin Digital Video\n D   gem_pipe        piped gem sequence\n D   genh            GENeric Header\n D   gif             CompuServe Graphics Interchange Format (GIF)\n D   gif_pipe        piped gif sequence\n D   gsm             raw GSM\n D   gxf             GXF (General eXchange Format)\n D   h261            raw H.261\n D   h263            raw H.263\n D   h264            raw H.264 video\n D   hca             CRI HCA\n D   hcom            Macintosh HCOM\n D   hdr_pipe        piped hdr sequence\n D   hevc            raw HEVC video\n D   hls             Apple HTTP Live Streaming\n D   hnm             Cryo HNM v4\n D   hxvs            HXVF/HXVS IP camera format\n D   iamf            Raw Immersive Audio Model and Formats\n D   ico             Microsoft Windows ICO\n D   idcin           id Cinematic\n D   idf             iCE Draw File\n D   iff             IFF (Interchange File Format)\n D   ifv             IFV CCTV DVR\n D   ilbc            iLBC storage\n D   image2          image2 sequence\n D   image2pipe      piped image2 sequence\n D   imf             IMF (Interoperable Master Format)\n D   ingenient       raw Ingenient MJPEG\n D   ipmovie         Interplay MVE\n D   ipu             raw IPU Video\n D   ircam           Berkeley/IRCAM/CARL Sound Format\n D   iss             Funcom ISS\n D   iv8             IndigoVision 8000 video\n D   ivf             On2 IVF\n D   ivr             IVR (Internet Video Recording)\n D   j2k_pipe        piped j2k sequence\n D   jacosub         JACOsub subtitle format\n D   jpeg_pipe       piped jpeg sequence\n D   jpegls_pipe     piped jpegls sequence\n D   jpegxl_anim     Animated JPEG XL\n D   jpegxl_pipe     piped jpegxl sequence\n D   jpegxs_pipe     piped jpegxs sequence\n D   jv              Bitmap Brothers JV\n D   kux             KUX (YouKu)\n D   kvag            Simon & Schuster Interactive VAG\n D   laf             LAF (Limitless Audio Format)\n D d lavfi           Libavfilter virtual input device\n D   lc3             LC3 (Low Complexity Communication Codec)\n D d libcdio          \n D   libgme          Game Music Emu demuxer\n D   libmodplug      ModPlug demuxer\n D   libopenmpt      Tracker formats (libopenmpt)\n D   live_flv        live RTMP FLV (Flash Video)\n D   lmlm4           raw lmlm4\n D   loas            LOAS AudioSyncStream\n D   lrc             LRC lyrics\n D   luodat          Video CCTV DAT\n D   lvf             LVF\n D   lxf             VR native stream (LXF)\n D   m4v             raw MPEG-4 video\n D   matroska,webm   Matroska / WebM\n D   mca             MCA Audio Format\n D   mcc             MacCaption\n D   mgsts           Metal Gear Solid: The Twin Snakes\n D   microdvd        MicroDVD subtitle format\n D   mjpeg           raw MJPEG video\n D   mjpeg_2000      raw MJPEG 2000 video\n D   mlp             raw MLP\n D   mlv             Magic Lantern Video (MLV)\n D   mm              American Laser Games MM\n D   mmf             Yamaha SMAF\n D   mods            MobiClip MODS\n D   moflex          MobiClip MOFLEX\n D   mov,mp4,m4a,3gp,3g2,mj2 QuickTime / MOV\n D   mp3             MP2/3 (MPEG audio layer 2/3)\n D   mpc             Musepack\n D   mpc8            Musepack SV8\n D   mpeg            MPEG-PS (MPEG-2 Program Stream)\n D   mpegts          MPEG-TS (MPEG-2 Transport Stream)\n D   mpegtsraw       raw MPEG-TS (MPEG-2 Transport Stream)\n D   mpegvideo       raw MPEG video\n D   mpjpeg          MIME multipart JPEG\n D   mpl2            MPL2 subtitles\n D   mpsub           MPlayer subtitles\n D   msf             Sony PS3 MSF\n D   msnwctcp        MSN TCP Webcam stream\n D   msp             Microsoft Paint (MSP))\n D   mtaf            Konami PS2 MTAF\n D   mtv             MTV\n D   mulaw           PCM mu-law\n D   musx            Eurocom MUSX\n D   mv              Silicon Graphics Movie\n D   mvi             Motion Pixels MVI\n D   mxf             MXF (Material eXchange Format)\n D   mxg             MxPEG clip\n D   nc              NC camera feed\n D   nistsphere      NIST SPeech HEader REsources\n D   nsp             Computerized Speech Lab NSP\n D   nsv             Nullsoft Streaming Video\n D   nut             NUT\n D   nuv             NuppelVideo\n D   obu             AV1 low overhead OBU\n D   ogg             Ogg\n D   oma             Sony OpenMG audio\n D d openal          OpenAL audio capture device\n D   osq             raw OSQ\n D   paf             Amazing Studio Packed Animation File\n D   pam_pipe        piped pam sequence\n D   pbm_pipe        piped pbm sequence\n D   pcx_pipe        piped pcx sequence\n D   pdv             PlayDate Video\n D   pfm_pipe        piped pfm sequence\n D   pgm_pipe        piped pgm sequence\n D   pgmyuv_pipe     piped pgmyuv sequence\n D   pgx_pipe        piped pgx sequence\n D   phm_pipe        piped phm sequence\n D   photocd_pipe    piped photocd sequence\n D   pictor_pipe     piped pictor sequence\n D   pjs             PJS (Phoenix Japanimation Society) subtitles\n D   pmp             Playstation Portable PMP\n D   png_pipe        piped png sequence\n D   pp_bnk          Pro Pinball Series Soundbank\n D   ppm_pipe        piped ppm sequence\n D   psd_pipe        piped psd sequence\n D   psxstr          Sony Playstation STR\n D   pva             TechnoTrend PVA\n D   pvf             PVF (Portable Voice Format)\n D   qcp             QCP\n D   qdraw_pipe      piped qdraw sequence\n D   qoa             QOA\n D   qoi_pipe        piped qoi sequence\n D   r3d             REDCODE R3D\n D   rawvideo        raw video\n D   rcwt            RCWT (Raw Captions With Time)\n D   realtext        RealText subtitle format\n D   redspark        RedSpark\n D   rka             RKA (RK Audio)\n D   rl2             RL2\n D   rm              RealMedia\n D   roq             id RoQ\n D   rpl             RPL / ARMovie\n D   rsd             GameCube RSD\n D   rso             Lego Mindstorms RSO\n D   rtp             RTP input\n D   rtsp            RTSP input\n D   s16be           PCM signed 16-bit big-endian\n D   s16le           PCM signed 16-bit little-endian\n D   s24be           PCM signed 24-bit big-endian\n D   s24le           PCM signed 24-bit little-endian\n D   s32be           PCM signed 32-bit big-endian\n D   s32le           PCM signed 32-bit little-endian\n D   s337m           SMPTE 337M\n D   s8              PCM signed 8-bit\n D   sami            SAMI subtitle format\n D   sap             SAP input\n D   sbc             raw SBC (low-complexity subband codec)\n D   sbg             SBaGen binaural beats script\n D   scc             Scenarist Closed Captions\n D   scd             Square Enix SCD\n D   sdns            Xbox SDNS\n D   sdp             SDP\n D   sdr2            SDR2\n D   sds             MIDI Sample Dump Standard\n D   sdx             Sample Dump eXchange\n D   ser             SER (Simple uncompressed video format for astronomical capturing)\n D   sga             Digital Pictures SGA\n D   sgi_pipe        piped sgi sequence\n D   shn             raw Shorten\n D   siff            Beam Software SIFF\n D   simbiosis_imx   Simbiosis Interactive IMX\n D   sln             Asterisk raw pcm\n D   smjpeg          Loki SDL MJPEG\n D   smk             Smacker\n D   smush           LucasArts Smush\n D   sol             Sierra SOL\n D   sox             SoX (Sound eXchange) native\n D   spdif           IEC 61937 (compressed data in S/PDIF)\n D   srt             SubRip subtitle\n D   stl             Spruce subtitle format\n D   subviewer       SubViewer subtitle format\n D   subviewer1      SubViewer v1 subtitle format\n D   sunrast_pipe    piped sunrast sequence\n D   sup             raw HDMV Presentation Graphic Stream subtitles\n D   svag            Konami PS2 SVAG\n D   svg_pipe        piped svg sequence\n D   svs             Square SVS\n D   swf             SWF (ShockWave Flash)\n D   tak             raw TAK\n D   tedcaptions     TED Talks captions\n D   thp             THP\n D   tiertexseq      Tiertex Limited SEQ\n D   tiff_pipe       piped tiff sequence\n D   tmv             8088flex TMV\n D   truehd          raw TrueHD\n D   tta             TTA (True Audio)\n D   tty             Tele-typewriter\n D   txd             Renderware TeXture Dictionary\n D   ty              TiVo TY Stream\n D   u16be           PCM unsigned 16-bit big-endian\n D   u16le           PCM unsigned 16-bit little-endian\n D   u24be           PCM unsigned 24-bit big-endian\n D   u24le           PCM unsigned 24-bit little-endian\n D   u32be           PCM unsigned 32-bit big-endian\n D   u32le           PCM unsigned 32-bit little-endian\n D   u8              PCM unsigned 8-bit\n D   usm             CRI USM\n D   v210            Uncompressed 4:2:2 10-bit\n D   v210x           Uncompressed 4:2:2 10-bit\n D   vag             Sony PS2 VAG\n D   vbn_pipe        piped vbn sequence\n D   vc1             raw VC-1\n D   vc1test         VC-1 test bitstream\n D d vfwcap          VfW video capture\n D   vidc            PCM Archimedes VIDC\n D   vividas         Vividas VIV\n D   vivo            Vivo\n D   vmd             Sierra VMD\n D   vobsub          VobSub subtitle format\n D   voc             Creative Voice\n D   vpk             Sony PS2 VPK\n D   vplayer         VPlayer subtitles\n D   vqf             Nippon Telegraph and Telephone Corporation (NTT) TwinVQ\n D   vvc             raw H.266/VVC video\n D   w64             Sony Wave64\n D   wady            Marble WADY\n D   wav             WAV / WAVE (Waveform Audio)\n D   wavarc          Waveform Archiver\n D   wc3movie        Wing Commander III movie\n D   webm_dash_manifest WebM DASH Manifest\n D   webp_anim       Animated WebP\n D   webp_pipe       piped webp sequence\n D   webvtt          WebVTT subtitle\n D   wsaud           Westwood Studios audio\n D   wsd             Wideband Single-bit Data (WSD)\n D   wsvqa           Westwood Studios VQA\n D   wtv             Windows Television (WTV)\n D   wv              WavPack\n D   wve             Psion 3 audio\n D   xa              Maxis XA\n D   xbin            eXtended BINary text (XBIN)\n D   xbm_pipe        piped xbm sequence\n D   xmd             Konami XMD\n D   xmv             Microsoft XMV\n D   xpm_pipe        piped xpm sequence\n D   xvag            Sony PS3 XVAG\n D   xwd_pipe        piped xwd sequence\n D   xwma            Microsoft xWMA\n D   yop             Psygnosis YOP\n D   yuv4mpegpipe    YUV4MPEG pipe\n",
+      "stderr": "",
+      "duration_seconds": 0.09299999999348074
+    },
+    {
+      "argv": [
+        "C:\\Users\\ComeToM3\\Dev\\AudioVideoManager\\.venv\\Scripts\\python.exe",
+        "-c",
+        "from audio_video_manager.extraction.dvd_navigation import _run_worker; _run_worker()"
+      ],
+      "returncode": 0,
+      "stdout": "{\"titles\": [{\"title_index\": 1, \"part_count\": 5, \"angle_count\": 1, \"duration_seconds\": 46.766666666666666, \"chapters\": [{\"index\": 1, \"start_seconds\": 0.0, \"end_seconds\": 11.8, \"title\": null}, {\"index\": 2, \"start_seconds\": 11.8, \"end_seconds\": 23.0, \"title\": null}, {\"index\": 3, \"start_seconds\": 23.0, \"end_seconds\": 33.2, \"title\": null}, {\"index\": 4, \"start_seconds\": 33.2, \"end_seconds\": 40.56666666666667, \"title\": null}, {\"index\": 5, \"start_seconds\": 40.56666666666667, \"end_seconds\": 46.766666666666666, \"title\": null}]}, {\"title_index\": 2, \"part_count\": 15, \"angle_count\": 1, \"duration_seconds\": 5403.6, \"chapters\": [{\"index\": 1, \"start_seconds\": 0.0, \"end_seconds\": 201.6, \"title\": null}, {\"index\": 2, \"start_seconds\": 201.6, \"end_seconds\": 510.8, \"title\": null}, {\"index\": 3, \"start_seconds\": 510.8, \"end_seconds\": 808.3, \"title\": null}, {\"index\": 4, \"start_seconds\": 808.3, \"end_seconds\": 1023.3, \"title\": null}, {\"index\": 5, \"start_seconds\": 1023.3, \"end_seconds\": 1249.3, \"title\": null}, {\"index\": 6, \"start_seconds\": 1249.3, \"end_seconds\": 1698.7, \"title\": null}, {\"index\": 7, \"start_seconds\": 1698.7, \"end_seconds\": 1870.1, \"title\": null}, {\"index\": 8, \"start_seconds\": 1870.1, \"end_seconds\": 2192.9, \"title\": null}, {\"index\": 9, \"start_seconds\": 2192.9, \"end_seconds\": 2507.2, \"title\": null}, {\"index\": 10, \"start_seconds\": 2507.2, \"end_seconds\": 2837.6, \"title\": null}, {\"index\": 11, \"start_seconds\": 2837.6, \"end_seconds\": 3375.9, \"title\": null}, {\"index\": 12, \"start_seconds\": 3375.9, \"end_seconds\": 3968.9, \"title\": null}, {\"index\": 13, \"start_seconds\": 3968.9, \"end_seconds\": 4094.4, \"title\": null}, {\"index\": 14, \"start_seconds\": 4094.4, \"end_seconds\": 4524.3, \"title\": null}, {\"index\": 15, \"start_seconds\": 4524.3, \"end_seconds\": 5403.6, \"title\": null}]}]}\nlibdvdnav: DVD Title: USE_YOUR_ILLUSION_1\nlibdvdnav: DVD Serial Number: 3F7B3F65___MVBION_1\nlibdvdnav: DVD Title (Alternative): \nlibdvdnav: DVD disk reports itself with Region mask 0x00c00000. Regions: 01 02 03 04 05 06\n",
+      "stderr": "",
+      "duration_seconds": 1.687999999994645
+    },
+    {
+      "argv": [
+        "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-11B2\\ffmpeg\\unpacked\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+        "-version"
+      ],
+      "returncode": 0,
+      "stdout": "ffprobe version 9.0.2-full_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers\nbuilt with gcc 16.2.0 (Rev3, Built by MSYS2 project)\nconfiguration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-cairo --enable-fontconfig --enable-iconv --enable-gnutls --enable-lcms2 --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-libsnappy --enable-zlib --enable-librist --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-sdl2 --enable-libaribb24 --enable-libaribcaption --enable-libdav1d --enable-libdavs2 --enable-libopenjpeg --enable-libquirc --enable-libuavs3d --enable-libxevd --enable-libzvbi --enable-liboapv --enable-libqrencode --enable-librav1e --enable-libsvtav1 --enable-libvvenc --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxeve --enable-libxvid --enable-libaom --enable-libjxl --enable-libsvtjpegxs --enable-libvpx --enable-mediafoundation --enable-libass --enable-frei0r --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-openal --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint --enable-whisper\nlibavutil      61.  1.102 / 61.  1.102\nlibavcodec     63.  1.102 / 63.  1.102\nlibavformat    63.  1.102 / 63.  1.102\nlibavdevice    63.  1.102 / 63.  1.102\nlibavfilter    12.  1.102 / 12.  1.102\nlibswscale     10.  1.102 / 10.  1.102\nlibswresample   7.  1.102 /  7.  1.102\n",
+      "stderr": "",
+      "duration_seconds": 0.21899999998277053
+    },
+    {
+      "argv": [
+        "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-11B2\\ffmpeg\\unpacked\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+        "-hide_banner",
+        "-demuxers"
+      ],
+      "returncode": 0,
+      "stdout": "Formats:\n D.. = Demuxing supported\n .E. = Muxing supported\n ..d = Is a device\n ---\n D   3dostr          3DO STR\n D   4xm             4X Technologies\n D   aa              Audible AA format files\n D   aac             raw ADTS AAC (Advanced Audio Coding)\n D   aax             CRI AAX\n D   ac3             raw AC-3\n D   ac4             raw AC-4\n D   ace             tri-Ace Audio Container\n D   acm             Interplay ACM\n D   act             ACT Voice file format\n D   adf             Artworx Data Format\n D   adp             ADP\n D   ads             Sony PS2 ADS\n D   adx             CRI ADX\n D   aea             MD STUDIO audio\n D   afc             AFC\n D   aiff            Audio IFF\n D   aix             CRI AIX\n D   alaw            PCM A-law\n D   alias_pix       Alias/Wavefront PIX image\n D   alp             LEGO Racers ALP\n D   amr             3GPP AMR\n D   amrnb           raw AMR-NB\n D   amrwb           raw AMR-WB\n D   anm             Deluxe Paint Animation\n D   apac            raw APAC\n D   apc             CRYO APC\n D   ape             Monkey's Audio\n D   apm             Ubisoft Rayman 2 APM\n D   apng            Animated Portable Network Graphics\n D   aptx            raw aptX\n D   aptx_hd         raw aptX HD\n D   apv             APV raw bitstream\n D   aqtitle         AQTitle subtitles\n D   argo_asf        Argonaut Games ASF\n D   argo_brp        Argonaut Games BRP\n D   argo_cvg        Argonaut Games CVG\n D   asf             ASF (Advanced / Active Streaming Format)\n D   asf_o           ASF (Advanced / Active Streaming Format)\n D   ass             SSA (SubStation Alpha) subtitle\n D   ast             AST (Audio Stream)\n D   au              Sun AU\n D   av1             AV1 Annex B\n D   avi             AVI (Audio Video Interleaved)\n D   avisynth        AviSynth script\n D   avr             AVR (Audio Visual Research)\n D   avs             Argonaut Games Creature Shock\n D   avs2            raw AVS2-P2/IEEE1857.4\n D   avs3            raw AVS3-P2/IEEE1857.10\n D   bethsoftvid     Bethesda Softworks VID\n D   bfi             Brute Force & Ignorance\n D   bfstm           BFSTM (Binary Cafe Stream)\n D   bin             Binary text\n D   bink            Bink\n D   binka           Bink Audio\n D   bit             G.729 BIT file format\n D   bitpacked       Bitpacked\n D   bmp_pipe        piped bmp sequence\n D   bmv             Discworld II BMV\n D   boa             Black Ops Audio\n D   bonk            raw Bonk\n D   brender_pix     BRender PIX image\n D   brstm           BRSTM (Binary Revolution Stream)\n D   c93             Interplay C93\n D   caf             Apple CAF (Core Audio Format)\n D   cavsvideo       raw Chinese AVS (Audio Video Standard)\n D   cdg             CD Graphics\n D   cdxl            Commodore CDXL video\n D   cine            Phantom Cine\n D   codec2          codec2 .c2 demuxer\n D   codec2raw       raw codec2 demuxer\n D   concat          Virtual concatenation script\n D   cri_pipe        piped cri sequence\n D   dash            Dynamic Adaptive Streaming over HTTP\n D   data            raw data\n D   daud            D-Cinema audio\n D   dcstr           Sega DC STR\n D   dds_pipe        piped dds sequence\n D   derf            Xilam DERF\n D   dfa             Chronomaster DFA\n D   dfpwm           raw DFPWM1a\n D   dhav            Video DAV\n D   dirac           raw Dirac\n D   dnxhd           raw DNxHD (SMPTE VC-3)\n D   dpx_pipe        piped dpx sequence\n D   dsf             DSD Stream File (DSF)\n D d dshow           DirectShow capture\n D   dsicin          Delphine Software International CIN\n D   dss             Digital Speech Standard (DSS)\n D   dts             raw DTS\n D   dtshd           raw DTS-HD\n D   dv              DV (Digital Video)\n D   dvbsub          raw dvbsub\n D   dvbtxt          dvbtxt\n D   dvdvideo        DVD-Video\n D   dxa             DXA\n D   ea              Electronic Arts Multimedia\n D   ea_cdata        Electronic Arts cdata\n D   eac3            raw E-AC-3\n D   epaf            Ensoniq Paris Audio File\n D   evc             EVC Annex B\n D   exr_pipe        piped exr sequence\n D   f32be           PCM 32-bit floating-point big-endian\n D   f32le           PCM 32-bit floating-point little-endian\n D   f64be           PCM 64-bit floating-point big-endian\n D   f64le           PCM 64-bit floating-point little-endian\n D   ffmetadata      FFmpeg metadata in text\n D   film_cpk        Sega FILM / CPK\n D   filmstrip       Adobe Filmstrip\n D   fits            Flexible Image Transport System\n D   flac            raw FLAC\n D   flic            FLI/FLC/FLX animation\n D   flv             FLV (Flash Video)\n D   frm             Megalux Frame\n D   fsb             FMOD Sample Bank\n D   fwse            Capcom's MT Framework sound\n D   g722            raw G.722\n D   g723_1          G.723.1\n D   g726            raw big-endian G.726 (\"left aligned\")\n D   g726le          raw little-endian G.726 (\"right aligned\")\n D   g728            raw G.728\n D   g729            G.729 raw format demuxer\n D d gdigrab         GDI API Windows frame grabber\n D   gdv             Gremlin Digital Video\n D   gem_pipe        piped gem sequence\n D   genh            GENeric Header\n D   gif             CompuServe Graphics Interchange Format (GIF)\n D   gif_pipe        piped gif sequence\n D   gsm             raw GSM\n D   gxf             GXF (General eXchange Format)\n D   h261            raw H.261\n D   h263            raw H.263\n D   h264            raw H.264 video\n D   hca             CRI HCA\n D   hcom            Macintosh HCOM\n D   hdr_pipe        piped hdr sequence\n D   hevc            raw HEVC video\n D   hls             Apple HTTP Live Streaming\n D   hnm             Cryo HNM v4\n D   hxvs            HXVF/HXVS IP camera format\n D   iamf            Raw Immersive Audio Model and Formats\n D   ico             Microsoft Windows ICO\n D   idcin           id Cinematic\n D   idf             iCE Draw File\n D   iff             IFF (Interchange File Format)\n D   ifv             IFV CCTV DVR\n D   ilbc            iLBC storage\n D   image2          image2 sequence\n D   image2pipe      piped image2 sequence\n D   imf             IMF (Interoperable Master Format)\n D   ingenient       raw Ingenient MJPEG\n D   ipmovie         Interplay MVE\n D   ipu             raw IPU Video\n D   ircam           Berkeley/IRCAM/CARL Sound Format\n D   iss             Funcom ISS\n D   iv8             IndigoVision 8000 video\n D   ivf             On2 IVF\n D   ivr             IVR (Internet Video Recording)\n D   j2k_pipe        piped j2k sequence\n D   jacosub         JACOsub subtitle format\n D   jpeg_pipe       piped jpeg sequence\n D   jpegls_pipe     piped jpegls sequence\n D   jpegxl_anim     Animated JPEG XL\n D   jpegxl_pipe     piped jpegxl sequence\n D   jpegxs_pipe     piped jpegxs sequence\n D   jv              Bitmap Brothers JV\n D   kux             KUX (YouKu)\n D   kvag            Simon & Schuster Interactive VAG\n D   laf             LAF (Limitless Audio Format)\n D d lavfi           Libavfilter virtual input device\n D   lc3             LC3 (Low Complexity Communication Codec)\n D d libcdio          \n D   libgme          Game Music Emu demuxer\n D   libmodplug      ModPlug demuxer\n D   libopenmpt      Tracker formats (libopenmpt)\n D   live_flv        live RTMP FLV (Flash Video)\n D   lmlm4           raw lmlm4\n D   loas            LOAS AudioSyncStream\n D   lrc             LRC lyrics\n D   luodat          Video CCTV DAT\n D   lvf             LVF\n D   lxf             VR native stream (LXF)\n D   m4v             raw MPEG-4 video\n D   matroska,webm   Matroska / WebM\n D   mca             MCA Audio Format\n D   mcc             MacCaption\n D   mgsts           Metal Gear Solid: The Twin Snakes\n D   microdvd        MicroDVD subtitle format\n D   mjpeg           raw MJPEG video\n D   mjpeg_2000      raw MJPEG 2000 video\n D   mlp             raw MLP\n D   mlv             Magic Lantern Video (MLV)\n D   mm              American Laser Games MM\n D   mmf             Yamaha SMAF\n D   mods            MobiClip MODS\n D   moflex          MobiClip MOFLEX\n D   mov,mp4,m4a,3gp,3g2,mj2 QuickTime / MOV\n D   mp3             MP2/3 (MPEG audio layer 2/3)\n D   mpc             Musepack\n D   mpc8            Musepack SV8\n D   mpeg            MPEG-PS (MPEG-2 Program Stream)\n D   mpegts          MPEG-TS (MPEG-2 Transport Stream)\n D   mpegtsraw       raw MPEG-TS (MPEG-2 Transport Stream)\n D   mpegvideo       raw MPEG video\n D   mpjpeg          MIME multipart JPEG\n D   mpl2            MPL2 subtitles\n D   mpsub           MPlayer subtitles\n D   msf             Sony PS3 MSF\n D   msnwctcp        MSN TCP Webcam stream\n D   msp             Microsoft Paint (MSP))\n D   mtaf            Konami PS2 MTAF\n D   mtv             MTV\n D   mulaw           PCM mu-law\n D   musx            Eurocom MUSX\n D   mv              Silicon Graphics Movie\n D   mvi             Motion Pixels MVI\n D   mxf             MXF (Material eXchange Format)\n D   mxg             MxPEG clip\n D   nc              NC camera feed\n D   nistsphere      NIST SPeech HEader REsources\n D   nsp             Computerized Speech Lab NSP\n D   nsv             Nullsoft Streaming Video\n D   nut             NUT\n D   nuv             NuppelVideo\n D   obu             AV1 low overhead OBU\n D   ogg             Ogg\n D   oma             Sony OpenMG audio\n D d openal          OpenAL audio capture device\n D   osq             raw OSQ\n D   paf             Amazing Studio Packed Animation File\n D   pam_pipe        piped pam sequence\n D   pbm_pipe        piped pbm sequence\n D   pcx_pipe        piped pcx sequence\n D   pdv             PlayDate Video\n D   pfm_pipe        piped pfm sequence\n D   pgm_pipe        piped pgm sequence\n D   pgmyuv_pipe     piped pgmyuv sequence\n D   pgx_pipe        piped pgx sequence\n D   phm_pipe        piped phm sequence\n D   photocd_pipe    piped photocd sequence\n D   pictor_pipe     piped pictor sequence\n D   pjs             PJS (Phoenix Japanimation Society) subtitles\n D   pmp             Playstation Portable PMP\n D   png_pipe        piped png sequence\n D   pp_bnk          Pro Pinball Series Soundbank\n D   ppm_pipe        piped ppm sequence\n D   psd_pipe        piped psd sequence\n D   psxstr          Sony Playstation STR\n D   pva             TechnoTrend PVA\n D   pvf             PVF (Portable Voice Format)\n D   qcp             QCP\n D   qdraw_pipe      piped qdraw sequence\n D   qoa             QOA\n D   qoi_pipe        piped qoi sequence\n D   r3d             REDCODE R3D\n D   rawvideo        raw video\n D   rcwt            RCWT (Raw Captions With Time)\n D   realtext        RealText subtitle format\n D   redspark        RedSpark\n D   rka             RKA (RK Audio)\n D   rl2             RL2\n D   rm              RealMedia\n D   roq             id RoQ\n D   rpl             RPL / ARMovie\n D   rsd             GameCube RSD\n D   rso             Lego Mindstorms RSO\n D   rtp             RTP input\n D   rtsp            RTSP input\n D   s16be           PCM signed 16-bit big-endian\n D   s16le           PCM signed 16-bit little-endian\n D   s24be           PCM signed 24-bit big-endian\n D   s24le           PCM signed 24-bit little-endian\n D   s32be           PCM signed 32-bit big-endian\n D   s32le           PCM signed 32-bit little-endian\n D   s337m           SMPTE 337M\n D   s8              PCM signed 8-bit\n D   sami            SAMI subtitle format\n D   sap             SAP input\n D   sbc             raw SBC (low-complexity subband codec)\n D   sbg             SBaGen binaural beats script\n D   scc             Scenarist Closed Captions\n D   scd             Square Enix SCD\n D   sdns            Xbox SDNS\n D   sdp             SDP\n D   sdr2            SDR2\n D   sds             MIDI Sample Dump Standard\n D   sdx             Sample Dump eXchange\n D   ser             SER (Simple uncompressed video format for astronomical capturing)\n D   sga             Digital Pictures SGA\n D   sgi_pipe        piped sgi sequence\n D   shn             raw Shorten\n D   siff            Beam Software SIFF\n D   simbiosis_imx   Simbiosis Interactive IMX\n D   sln             Asterisk raw pcm\n D   smjpeg          Loki SDL MJPEG\n D   smk             Smacker\n D   smush           LucasArts Smush\n D   sol             Sierra SOL\n D   sox             SoX (Sound eXchange) native\n D   spdif           IEC 61937 (compressed data in S/PDIF)\n D   srt             SubRip subtitle\n D   stl             Spruce subtitle format\n D   subviewer       SubViewer subtitle format\n D   subviewer1      SubViewer v1 subtitle format\n D   sunrast_pipe    piped sunrast sequence\n D   sup             raw HDMV Presentation Graphic Stream subtitles\n D   svag            Konami PS2 SVAG\n D   svg_pipe        piped svg sequence\n D   svs             Square SVS\n D   swf             SWF (ShockWave Flash)\n D   tak             raw TAK\n D   tedcaptions     TED Talks captions\n D   thp             THP\n D   tiertexseq      Tiertex Limited SEQ\n D   tiff_pipe       piped tiff sequence\n D   tmv             8088flex TMV\n D   truehd          raw TrueHD\n D   tta             TTA (True Audio)\n D   tty             Tele-typewriter\n D   txd             Renderware TeXture Dictionary\n D   ty              TiVo TY Stream\n D   u16be           PCM unsigned 16-bit big-endian\n D   u16le           PCM unsigned 16-bit little-endian\n D   u24be           PCM unsigned 24-bit big-endian\n D   u24le           PCM unsigned 24-bit little-endian\n D   u32be           PCM unsigned 32-bit big-endian\n D   u32le           PCM unsigned 32-bit little-endian\n D   u8              PCM unsigned 8-bit\n D   usm             CRI USM\n D   v210            Uncompressed 4:2:2 10-bit\n D   v210x           Uncompressed 4:2:2 10-bit\n D   vag             Sony PS2 VAG\n D   vbn_pipe        piped vbn sequence\n D   vc1             raw VC-1\n D   vc1test         VC-1 test bitstream\n D d vfwcap          VfW video capture\n D   vidc            PCM Archimedes VIDC\n D   vividas         Vividas VIV\n D   vivo            Vivo\n D   vmd             Sierra VMD\n D   vobsub          VobSub subtitle format\n D   voc             Creative Voice\n D   vpk             Sony PS2 VPK\n D   vplayer         VPlayer subtitles\n D   vqf             Nippon Telegraph and Telephone Corporation (NTT) TwinVQ\n D   vvc             raw H.266/VVC video\n D   w64             Sony Wave64\n D   wady            Marble WADY\n D   wav             WAV / WAVE (Waveform Audio)\n D   wavarc          Waveform Archiver\n D   wc3movie        Wing Commander III movie\n D   webm_dash_manifest WebM DASH Manifest\n D   webp_anim       Animated WebP\n D   webp_pipe       piped webp sequence\n D   webvtt          WebVTT subtitle\n D   wsaud           Westwood Studios audio\n D   wsd             Wideband Single-bit Data (WSD)\n D   wsvqa           Westwood Studios VQA\n D   wtv             Windows Television (WTV)\n D   wv              WavPack\n D   wve             Psion 3 audio\n D   xa              Maxis XA\n D   xbin            eXtended BINary text (XBIN)\n D   xbm_pipe        piped xbm sequence\n D   xmd             Konami XMD\n D   xmv             Microsoft XMV\n D   xpm_pipe        piped xpm sequence\n D   xvag            Sony PS3 XVAG\n D   xwd_pipe        piped xwd sequence\n D   xwma            Microsoft xWMA\n D   yop             Psygnosis YOP\n D   yuv4mpegpipe    YUV4MPEG pipe\n",
+      "stderr": "",
+      "duration_seconds": 1.047000000020489
+    },
+    {
+      "argv": [
+        "C:\\Users\\ComeToM3\\Dev\\AudioVideoManager\\.venv\\Scripts\\python.exe",
+        "-c",
+        "from audio_video_manager.extraction.dvd_navigation import _run_worker; _run_worker()"
+      ],
+      "returncode": 0,
+      "stdout": "{\"titles\": [{\"title_index\": 1, \"part_count\": 5, \"angle_count\": 1, \"duration_seconds\": 46.766666666666666, \"chapters\": [{\"index\": 1, \"start_seconds\": 0.0, \"end_seconds\": 11.8, \"title\": null}, {\"index\": 2, \"start_seconds\": 11.8, \"end_seconds\": 23.0, \"title\": null}, {\"index\": 3, \"start_seconds\": 23.0, \"end_seconds\": 33.2, \"title\": null}, {\"index\": 4, \"start_seconds\": 33.2, \"end_seconds\": 40.56666666666667, \"title\": null}, {\"index\": 5, \"start_seconds\": 40.56666666666667, \"end_seconds\": 46.766666666666666, \"title\": null}]}, {\"title_index\": 2, \"part_count\": 15, \"angle_count\": 1, \"duration_seconds\": 5403.6, \"chapters\": [{\"index\": 1, \"start_seconds\": 0.0, \"end_seconds\": 201.6, \"title\": null}, {\"index\": 2, \"start_seconds\": 201.6, \"end_seconds\": 510.8, \"title\": null}, {\"index\": 3, \"start_seconds\": 510.8, \"end_seconds\": 808.3, \"title\": null}, {\"index\": 4, \"start_seconds\": 808.3, \"end_seconds\": 1023.3, \"title\": null}, {\"index\": 5, \"start_seconds\": 1023.3, \"end_seconds\": 1249.3, \"title\": null}, {\"index\": 6, \"start_seconds\": 1249.3, \"end_seconds\": 1698.7, \"title\": null}, {\"index\": 7, \"start_seconds\": 1698.7, \"end_seconds\": 1870.1, \"title\": null}, {\"index\": 8, \"start_seconds\": 1870.1, \"end_seconds\": 2192.9, \"title\": null}, {\"index\": 9, \"start_seconds\": 2192.9, \"end_seconds\": 2507.2, \"title\": null}, {\"index\": 10, \"start_seconds\": 2507.2, \"end_seconds\": 2837.6, \"title\": null}, {\"index\": 11, \"start_seconds\": 2837.6, \"end_seconds\": 3375.9, \"title\": null}, {\"index\": 12, \"start_seconds\": 3375.9, \"end_seconds\": 3968.9, \"title\": null}, {\"index\": 13, \"start_seconds\": 3968.9, \"end_seconds\": 4094.4, \"title\": null}, {\"index\": 14, \"start_seconds\": 4094.4, \"end_seconds\": 4524.3, \"title\": null}, {\"index\": 15, \"start_seconds\": 4524.3, \"end_seconds\": 5403.6, \"title\": null}]}]}\nlibdvdnav: DVD Title: USE_YOUR_ILLUSION_1\nlibdvdnav: DVD Serial Number: 3F7B3F65___MVBION_1\nlibdvdnav: DVD Title (Alternative): \nlibdvdnav: DVD disk reports itself with Region mask 0x00c00000. Regions: 01 02 03 04 05 06\n",
+      "stderr": "",
+      "duration_seconds": 1.125
+    },
+    {
+      "argv": [
+        "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-11B2\\ffmpeg\\unpacked\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+        "-hide_banner",
+        "-v",
+        "error",
+        "-f",
+        "dvdvideo",
+        "-title",
+        "1",
+        "-angle",
+        "1",
+        "-show_format",
+        "-show_streams",
+        "-show_chapters",
+        "-of",
+        "json",
+        "-i",
+        "\\\\.\\D:"
+      ],
+      "returncode": 0,
+      "stdout": "{\n    \"streams\": [\n        {\n            \"index\": 0,\n            \"codec_name\": \"mpeg2video\",\n            \"codec_long_name\": \"MPEG-2 video\",\n            \"codec_type\": \"video\",\n            \"codec_tag_string\": \"[0][0][0][0]\",\n            \"codec_tag\": \"0x0000\",\n            \"width\": 720,\n            \"height\": 480,\n            \"coded_width\": 0,\n            \"coded_height\": 0,\n            \"has_b_frames\": 1,\n            \"sample_aspect_ratio\": \"8:9\",\n            \"display_aspect_ratio\": \"4:3\",\n            \"pix_fmt\": \"yuv420p\",\n            \"level\": -99,\n            \"color_range\": \"tv\",\n            \"field_order\": \"tt\",\n            \"id\": \"0x1e0\",\n            \"r_frame_rate\": \"30000/1001\",\n            \"avg_frame_rate\": \"30000/1001\",\n            \"time_base\": \"1/90000\",\n            \"start_pts\": 0,\n            \"start_time\": \"0.000000\",\n            \"bit_rate\": \"8000000\",\n            \"extradata_size\": 88,\n            \"disposition\": {\n                \"default\": 0,\n                \"dub\": 0,\n                \"original\": 0,\n                \"comment\": 0,\n                \"lyrics\": 0,\n                \"karaoke\": 0,\n                \"forced\": 0,\n                \"hearing_impaired\": 0,\n                \"visual_impaired\": 0,\n                \"clean_effects\": 0,\n                \"attached_pic\": 0,\n                \"timed_thumbnails\": 0,\n                \"non_diegetic\": 0,\n                \"captions\": 0,\n                \"descriptions\": 0,\n                \"metadata\": 0,\n                \"dependent\": 0,\n                \"still_image\": 0,\n                \"multilayer\": 0\n            },\n            \"side_data_list\": [\n                {\n                    \"side_data_type\": \"CPB properties\",\n                    \"max_bitrate\": 8000000,\n                    \"min_bitrate\": 0,\n                    \"avg_bitrate\": 0,\n                    \"buffer_size\": 0,\n                    \"vbv_delay\": -1\n                }\n            ]\n        },\n        {\n            \"index\": 1,\n            \"codec_name\": \"ac3\",\n            \"codec_long_name\": \"ATSC A/52A (AC-3)\",\n            \"codec_type\": \"audio\",\n            \"codec_tag_string\": \"[0][0][0][0]\",\n            \"codec_tag\": \"0x0000\",\n            \"mime_codec_string\": \"ac-3\",\n            \"sample_fmt\": \"u8\",\n            \"sample_rate\": \"48000\",\n            \"channels\": 2,\n            \"channel_layout\": \"stereo\",\n            \"bits_per_sample\": 0,\n            \"initial_padding\": 0,\n            \"dmix_mode\": \"0\",\n            \"ltrt_cmixlev\": \"0.000000\",\n            \"ltrt_surmixlev\": \"0.000000\",\n            \"loro_cmixlev\": \"0.000000\",\n            \"loro_surmixlev\": \"0.000000\",\n            \"id\": \"0x80\",\n            \"r_frame_rate\": \"0/0\",\n            \"avg_frame_rate\": \"0/0\",\n            \"time_base\": \"1/90000\",\n            \"start_pts\": 0,\n            \"start_time\": \"0.000000\",\n            \"duration_ts\": 4209000,\n            \"duration\": \"46.766667\",\n            \"disposition\": {\n                \"default\": 0,\n                \"dub\": 0,\n                \"original\": 0,\n                \"comment\": 0,\n                \"lyrics\": 0,\n                \"karaoke\": 0,\n                \"forced\": 0,\n                \"hearing_impaired\": 0,\n                \"visual_impaired\": 0,\n                \"clean_effects\": 0,\n                \"attached_pic\": 0,\n                \"timed_thumbnails\": 0,\n                \"non_diegetic\": 0,\n                \"captions\": 0,\n                \"descriptions\": 0,\n                \"metadata\": 0,\n                \"dependent\": 0,\n                \"still_image\": 0,\n                \"multilayer\": 0\n            },\n            \"tags\": {\n                \"language\": \"eng\"\n            }\n        }\n    ],\n    \"chapters\": [\n        {\n            \"id\": 0,\n            \"time_base\": \"1/90000\",\n            \"start\": 0,\n            \"start_time\": \"0.000000\",\n            \"end\": 1062000,\n            \"end_time\": \"11.800000\"\n        },\n        {\n            \"id\": 1,\n            \"time_base\": \"1/90000\",\n            \"start\": 1062000,\n            \"start_time\": \"11.800000\",\n            \"end\": 2070000,\n            \"end_time\": \"23.000000\"\n        },\n        {\n            \"id\": 2,\n            \"time_base\": \"1/90000\",\n            \"start\": 2070000,\n            \"start_time\": \"23.000000\",\n            \"end\": 2988000,\n            \"end_time\": \"33.200000\"\n        },\n        {\n            \"id\": 3,\n            \"time_base\": \"1/90000\",\n            \"start\": 2988000,\n            \"start_time\": \"33.200000\",\n            \"end\": 3651000,\n            \"end_time\": \"40.566667\"\n        },\n        {\n            \"id\": 4,\n            \"time_base\": \"1/90000\",\n            \"start\": 3651000,\n            \"start_time\": \"40.566667\",\n            \"end\": 4209000,\n            \"end_time\": \"46.766667\"\n        }\n    ],\n    \"format\": {\n        \"filename\": \"\\\\\\\\.\\\\D:\",\n        \"nb_streams\": 2,\n        \"nb_programs\": 0,\n        \"nb_stream_groups\": 0,\n        \"format_name\": \"dvdvideo\",\n        \"format_long_name\": \"DVD-Video\",\n        \"start_time\": \"0.000000\",\n        \"duration\": \"46.766667\",\n        \"probe_score\": 25\n    }\n}\n",
+      "stderr": "[dvdvideo @ 0000028ca704b280] Unable to read next block of PGC\n[dvdvideo @ 0000028ca704b280] dvdnav error (title=1185091011 pgc=-1268705139 pg=212062568 cell=1): Error reading from DVD.\n",
+      "duration_seconds": 1.2809999999881256
+    },
+    {
+      "argv": [
+        "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-11B2\\ffmpeg\\unpacked\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+        "-version"
+      ],
+      "returncode": 0,
+      "stdout": "ffprobe version 9.0.2-full_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers\nbuilt with gcc 16.2.0 (Rev3, Built by MSYS2 project)\nconfiguration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-cairo --enable-fontconfig --enable-iconv --enable-gnutls --enable-lcms2 --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-libsnappy --enable-zlib --enable-librist --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-libbluray --enable-libcaca --enable-libdvdnav --enable-libdvdread --enable-sdl2 --enable-libaribb24 --enable-libaribcaption --enable-libdav1d --enable-libdavs2 --enable-libopenjpeg --enable-libquirc --enable-libuavs3d --enable-libxevd --enable-libzvbi --enable-liboapv --enable-libqrencode --enable-librav1e --enable-libsvtav1 --enable-libvvenc --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxeve --enable-libxvid --enable-libaom --enable-libjxl --enable-libsvtjpegxs --enable-libvpx --enable-mediafoundation --enable-libass --enable-frei0r --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-liblensfun --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-vulkan --enable-libplacebo --enable-opencl --enable-libcdio --enable-openal --enable-libgme --enable-libmodplug --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libshine --enable-libtheora --enable-libtwolame --enable-libvo-amrwbenc --enable-libcodec2 --enable-libilbc --enable-libgsm --enable-liblc3 --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-ladspa --enable-libbs2b --enable-libflite --enable-libmysofa --enable-librubberband --enable-libsoxr --enable-chromaprint --enable-whisper\nlibavutil      61.  1.102 / 61.  1.102\nlibavcodec     63.  1.102 / 63.  1.102\nlibavformat    63.  1.102 / 63.  1.102\nlibavdevice    63.  1.102 / 63.  1.102\nlibavfilter    12.  1.102 / 12.  1.102\nlibswscale     10.  1.102 / 10.  1.102\nlibswresample   7.  1.102 /  7.  1.102\n",
+      "stderr": "",
+      "duration_seconds": 0.046000000002095476
+    },
+    {
+      "argv": [
+        "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-11B2\\ffmpeg\\unpacked\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+        "-hide_banner",
+        "-demuxers"
+      ],
+      "returncode": 0,
+      "stdout": "Formats:\n D.. = Demuxing supported\n .E. = Muxing supported\n ..d = Is a device\n ---\n D   3dostr          3DO STR\n D   4xm             4X Technologies\n D   aa              Audible AA format files\n D   aac             raw ADTS AAC (Advanced Audio Coding)\n D   aax             CRI AAX\n D   ac3             raw AC-3\n D   ac4             raw AC-4\n D   ace             tri-Ace Audio Container\n D   acm             Interplay ACM\n D   act             ACT Voice file format\n D   adf             Artworx Data Format\n D   adp             ADP\n D   ads             Sony PS2 ADS\n D   adx             CRI ADX\n D   aea             MD STUDIO audio\n D   afc             AFC\n D   aiff            Audio IFF\n D   aix             CRI AIX\n D   alaw            PCM A-law\n D   alias_pix       Alias/Wavefront PIX image\n D   alp             LEGO Racers ALP\n D   amr             3GPP AMR\n D   amrnb           raw AMR-NB\n D   amrwb           raw AMR-WB\n D   anm             Deluxe Paint Animation\n D   apac            raw APAC\n D   apc             CRYO APC\n D   ape             Monkey's Audio\n D   apm             Ubisoft Rayman 2 APM\n D   apng            Animated Portable Network Graphics\n D   aptx            raw aptX\n D   aptx_hd         raw aptX HD\n D   apv             APV raw bitstream\n D   aqtitle         AQTitle subtitles\n D   argo_asf        Argonaut Games ASF\n D   argo_brp        Argonaut Games BRP\n D   argo_cvg        Argonaut Games CVG\n D   asf             ASF (Advanced / Active Streaming Format)\n D   asf_o           ASF (Advanced / Active Streaming Format)\n D   ass             SSA (SubStation Alpha) subtitle\n D   ast             AST (Audio Stream)\n D   au              Sun AU\n D   av1             AV1 Annex B\n D   avi             AVI (Audio Video Interleaved)\n D   avisynth        AviSynth script\n D   avr             AVR (Audio Visual Research)\n D   avs             Argonaut Games Creature Shock\n D   avs2            raw AVS2-P2/IEEE1857.4\n D   avs3            raw AVS3-P2/IEEE1857.10\n D   bethsoftvid     Bethesda Softworks VID\n D   bfi             Brute Force & Ignorance\n D   bfstm           BFSTM (Binary Cafe Stream)\n D   bin             Binary text\n D   bink            Bink\n D   binka           Bink Audio\n D   bit             G.729 BIT file format\n D   bitpacked       Bitpacked\n D   bmp_pipe        piped bmp sequence\n D   bmv             Discworld II BMV\n D   boa             Black Ops Audio\n D   bonk            raw Bonk\n D   brender_pix     BRender PIX image\n D   brstm           BRSTM (Binary Revolution Stream)\n D   c93             Interplay C93\n D   caf             Apple CAF (Core Audio Format)\n D   cavsvideo       raw Chinese AVS (Audio Video Standard)\n D   cdg             CD Graphics\n D   cdxl            Commodore CDXL video\n D   cine            Phantom Cine\n D   codec2          codec2 .c2 demuxer\n D   codec2raw       raw codec2 demuxer\n D   concat          Virtual concatenation script\n D   cri_pipe        piped cri sequence\n D   dash            Dynamic Adaptive Streaming over HTTP\n D   data            raw data\n D   daud            D-Cinema audio\n D   dcstr           Sega DC STR\n D   dds_pipe        piped dds sequence\n D   derf            Xilam DERF\n D   dfa             Chronomaster DFA\n D   dfpwm           raw DFPWM1a\n D   dhav            Video DAV\n D   dirac           raw Dirac\n D   dnxhd           raw DNxHD (SMPTE VC-3)\n D   dpx_pipe        piped dpx sequence\n D   dsf             DSD Stream File (DSF)\n D d dshow           DirectShow capture\n D   dsicin          Delphine Software International CIN\n D   dss             Digital Speech Standard (DSS)\n D   dts             raw DTS\n D   dtshd           raw DTS-HD\n D   dv              DV (Digital Video)\n D   dvbsub          raw dvbsub\n D   dvbtxt          dvbtxt\n D   dvdvideo        DVD-Video\n D   dxa             DXA\n D   ea              Electronic Arts Multimedia\n D   ea_cdata        Electronic Arts cdata\n D   eac3            raw E-AC-3\n D   epaf            Ensoniq Paris Audio File\n D   evc             EVC Annex B\n D   exr_pipe        piped exr sequence\n D   f32be           PCM 32-bit floating-point big-endian\n D   f32le           PCM 32-bit floating-point little-endian\n D   f64be           PCM 64-bit floating-point big-endian\n D   f64le           PCM 64-bit floating-point little-endian\n D   ffmetadata      FFmpeg metadata in text\n D   film_cpk        Sega FILM / CPK\n D   filmstrip       Adobe Filmstrip\n D   fits            Flexible Image Transport System\n D   flac            raw FLAC\n D   flic            FLI/FLC/FLX animation\n D   flv             FLV (Flash Video)\n D   frm             Megalux Frame\n D   fsb             FMOD Sample Bank\n D   fwse            Capcom's MT Framework sound\n D   g722            raw G.722\n D   g723_1          G.723.1\n D   g726            raw big-endian G.726 (\"left aligned\")\n D   g726le          raw little-endian G.726 (\"right aligned\")\n D   g728            raw G.728\n D   g729            G.729 raw format demuxer\n D d gdigrab         GDI API Windows frame grabber\n D   gdv             Gremlin Digital Video\n D   gem_pipe        piped gem sequence\n D   genh            GENeric Header\n D   gif             CompuServe Graphics Interchange Format (GIF)\n D   gif_pipe        piped gif sequence\n D   gsm             raw GSM\n D   gxf             GXF (General eXchange Format)\n D   h261            raw H.261\n D   h263            raw H.263\n D   h264            raw H.264 video\n D   hca             CRI HCA\n D   hcom            Macintosh HCOM\n D   hdr_pipe        piped hdr sequence\n D   hevc            raw HEVC video\n D   hls             Apple HTTP Live Streaming\n D   hnm             Cryo HNM v4\n D   hxvs            HXVF/HXVS IP camera format\n D   iamf            Raw Immersive Audio Model and Formats\n D   ico             Microsoft Windows ICO\n D   idcin           id Cinematic\n D   idf             iCE Draw File\n D   iff             IFF (Interchange File Format)\n D   ifv             IFV CCTV DVR\n D   ilbc            iLBC storage\n D   image2          image2 sequence\n D   image2pipe      piped image2 sequence\n D   imf             IMF (Interoperable Master Format)\n D   ingenient       raw Ingenient MJPEG\n D   ipmovie         Interplay MVE\n D   ipu             raw IPU Video\n D   ircam           Berkeley/IRCAM/CARL Sound Format\n D   iss             Funcom ISS\n D   iv8             IndigoVision 8000 video\n D   ivf             On2 IVF\n D   ivr             IVR (Internet Video Recording)\n D   j2k_pipe        piped j2k sequence\n D   jacosub         JACOsub subtitle format\n D   jpeg_pipe       piped jpeg sequence\n D   jpegls_pipe     piped jpegls sequence\n D   jpegxl_anim     Animated JPEG XL\n D   jpegxl_pipe     piped jpegxl sequence\n D   jpegxs_pipe     piped jpegxs sequence\n D   jv              Bitmap Brothers JV\n D   kux             KUX (YouKu)\n D   kvag            Simon & Schuster Interactive VAG\n D   laf             LAF (Limitless Audio Format)\n D d lavfi           Libavfilter virtual input device\n D   lc3             LC3 (Low Complexity Communication Codec)\n D d libcdio          \n D   libgme          Game Music Emu demuxer\n D   libmodplug      ModPlug demuxer\n D   libopenmpt      Tracker formats (libopenmpt)\n D   live_flv        live RTMP FLV (Flash Video)\n D   lmlm4           raw lmlm4\n D   loas            LOAS AudioSyncStream\n D   lrc             LRC lyrics\n D   luodat          Video CCTV DAT\n D   lvf             LVF\n D   lxf             VR native stream (LXF)\n D   m4v             raw MPEG-4 video\n D   matroska,webm   Matroska / WebM\n D   mca             MCA Audio Format\n D   mcc             MacCaption\n D   mgsts           Metal Gear Solid: The Twin Snakes\n D   microdvd        MicroDVD subtitle format\n D   mjpeg           raw MJPEG video\n D   mjpeg_2000      raw MJPEG 2000 video\n D   mlp             raw MLP\n D   mlv             Magic Lantern Video (MLV)\n D   mm              American Laser Games MM\n D   mmf             Yamaha SMAF\n D   mods            MobiClip MODS\n D   moflex          MobiClip MOFLEX\n D   mov,mp4,m4a,3gp,3g2,mj2 QuickTime / MOV\n D   mp3             MP2/3 (MPEG audio layer 2/3)\n D   mpc             Musepack\n D   mpc8            Musepack SV8\n D   mpeg            MPEG-PS (MPEG-2 Program Stream)\n D   mpegts          MPEG-TS (MPEG-2 Transport Stream)\n D   mpegtsraw       raw MPEG-TS (MPEG-2 Transport Stream)\n D   mpegvideo       raw MPEG video\n D   mpjpeg          MIME multipart JPEG\n D   mpl2            MPL2 subtitles\n D   mpsub           MPlayer subtitles\n D   msf             Sony PS3 MSF\n D   msnwctcp        MSN TCP Webcam stream\n D   msp             Microsoft Paint (MSP))\n D   mtaf            Konami PS2 MTAF\n D   mtv             MTV\n D   mulaw           PCM mu-law\n D   musx            Eurocom MUSX\n D   mv              Silicon Graphics Movie\n D   mvi             Motion Pixels MVI\n D   mxf             MXF (Material eXchange Format)\n D   mxg             MxPEG clip\n D   nc              NC camera feed\n D   nistsphere      NIST SPeech HEader REsources\n D   nsp             Computerized Speech Lab NSP\n D   nsv             Nullsoft Streaming Video\n D   nut             NUT\n D   nuv             NuppelVideo\n D   obu             AV1 low overhead OBU\n D   ogg             Ogg\n D   oma             Sony OpenMG audio\n D d openal          OpenAL audio capture device\n D   osq             raw OSQ\n D   paf             Amazing Studio Packed Animation File\n D   pam_pipe        piped pam sequence\n D   pbm_pipe        piped pbm sequence\n D   pcx_pipe        piped pcx sequence\n D   pdv             PlayDate Video\n D   pfm_pipe        piped pfm sequence\n D   pgm_pipe        piped pgm sequence\n D   pgmyuv_pipe     piped pgmyuv sequence\n D   pgx_pipe        piped pgx sequence\n D   phm_pipe        piped phm sequence\n D   photocd_pipe    piped photocd sequence\n D   pictor_pipe     piped pictor sequence\n D   pjs             PJS (Phoenix Japanimation Society) subtitles\n D   pmp             Playstation Portable PMP\n D   png_pipe        piped png sequence\n D   pp_bnk          Pro Pinball Series Soundbank\n D   ppm_pipe        piped ppm sequence\n D   psd_pipe        piped psd sequence\n D   psxstr          Sony Playstation STR\n D   pva             TechnoTrend PVA\n D   pvf             PVF (Portable Voice Format)\n D   qcp             QCP\n D   qdraw_pipe      piped qdraw sequence\n D   qoa             QOA\n D   qoi_pipe        piped qoi sequence\n D   r3d             REDCODE R3D\n D   rawvideo        raw video\n D   rcwt            RCWT (Raw Captions With Time)\n D   realtext        RealText subtitle format\n D   redspark        RedSpark\n D   rka             RKA (RK Audio)\n D   rl2             RL2\n D   rm              RealMedia\n D   roq             id RoQ\n D   rpl             RPL / ARMovie\n D   rsd             GameCube RSD\n D   rso             Lego Mindstorms RSO\n D   rtp             RTP input\n D   rtsp            RTSP input\n D   s16be           PCM signed 16-bit big-endian\n D   s16le           PCM signed 16-bit little-endian\n D   s24be           PCM signed 24-bit big-endian\n D   s24le           PCM signed 24-bit little-endian\n D   s32be           PCM signed 32-bit big-endian\n D   s32le           PCM signed 32-bit little-endian\n D   s337m           SMPTE 337M\n D   s8              PCM signed 8-bit\n D   sami            SAMI subtitle format\n D   sap             SAP input\n D   sbc             raw SBC (low-complexity subband codec)\n D   sbg             SBaGen binaural beats script\n D   scc             Scenarist Closed Captions\n D   scd             Square Enix SCD\n D   sdns            Xbox SDNS\n D   sdp             SDP\n D   sdr2            SDR2\n D   sds             MIDI Sample Dump Standard\n D   sdx             Sample Dump eXchange\n D   ser             SER (Simple uncompressed video format for astronomical capturing)\n D   sga             Digital Pictures SGA\n D   sgi_pipe        piped sgi sequence\n D   shn             raw Shorten\n D   siff            Beam Software SIFF\n D   simbiosis_imx   Simbiosis Interactive IMX\n D   sln             Asterisk raw pcm\n D   smjpeg          Loki SDL MJPEG\n D   smk             Smacker\n D   smush           LucasArts Smush\n D   sol             Sierra SOL\n D   sox             SoX (Sound eXchange) native\n D   spdif           IEC 61937 (compressed data in S/PDIF)\n D   srt             SubRip subtitle\n D   stl             Spruce subtitle format\n D   subviewer       SubViewer subtitle format\n D   subviewer1      SubViewer v1 subtitle format\n D   sunrast_pipe    piped sunrast sequence\n D   sup             raw HDMV Presentation Graphic Stream subtitles\n D   svag            Konami PS2 SVAG\n D   svg_pipe        piped svg sequence\n D   svs             Square SVS\n D   swf             SWF (ShockWave Flash)\n D   tak             raw TAK\n D   tedcaptions     TED Talks captions\n D   thp             THP\n D   tiertexseq      Tiertex Limited SEQ\n D   tiff_pipe       piped tiff sequence\n D   tmv             8088flex TMV\n D   truehd          raw TrueHD\n D   tta             TTA (True Audio)\n D   tty             Tele-typewriter\n D   txd             Renderware TeXture Dictionary\n D   ty              TiVo TY Stream\n D   u16be           PCM unsigned 16-bit big-endian\n D   u16le           PCM unsigned 16-bit little-endian\n D   u24be           PCM unsigned 24-bit big-endian\n D   u24le           PCM unsigned 24-bit little-endian\n D   u32be           PCM unsigned 32-bit big-endian\n D   u32le           PCM unsigned 32-bit little-endian\n D   u8              PCM unsigned 8-bit\n D   usm             CRI USM\n D   v210            Uncompressed 4:2:2 10-bit\n D   v210x           Uncompressed 4:2:2 10-bit\n D   vag             Sony PS2 VAG\n D   vbn_pipe        piped vbn sequence\n D   vc1             raw VC-1\n D   vc1test         VC-1 test bitstream\n D d vfwcap          VfW video capture\n D   vidc            PCM Archimedes VIDC\n D   vividas         Vividas VIV\n D   vivo            Vivo\n D   vmd             Sierra VMD\n D   vobsub          VobSub subtitle format\n D   voc             Creative Voice\n D   vpk             Sony PS2 VPK\n D   vplayer         VPlayer subtitles\n D   vqf             Nippon Telegraph and Telephone Corporation (NTT) TwinVQ\n D   vvc             raw H.266/VVC video\n D   w64             Sony Wave64\n D   wady            Marble WADY\n D   wav             WAV / WAVE (Waveform Audio)\n D   wavarc          Waveform Archiver\n D   wc3movie        Wing Commander III movie\n D   webm_dash_manifest WebM DASH Manifest\n D   webp_anim       Animated WebP\n D   webp_pipe       piped webp sequence\n D   webvtt          WebVTT subtitle\n D   wsaud           Westwood Studios audio\n D   wsd             Wideband Single-bit Data (WSD)\n D   wsvqa           Westwood Studios VQA\n D   wtv             Windows Television (WTV)\n D   wv              WavPack\n D   wve             Psion 3 audio\n D   xa              Maxis XA\n D   xbin            eXtended BINary text (XBIN)\n D   xbm_pipe        piped xbm sequence\n D   xmd             Konami XMD\n D   xmv             Microsoft XMV\n D   xpm_pipe        piped xpm sequence\n D   xvag            Sony PS3 XVAG\n D   xwd_pipe        piped xwd sequence\n D   xwma            Microsoft xWMA\n D   yop             Psygnosis YOP\n D   yuv4mpegpipe    YUV4MPEG pipe\n",
+      "stderr": "",
+      "duration_seconds": 0.046999999991385266
+    },
+    {
+      "argv": [
+        "C:\\Users\\ComeToM3\\Dev\\AudioVideoManager\\.venv\\Scripts\\python.exe",
+        "-c",
+        "from audio_video_manager.extraction.dvd_navigation import _run_worker; _run_worker()"
+      ],
+      "returncode": 0,
+      "stdout": "{\"titles\": [{\"title_index\": 1, \"part_count\": 5, \"angle_count\": 1, \"duration_seconds\": 46.766666666666666, \"chapters\": [{\"index\": 1, \"start_seconds\": 0.0, \"end_seconds\": 11.8, \"title\": null}, {\"index\": 2, \"start_seconds\": 11.8, \"end_seconds\": 23.0, \"title\": null}, {\"index\": 3, \"start_seconds\": 23.0, \"end_seconds\": 33.2, \"title\": null}, {\"index\": 4, \"start_seconds\": 33.2, \"end_seconds\": 40.56666666666667, \"title\": null}, {\"index\": 5, \"start_seconds\": 40.56666666666667, \"end_seconds\": 46.766666666666666, \"title\": null}]}, {\"title_index\": 2, \"part_count\": 15, \"angle_count\": 1, \"duration_seconds\": 5403.6, \"chapters\": [{\"index\": 1, \"start_seconds\": 0.0, \"end_seconds\": 201.6, \"title\": null}, {\"index\": 2, \"start_seconds\": 201.6, \"end_seconds\": 510.8, \"title\": null}, {\"index\": 3, \"start_seconds\": 510.8, \"end_seconds\": 808.3, \"title\": null}, {\"index\": 4, \"start_seconds\": 808.3, \"end_seconds\": 1023.3, \"title\": null}, {\"index\": 5, \"start_seconds\": 1023.3, \"end_seconds\": 1249.3, \"title\": null}, {\"index\": 6, \"start_seconds\": 1249.3, \"end_seconds\": 1698.7, \"title\": null}, {\"index\": 7, \"start_seconds\": 1698.7, \"end_seconds\": 1870.1, \"title\": null}, {\"index\": 8, \"start_seconds\": 1870.1, \"end_seconds\": 2192.9, \"title\": null}, {\"index\": 9, \"start_seconds\": 2192.9, \"end_seconds\": 2507.2, \"title\": null}, {\"index\": 10, \"start_seconds\": 2507.2, \"end_seconds\": 2837.6, \"title\": null}, {\"index\": 11, \"start_seconds\": 2837.6, \"end_seconds\": 3375.9, \"title\": null}, {\"index\": 12, \"start_seconds\": 3375.9, \"end_seconds\": 3968.9, \"title\": null}, {\"index\": 13, \"start_seconds\": 3968.9, \"end_seconds\": 4094.4, \"title\": null}, {\"index\": 14, \"start_seconds\": 4094.4, \"end_seconds\": 4524.3, \"title\": null}, {\"index\": 15, \"start_seconds\": 4524.3, \"end_seconds\": 5403.6, \"title\": null}]}]}\nlibdvdnav: DVD Title: USE_YOUR_ILLUSION_1\nlibdvdnav: DVD Serial Number: 3F7B3F65___MVBION_1\nlibdvdnav: DVD Title (Alternative): \nlibdvdnav: DVD disk reports itself with Region mask 0x00c00000. Regions: 01 02 03 04 05 06\n",
+      "stderr": "",
+      "duration_seconds": 1.0780000000086147
+    },
+    {
+      "argv": [
+        "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-11B2\\ffmpeg\\unpacked\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+        "-hide_banner",
+        "-v",
+        "error",
+        "-f",
+        "dvdvideo",
+        "-title",
+        "2",
+        "-angle",
+        "1",
+        "-show_format",
+        "-show_streams",
+        "-show_chapters",
+        "-of",
+        "json",
+        "-i",
+        "\\\\.\\D:"
+      ],
+      "returncode": 0,
+      "stdout": "{\n    \"streams\": [\n        {\n            \"index\": 0,\n            \"codec_name\": \"mpeg2video\",\n            \"codec_long_name\": \"MPEG-2 video\",\n            \"codec_type\": \"video\",\n            \"codec_tag_string\": \"[0][0][0][0]\",\n            \"codec_tag\": \"0x0000\",\n            \"width\": 720,\n            \"height\": 480,\n            \"coded_width\": 0,\n            \"coded_height\": 0,\n            \"has_b_frames\": 1,\n            \"sample_aspect_ratio\": \"8:9\",\n            \"display_aspect_ratio\": \"4:3\",\n            \"pix_fmt\": \"yuv420p\",\n            \"level\": -99,\n            \"color_range\": \"tv\",\n            \"field_order\": \"tt\",\n            \"id\": \"0x1e0\",\n            \"r_frame_rate\": \"30000/1001\",\n            \"avg_frame_rate\": \"30000/1001\",\n            \"time_base\": \"1/90000\",\n            \"start_pts\": 0,\n            \"start_time\": \"0.000000\",\n            \"extradata_size\": 88,\n            \"disposition\": {\n                \"default\": 0,\n                \"dub\": 0,\n                \"original\": 0,\n                \"comment\": 0,\n                \"lyrics\": 0,\n                \"karaoke\": 0,\n                \"forced\": 0,\n                \"hearing_impaired\": 0,\n                \"visual_impaired\": 0,\n                \"clean_effects\": 0,\n                \"attached_pic\": 0,\n                \"timed_thumbnails\": 0,\n                \"non_diegetic\": 0,\n                \"captions\": 0,\n                \"descriptions\": 0,\n                \"metadata\": 0,\n                \"dependent\": 0,\n                \"still_image\": 0,\n                \"multilayer\": 0\n            },\n            \"side_data_list\": [\n                {\n                    \"side_data_type\": \"CPB properties\",\n                    \"max_bitrate\": 8000000,\n                    \"min_bitrate\": 0,\n                    \"avg_bitrate\": 0,\n                    \"buffer_size\": 0,\n                    \"vbv_delay\": -1\n                }\n            ]\n        },\n        {\n            \"index\": 1,\n            \"codec_name\": \"ac3\",\n            \"codec_long_name\": \"ATSC A/52A (AC-3)\",\n            \"codec_type\": \"audio\",\n            \"codec_tag_string\": \"[0][0][0][0]\",\n            \"codec_tag\": \"0x0000\",\n            \"mime_codec_string\": \"ac-3\",\n            \"sample_fmt\": \"u8\",\n            \"sample_rate\": \"48000\",\n            \"channels\": 2,\n            \"channel_layout\": \"stereo\",\n            \"bits_per_sample\": 0,\n            \"initial_padding\": 0,\n            \"dmix_mode\": \"0\",\n            \"ltrt_cmixlev\": \"0.000000\",\n            \"ltrt_surmixlev\": \"0.000000\",\n            \"loro_cmixlev\": \"0.000000\",\n            \"loro_surmixlev\": \"0.000000\",\n            \"id\": \"0x80\",\n            \"r_frame_rate\": \"0/0\",\n            \"avg_frame_rate\": \"0/0\",\n            \"time_base\": \"1/90000\",\n            \"start_pts\": 0,\n            \"start_time\": \"0.000000\",\n            \"duration_ts\": 486324000,\n            \"duration\": \"5403.600000\",\n            \"disposition\": {\n                \"default\": 0,\n                \"dub\": 0,\n                \"original\": 0,\n                \"comment\": 0,\n                \"lyrics\": 0,\n                \"karaoke\": 0,\n                \"forced\": 0,\n                \"hearing_impaired\": 0,\n                \"visual_impaired\": 0,\n                \"clean_effects\": 0,\n                \"attached_pic\": 0,\n                \"timed_thumbnails\": 0,\n                \"non_diegetic\": 0,\n                \"captions\": 0,\n                \"descriptions\": 0,\n                \"metadata\": 0,\n                \"dependent\": 0,\n                \"still_image\": 0,\n                \"multilayer\": 0\n            },\n            \"tags\": {\n                \"language\": \"eng\"\n            }\n        }\n    ],\n    \"chapters\": [\n        {\n            \"id\": 0,\n            \"time_base\": \"1/90000\",\n            \"start\": 0,\n            \"start_time\": \"0.000000\",\n            \"end\": 18144000,\n            \"end_time\": \"201.600000\"\n        },\n        {\n            \"id\": 1,\n            \"time_base\": \"1/90000\",\n            \"start\": 18144000,\n            \"start_time\": \"201.600000\",\n            \"end\": 45972000,\n            \"end_time\": \"510.800000\"\n        },\n        {\n            \"id\": 2,\n            \"time_base\": \"1/90000\",\n            \"start\": 45972000,\n            \"start_time\": \"510.800000\",\n            \"end\": 72747000,\n            \"end_time\": \"808.300000\"\n        },\n        {\n            \"id\": 3,\n            \"time_base\": \"1/90000\",\n            \"start\": 72747000,\n            \"start_time\": \"808.300000\",\n            \"end\": 92097000,\n            \"end_time\": \"1023.300000\"\n        },\n        {\n            \"id\": 4,\n            \"time_base\": \"1/90000\",\n            \"start\": 92097000,\n            \"start_time\": \"1023.300000\",\n            \"end\": 112437000,\n            \"end_time\": \"1249.300000\"\n        },\n        {\n            \"id\": 5,\n            \"time_base\": \"1/90000\",\n            \"start\": 112437000,\n            \"start_time\": \"1249.300000\",\n            \"end\": 152883000,\n            \"end_time\": \"1698.700000\"\n        },\n        {\n            \"id\": 6,\n            \"time_base\": \"1/90000\",\n            \"start\": 152883000,\n            \"start_time\": \"1698.700000\",\n            \"end\": 168309000,\n            \"end_time\": \"1870.100000\"\n        },\n        {\n            \"id\": 7,\n            \"time_base\": \"1/90000\",\n            \"start\": 168309000,\n            \"start_time\": \"1870.100000\",\n            \"end\": 197361000,\n            \"end_time\": \"2192.900000\"\n        },\n        {\n            \"id\": 8,\n            \"time_base\": \"1/90000\",\n            \"start\": 197361000,\n            \"start_time\": \"2192.900000\",\n            \"end\": 225648000,\n            \"end_time\": \"2507.200000\"\n        },\n        {\n            \"id\": 9,\n            \"time_base\": \"1/90000\",\n            \"start\": 225648000,\n            \"start_time\": \"2507.200000\",\n            \"end\": 255384000,\n            \"end_time\": \"2837.600000\"\n        },\n        {\n            \"id\": 10,\n            \"time_base\": \"1/90000\",\n            \"start\": 255384000,\n            \"start_time\": \"2837.600000\",\n            \"end\": 303831000,\n            \"end_time\": \"3375.900000\"\n        },\n        {\n            \"id\": 11,\n            \"time_base\": \"1/90000\",\n            \"start\": 303831000,\n            \"start_time\": \"3375.900000\",\n            \"end\": 357201000,\n            \"end_time\": \"3968.900000\"\n        },\n        {\n            \"id\": 12,\n            \"time_base\": \"1/90000\",\n            \"start\": 357201000,\n            \"start_time\": \"3968.900000\",\n            \"end\": 368496000,\n            \"end_time\": \"4094.400000\"\n        },\n        {\n            \"id\": 13,\n            \"time_base\": \"1/90000\",\n            \"start\": 368496000,\n            \"start_time\": \"4094.400000\",\n            \"end\": 407187000,\n            \"end_time\": \"4524.300000\"\n        },\n        {\n            \"id\": 14,\n            \"time_base\": \"1/90000\",\n            \"start\": 407187000,\n            \"start_time\": \"4524.300000\",\n            \"end\": 486324000,\n            \"end_time\": \"5403.600000\"\n        }\n    ],\n    \"format\": {\n        \"filename\": \"\\\\\\\\.\\\\D:\",\n        \"nb_streams\": 2,\n        \"nb_programs\": 0,\n        \"nb_stream_groups\": 0,\n        \"format_name\": \"dvdvideo\",\n        \"format_long_name\": \"DVD-Video\",\n        \"start_time\": \"0.000000\",\n        \"duration\": \"5403.600000\",\n        \"probe_score\": 25\n    }\n}\n",
+      "stderr": "[dvdvideo @ 0000019d51c20100] Unable to read next block of PGC\n[dvdvideo @ 0000019d51c20100] dvdnav error (title=1980154637 pgc=443455500 pg=1628989745 cell=1): Error reading from DVD.\n",
+      "duration_seconds": 1.7039999999979045
+    }
+  ],
+  "inspections": [
+    {
+      "operation": "enumeration",
+      "duration_seconds": 1.9219999999913853,
+      "result": {
+        "source": "D:\\",
+        "status": "title_selection_required",
+        "video_ts_path": "D:\\VIDEO_TS",
+        "title_set_numbers": [
+          1,
+          2
+        ],
+        "title_candidates": [
+          {
+            "title_index": 1,
+            "part_count": 5,
+            "angle_count": 1,
+            "duration_seconds": 46.766666666666666,
+            "chapters": [
+              {
+                "index": 1,
+                "start_seconds": 0.0,
+                "end_seconds": 11.8,
+                "title": null
+              },
+              {
+                "index": 2,
+                "start_seconds": 11.8,
+                "end_seconds": 23.0,
+                "title": null
+              },
+              {
+                "index": 3,
+                "start_seconds": 23.0,
+                "end_seconds": 33.2,
+                "title": null
+              },
+              {
+                "index": 4,
+                "start_seconds": 33.2,
+                "end_seconds": 40.56666666666667,
+                "title": null
+              },
+              {
+                "index": 5,
+                "start_seconds": 40.56666666666667,
+                "end_seconds": 46.766666666666666,
+                "title": null
+              }
+            ]
+          },
+          {
+            "title_index": 2,
+            "part_count": 15,
+            "angle_count": 1,
+            "duration_seconds": 5403.6,
+            "chapters": [
+              {
+                "index": 1,
+                "start_seconds": 0.0,
+                "end_seconds": 201.6,
+                "title": null
+              },
+              {
+                "index": 2,
+                "start_seconds": 201.6,
+                "end_seconds": 510.8,
+                "title": null
+              },
+              {
+                "index": 3,
+                "start_seconds": 510.8,
+                "end_seconds": 808.3,
+                "title": null
+              },
+              {
+                "index": 4,
+                "start_seconds": 808.3,
+                "end_seconds": 1023.3,
+                "title": null
+              },
+              {
+                "index": 5,
+                "start_seconds": 1023.3,
+                "end_seconds": 1249.3,
+                "title": null
+              },
+              {
+                "index": 6,
+                "start_seconds": 1249.3,
+                "end_seconds": 1698.7,
+                "title": null
+              },
+              {
+                "index": 7,
+                "start_seconds": 1698.7,
+                "end_seconds": 1870.1,
+                "title": null
+              },
+              {
+                "index": 8,
+                "start_seconds": 1870.1,
+                "end_seconds": 2192.9,
+                "title": null
+              },
+              {
+                "index": 9,
+                "start_seconds": 2192.9,
+                "end_seconds": 2507.2,
+                "title": null
+              },
+              {
+                "index": 10,
+                "start_seconds": 2507.2,
+                "end_seconds": 2837.6,
+                "title": null
+              },
+              {
+                "index": 11,
+                "start_seconds": 2837.6,
+                "end_seconds": 3375.9,
+                "title": null
+              },
+              {
+                "index": 12,
+                "start_seconds": 3375.9,
+                "end_seconds": 3968.9,
+                "title": null
+              },
+              {
+                "index": 13,
+                "start_seconds": 3968.9,
+                "end_seconds": 4094.4,
+                "title": null
+              },
+              {
+                "index": 14,
+                "start_seconds": 4094.4,
+                "end_seconds": 4524.3,
+                "title": null
+              },
+              {
+                "index": 15,
+                "start_seconds": 4524.3,
+                "end_seconds": 5403.6,
+                "title": null
+              }
+            ]
+          }
+        ],
+        "titles": [],
+        "backend": {
+          "executable": "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-11B2\\ffmpeg\\unpacked\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+          "version": "ffprobe version 9.0.2-full_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers",
+          "dvdvideo_demuxer": true,
+          "diagnostic": "ffprobe expose le d\u00e9multiplexeur dvdvideo."
+        },
+        "diagnostic": "2 titre(s) \u00e9num\u00e9r\u00e9(s); choisissez explicitement les titres \u00e0 inspecter par ffprobe.",
+        "technical_detail": null,
+        "warnings": []
+      }
+    },
+    {
+      "operation": "title",
+      "title_index": 1,
+      "angle_index": 1,
+      "duration_seconds": 3.7030000000086147,
+      "result": {
+        "source": "D:\\",
+        "status": "inspected",
+        "video_ts_path": "D:\\VIDEO_TS",
+        "title_set_numbers": [
+          1,
+          2
+        ],
+        "title_candidates": [
+          {
+            "title_index": 1,
+            "part_count": 5,
+            "angle_count": 1,
+            "duration_seconds": 46.766666666666666,
+            "chapters": [
+              {
+                "index": 1,
+                "start_seconds": 0.0,
+                "end_seconds": 11.8,
+                "title": null
+              },
+              {
+                "index": 2,
+                "start_seconds": 11.8,
+                "end_seconds": 23.0,
+                "title": null
+              },
+              {
+                "index": 3,
+                "start_seconds": 23.0,
+                "end_seconds": 33.2,
+                "title": null
+              },
+              {
+                "index": 4,
+                "start_seconds": 33.2,
+                "end_seconds": 40.56666666666667,
+                "title": null
+              },
+              {
+                "index": 5,
+                "start_seconds": 40.56666666666667,
+                "end_seconds": 46.766666666666666,
+                "title": null
+              }
+            ]
+          },
+          {
+            "title_index": 2,
+            "part_count": 15,
+            "angle_count": 1,
+            "duration_seconds": 5403.6,
+            "chapters": [
+              {
+                "index": 1,
+                "start_seconds": 0.0,
+                "end_seconds": 201.6,
+                "title": null
+              },
+              {
+                "index": 2,
+                "start_seconds": 201.6,
+                "end_seconds": 510.8,
+                "title": null
+              },
+              {
+                "index": 3,
+                "start_seconds": 510.8,
+                "end_seconds": 808.3,
+                "title": null
+              },
+              {
+                "index": 4,
+                "start_seconds": 808.3,
+                "end_seconds": 1023.3,
+                "title": null
+              },
+              {
+                "index": 5,
+                "start_seconds": 1023.3,
+                "end_seconds": 1249.3,
+                "title": null
+              },
+              {
+                "index": 6,
+                "start_seconds": 1249.3,
+                "end_seconds": 1698.7,
+                "title": null
+              },
+              {
+                "index": 7,
+                "start_seconds": 1698.7,
+                "end_seconds": 1870.1,
+                "title": null
+              },
+              {
+                "index": 8,
+                "start_seconds": 1870.1,
+                "end_seconds": 2192.9,
+                "title": null
+              },
+              {
+                "index": 9,
+                "start_seconds": 2192.9,
+                "end_seconds": 2507.2,
+                "title": null
+              },
+              {
+                "index": 10,
+                "start_seconds": 2507.2,
+                "end_seconds": 2837.6,
+                "title": null
+              },
+              {
+                "index": 11,
+                "start_seconds": 2837.6,
+                "end_seconds": 3375.9,
+                "title": null
+              },
+              {
+                "index": 12,
+                "start_seconds": 3375.9,
+                "end_seconds": 3968.9,
+                "title": null
+              },
+              {
+                "index": 13,
+                "start_seconds": 3968.9,
+                "end_seconds": 4094.4,
+                "title": null
+              },
+              {
+                "index": 14,
+                "start_seconds": 4094.4,
+                "end_seconds": 4524.3,
+                "title": null
+              },
+              {
+                "index": 15,
+                "start_seconds": 4524.3,
+                "end_seconds": 5403.6,
+                "title": null
+              }
+            ]
+          }
+        ],
+        "titles": [
+          {
+            "title_index": 1,
+            "angle_index": 1,
+            "duration_seconds": 46.766667,
+            "format_name": "dvdvideo",
+            "streams": [
+              {
+                "index": 0,
+                "codec_type": "video",
+                "codec_name": "mpeg2video",
+                "language": null,
+                "title": null,
+                "width": 720,
+                "height": 480,
+                "sample_rate": null,
+                "channels": null,
+                "channel_layout": null
+              },
+              {
+                "index": 1,
+                "codec_type": "audio",
+                "codec_name": "ac3",
+                "language": "eng",
+                "title": null,
+                "width": null,
+                "height": null,
+                "sample_rate": 48000,
+                "channels": 2,
+                "channel_layout": "stereo"
+              }
+            ],
+            "chapters": [
+              {
+                "index": 1,
+                "start_seconds": 0.0,
+                "end_seconds": 11.8,
+                "title": null
+              },
+              {
+                "index": 2,
+                "start_seconds": 11.8,
+                "end_seconds": 23.0,
+                "title": null
+              },
+              {
+                "index": 3,
+                "start_seconds": 23.0,
+                "end_seconds": 33.2,
+                "title": null
+              },
+              {
+                "index": 4,
+                "start_seconds": 33.2,
+                "end_seconds": 40.566667,
+                "title": null
+              },
+              {
+                "index": 5,
+                "start_seconds": 40.566667,
+                "end_seconds": 46.766667,
+                "title": null
+              }
+            ]
+          }
+        ],
+        "backend": {
+          "executable": "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-11B2\\ffmpeg\\unpacked\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+          "version": "ffprobe version 9.0.2-full_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers",
+          "dvdvideo_demuxer": true,
+          "diagnostic": "ffprobe expose le d\u00e9multiplexeur dvdvideo."
+        },
+        "diagnostic": "Inspection ffprobe termin\u00e9e; aucun m\u00e9dia n'a \u00e9t\u00e9 extrait.",
+        "technical_detail": null,
+        "warnings": [
+          "Titre 1 : Certaines m\u00e9tadonn\u00e9es de flux sont indisponibles."
+        ]
+      }
+    },
+    {
+      "operation": "title",
+      "title_index": 2,
+      "angle_index": 1,
+      "duration_seconds": 2.8910000000032596,
+      "result": {
+        "source": "D:\\",
+        "status": "inspected",
+        "video_ts_path": "D:\\VIDEO_TS",
+        "title_set_numbers": [
+          1,
+          2
+        ],
+        "title_candidates": [
+          {
+            "title_index": 1,
+            "part_count": 5,
+            "angle_count": 1,
+            "duration_seconds": 46.766666666666666,
+            "chapters": [
+              {
+                "index": 1,
+                "start_seconds": 0.0,
+                "end_seconds": 11.8,
+                "title": null
+              },
+              {
+                "index": 2,
+                "start_seconds": 11.8,
+                "end_seconds": 23.0,
+                "title": null
+              },
+              {
+                "index": 3,
+                "start_seconds": 23.0,
+                "end_seconds": 33.2,
+                "title": null
+              },
+              {
+                "index": 4,
+                "start_seconds": 33.2,
+                "end_seconds": 40.56666666666667,
+                "title": null
+              },
+              {
+                "index": 5,
+                "start_seconds": 40.56666666666667,
+                "end_seconds": 46.766666666666666,
+                "title": null
+              }
+            ]
+          },
+          {
+            "title_index": 2,
+            "part_count": 15,
+            "angle_count": 1,
+            "duration_seconds": 5403.6,
+            "chapters": [
+              {
+                "index": 1,
+                "start_seconds": 0.0,
+                "end_seconds": 201.6,
+                "title": null
+              },
+              {
+                "index": 2,
+                "start_seconds": 201.6,
+                "end_seconds": 510.8,
+                "title": null
+              },
+              {
+                "index": 3,
+                "start_seconds": 510.8,
+                "end_seconds": 808.3,
+                "title": null
+              },
+              {
+                "index": 4,
+                "start_seconds": 808.3,
+                "end_seconds": 1023.3,
+                "title": null
+              },
+              {
+                "index": 5,
+                "start_seconds": 1023.3,
+                "end_seconds": 1249.3,
+                "title": null
+              },
+              {
+                "index": 6,
+                "start_seconds": 1249.3,
+                "end_seconds": 1698.7,
+                "title": null
+              },
+              {
+                "index": 7,
+                "start_seconds": 1698.7,
+                "end_seconds": 1870.1,
+                "title": null
+              },
+              {
+                "index": 8,
+                "start_seconds": 1870.1,
+                "end_seconds": 2192.9,
+                "title": null
+              },
+              {
+                "index": 9,
+                "start_seconds": 2192.9,
+                "end_seconds": 2507.2,
+                "title": null
+              },
+              {
+                "index": 10,
+                "start_seconds": 2507.2,
+                "end_seconds": 2837.6,
+                "title": null
+              },
+              {
+                "index": 11,
+                "start_seconds": 2837.6,
+                "end_seconds": 3375.9,
+                "title": null
+              },
+              {
+                "index": 12,
+                "start_seconds": 3375.9,
+                "end_seconds": 3968.9,
+                "title": null
+              },
+              {
+                "index": 13,
+                "start_seconds": 3968.9,
+                "end_seconds": 4094.4,
+                "title": null
+              },
+              {
+                "index": 14,
+                "start_seconds": 4094.4,
+                "end_seconds": 4524.3,
+                "title": null
+              },
+              {
+                "index": 15,
+                "start_seconds": 4524.3,
+                "end_seconds": 5403.6,
+                "title": null
+              }
+            ]
+          }
+        ],
+        "titles": [
+          {
+            "title_index": 2,
+            "angle_index": 1,
+            "duration_seconds": 5403.6,
+            "format_name": "dvdvideo",
+            "streams": [
+              {
+                "index": 0,
+                "codec_type": "video",
+                "codec_name": "mpeg2video",
+                "language": null,
+                "title": null,
+                "width": 720,
+                "height": 480,
+                "sample_rate": null,
+                "channels": null,
+                "channel_layout": null
+              },
+              {
+                "index": 1,
+                "codec_type": "audio",
+                "codec_name": "ac3",
+                "language": "eng",
+                "title": null,
+                "width": null,
+                "height": null,
+                "sample_rate": 48000,
+                "channels": 2,
+                "channel_layout": "stereo"
+              }
+            ],
+            "chapters": [
+              {
+                "index": 1,
+                "start_seconds": 0.0,
+                "end_seconds": 201.6,
+                "title": null
+              },
+              {
+                "index": 2,
+                "start_seconds": 201.6,
+                "end_seconds": 510.8,
+                "title": null
+              },
+              {
+                "index": 3,
+                "start_seconds": 510.8,
+                "end_seconds": 808.3,
+                "title": null
+              },
+              {
+                "index": 4,
+                "start_seconds": 808.3,
+                "end_seconds": 1023.3,
+                "title": null
+              },
+              {
+                "index": 5,
+                "start_seconds": 1023.3,
+                "end_seconds": 1249.3,
+                "title": null
+              },
+              {
+                "index": 6,
+                "start_seconds": 1249.3,
+                "end_seconds": 1698.7,
+                "title": null
+              },
+              {
+                "index": 7,
+                "start_seconds": 1698.7,
+                "end_seconds": 1870.1,
+                "title": null
+              },
+              {
+                "index": 8,
+                "start_seconds": 1870.1,
+                "end_seconds": 2192.9,
+                "title": null
+              },
+              {
+                "index": 9,
+                "start_seconds": 2192.9,
+                "end_seconds": 2507.2,
+                "title": null
+              },
+              {
+                "index": 10,
+                "start_seconds": 2507.2,
+                "end_seconds": 2837.6,
+                "title": null
+              },
+              {
+                "index": 11,
+                "start_seconds": 2837.6,
+                "end_seconds": 3375.9,
+                "title": null
+              },
+              {
+                "index": 12,
+                "start_seconds": 3375.9,
+                "end_seconds": 3968.9,
+                "title": null
+              },
+              {
+                "index": 13,
+                "start_seconds": 3968.9,
+                "end_seconds": 4094.4,
+                "title": null
+              },
+              {
+                "index": 14,
+                "start_seconds": 4094.4,
+                "end_seconds": 4524.3,
+                "title": null
+              },
+              {
+                "index": 15,
+                "start_seconds": 4524.3,
+                "end_seconds": 5403.6,
+                "title": null
+              }
+            ]
+          }
+        ],
+        "backend": {
+          "executable": "C:\\Users\\ComeToM3\\AppData\\Local\\Temp\\AVM-11B2\\ffmpeg\\unpacked\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+          "version": "ffprobe version 9.0.2-full_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers",
+          "dvdvideo_demuxer": true,
+          "diagnostic": "ffprobe expose le d\u00e9multiplexeur dvdvideo."
+        },
+        "diagnostic": "Inspection ffprobe termin\u00e9e; aucun m\u00e9dia n'a \u00e9t\u00e9 extrait.",
+        "technical_detail": null,
+        "warnings": [
+          "Titre 2 : Certaines m\u00e9tadonn\u00e9es de flux sont indisponibles."
+        ]
+      }
+    }
+  ],
+  "personal_config_before": "b37a325e1835e5e1c7a943c933c0d54fa103d90c597ee5ac26dcdcea76797c50",
+  "personal_config_after": "b37a325e1835e5e1c7a943c933c0d54fa103d90c597ee5ac26dcdcea76797c50",
+  "extractions": [],
+  "rights": "inspection only; reproduction not established"
+}

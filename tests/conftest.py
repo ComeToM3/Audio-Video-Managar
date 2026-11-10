@@ -14,7 +14,6 @@ UI_TEST_FILES = frozenset(
         "test_ui_design_06l.py",
         "test_ui_shell.py",
         "test_ui_library_history_06h.py",
-        "test_library_qml_08b.py",
         "test_humanisation_06i.py",
         "test_ui_w3_prefill.py",
         "test_ui_collision_replace_disabled.py",
@@ -27,7 +26,7 @@ UI_TEST_FILES = frozenset(
 
 
 def pytest_configure(config: pytest.Config) -> None:
-    config.addinivalue_line("markers", "qt_ui: tests PySide6/QML (isolation sous-processus CI)")
+    config.addinivalue_line("markers", "qt_ui: tests PySide6 Widgets (isolation sous-processus CI)")
     config.addinivalue_line(
         "markers",
         "requires_freac: nécessite freaccmd.exe (skipped sinon — jamais compté PASS)",

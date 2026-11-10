@@ -46,7 +46,6 @@ def config(tmp_path):
         freaccmd_path="",
         preferred_release_country="CA",
         auto_approve_high_confidence=False,
-        library_ui_mode="widgets",
     )
 
 
@@ -178,7 +177,10 @@ def test_wizard_w4_has_cover_and_dup_banner(qapp, config, db) -> None:
 def test_duplicate_ux_prefers_open_path(qapp, config, db, tmp_path) -> None:
     album = Path(config.library_root) / "Queen" / "Hits"
     _seed_release(db, album)
-    sheet = make_approvable_sheet(album="Greatest Hits", artist="Queen", year=1992)
+    (album / "01.flac").write_bytes(b"complete fixture track")
+    sheet = make_approvable_sheet(
+        album="Greatest Hits", artist="Queen", year=1992, tracks=1
+    )
     sheet.edition.musicbrainz_release_id = "mbid-a"
     sheet.edition.cover_status = CoverStatus.CONFIRMED
     sheet.edition.cover_path_or_url = "https://example.test/c.jpg"

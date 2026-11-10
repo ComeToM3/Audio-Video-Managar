@@ -34,6 +34,7 @@ class TrackRow:
     path: str | None
     duration_ms: int | None
     flac_ok: int | None
+    id: int | None = None
 
 
 @dataclass(frozen=True)
@@ -163,7 +164,7 @@ def list_tracks_for_release(db: Database, release_id: int) -> list[TrackRow]:
     conn = db.connect()
     rows = conn.execute(
         """
-        SELECT number, title, path, duration_ms, flac_ok
+        SELECT id, number, title, path, duration_ms, flac_ok
         FROM tracks
         WHERE release_id = ?
         ORDER BY number ASC
@@ -177,6 +178,7 @@ def list_tracks_for_release(db: Database, release_id: int) -> list[TrackRow]:
             path=r["path"],
             duration_ms=r["duration_ms"],
             flac_ok=r["flac_ok"],
+            id=int(r["id"]),
         )
         for r in rows
     ]

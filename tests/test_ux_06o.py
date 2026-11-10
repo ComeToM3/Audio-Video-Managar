@@ -207,6 +207,7 @@ def test_wizard_displays_normal_destination_and_publish_result(qapp, config, db,
         ),
         state="Completed",
     )
+    wizard._active_job_id = report.job_id  # noqa: SLF001
     wizard._on_archive_finished(report)  # noqa: SLF001
     details = wizard.txt_done.toPlainText()
     assert "Publication et indexation SQLite : réussies" in details

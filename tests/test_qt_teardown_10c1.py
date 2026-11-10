@@ -1,4 +1,4 @@
-"""AVM-10C.1 — non-régression teardown QML / survivors (sans forcer le GC)."""
+"""AVM-10C.1 — non-régression teardown Widgets et threads."""
 
 from __future__ import annotations
 
@@ -7,7 +7,6 @@ import os
 import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-os.environ.setdefault("QT_QUICK_CONTROLS_STYLE", "Basic")
 
 from PySide6.QtWidgets import QApplication
 
@@ -22,30 +21,6 @@ def qapp():
     app = QApplication.instance() or QApplication([])
     apply_app_style(app)
     return app
-
-
-def test_library_shutdown_ui_clears_quick_refs(qapp, tmp_path) -> None:
-    db = Database(tmp_path / "t.sqlite3")
-    db.initialize()
-    cfg = AppConfig(
-        library_root=str(tmp_path / "lib"),
-        jobs_dir=str(tmp_path / "jobs"),
-        log_dir=str(tmp_path / "logs"),
-        library_ui_mode="qml",
-    )
-    win = MainWindow(cfg, db)
-    win.show()
-    qapp.processEvents()
-    win.navigate_to(1)
-    qapp.processEvents()
-    lib = win.page_library
-    # May or may not have loaded QML depending on platform plugins
-    win.close()
-    qapp.processEvents()
-    assert lib._quick is None
-    assert lib._bridge is None
-    assert lib._qml_ok is False
-    db.close()
 
 
 def test_no_running_qthread_after_close(qapp, tmp_path) -> None:

@@ -6,6 +6,8 @@ import hashlib
 import urllib.request
 from pathlib import Path
 
+from PySide6.QtGui import QImage
+
 from audio_video_manager.paths import default_cover_cache_dir
 
 
@@ -31,7 +33,11 @@ def fetch_cover_to_cache(
         return None
     dest = cached_cover_path(url, cache_dir)
     if dest.is_file() and dest.stat().st_size > 0:
-        return dest
+        try:
+            if not QImage.fromData(dest.read_bytes()).isNull():
+                return dest
+        except OSError:
+            pass
     req = urllib.request.Request(
         url,
         headers={"User-Agent": "AudioVideoManager/0.5.0 (local; cover cache)"},
@@ -42,7 +48,7 @@ def fetch_cover_to_cache(
             data = resp.read()
     except Exception:  # noqa: BLE001
         return None
-    if not data:
+    if not data or QImage.fromData(data).isNull():
         return None
     dest.write_bytes(data)
     return dest

@@ -7,7 +7,6 @@ from pathlib import Path
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QCheckBox,
-    QComboBox,
     QFileDialog,
     QFormLayout,
     QGroupBox,
@@ -57,9 +56,20 @@ class SettingsPage(QWidget):
         root.addWidget(title)
 
         root.addWidget(self._build_library())
-        root.addWidget(self._build_identify())
-        root.addWidget(self._build_extract())
-        root.addWidget(self._build_advanced())
+        self.advanced_toggle = QPushButton("Afficher les paramètres avancés")
+        self.advanced_toggle.setCheckable(True)
+        self.advanced_toggle.setAccessibleName("Afficher les paramètres avancés")
+        self.advanced_toggle.toggled.connect(self._set_advanced_visible)
+        root.addWidget(self.advanced_toggle, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.advanced_content = QWidget()
+        advanced_layout = QVBoxLayout(self.advanced_content)
+        advanced_layout.setContentsMargins(0, 0, 0, 0)
+        advanced_layout.setSpacing(14)
+        advanced_layout.addWidget(self._build_identify())
+        advanced_layout.addWidget(self._build_extract())
+        advanced_layout.addWidget(self._build_advanced())
+        self.advanced_content.hide()
+        root.addWidget(self.advanced_content)
 
         save = QPushButton("Enregistrer")
         save.setProperty("primary", True)
@@ -74,12 +84,19 @@ class SettingsPage(QWidget):
         scroll.setWidget(content)
         outer.addWidget(scroll, 1)
 
+    def _set_advanced_visible(self, visible: bool) -> None:
+        self.advanced_content.setVisible(visible)
+        self.advanced_toggle.setText(
+            "Masquer les paramètres avancés"
+            if visible
+            else "Afficher les paramètres avancés"
+        )
+        self.advanced_toggle.setAccessibleName(self.advanced_toggle.text())
+
     def set_config(self, config: AppConfig) -> None:
         self._config = config
         self.edit_library.setText(config.library_root)
         self.edit_library.setToolTip(path_tooltip(config.library_root))
-        mode = (config.library_ui_mode or "widgets").strip().lower()
-        self.combo_lib_ui.setCurrentIndex(0 if mode == "qml" else 1)
         self.edit_freaccmd.setText(config.freaccmd_path)
         self.edit_freaccmd.setToolTip(path_tooltip(config.freaccmd_path))
         self.edit_ffmpeg.setText(config.ffmpeg_path)
@@ -110,7 +127,7 @@ class SettingsPage(QWidget):
         return wrap
 
     def _build_library(self) -> QGroupBox:
-        box = QGroupBox("Bibliothèque")
+        box = QGroupBox("Bibliothèque musicale")
         form = QFormLayout(box)
         form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow)
         self.edit_library = QLineEdit(self._config.library_root)
@@ -118,27 +135,17 @@ class SettingsPage(QWidget):
         browse = QPushButton("…")
         browse.setAccessibleName("Parcourir le dossier bibliothèque")
         browse.clicked.connect(self._browse_lib)
-        form.addRow("Destination des albums :", self._path_row(self.edit_library, browse))
+        form.addRow("Dossier de destination :", self._path_row(self.edit_library, browse))
         library_hint = QLabel(
-            "Les albums CD archivés seront publiés ici. Les fichiers de travail restent dans le dossier temporaire."
+            "Les albums archivés seront enregistrés ici."
         )
         library_hint.setWordWrap(True)
         library_hint.setProperty("role", "muted")
         form.addRow(library_hint)
-        self.combo_lib_ui = QComboBox()
-        self.combo_lib_ui.addItem("Interface moderne (QML)", "qml")
-        self.combo_lib_ui.addItem("Interface classique (Widgets)", "widgets")
-        mode = (self._config.library_ui_mode or "widgets").strip().lower()
-        self.combo_lib_ui.setCurrentIndex(0 if mode == "qml" else 1)
-        self.combo_lib_ui.setAccessibleName("Mode d’affichage de la bibliothèque")
-        form.addRow("Affichage :", self.combo_lib_ui)
-        hint = QLabel(
-            "Le basculement immédiat est aussi disponible dans Ma bibliothèque. "
-            "Redémarrer l’app applique le choix enregistré."
-        )
-        hint.setWordWrap(True)
-        hint.setProperty("role", "muted")
-        form.addRow(hint)
+        self.chk_eject = QCheckBox("Éjecter le CD après extraction")
+        self.chk_eject.setChecked(bool(self._config.eject_after_rip))
+        self.chk_eject.setAccessibleName("Éjecter le CD après extraction")
+        form.addRow("", self.chk_eject)
         return box
 
     def _build_identify(self) -> QGroupBox:
@@ -194,9 +201,6 @@ class SettingsPage(QWidget):
         self.spin_flac.setRange(0, 8)
         self.spin_flac.setValue(int(self._config.flac_compression))
         form.addRow("Compression FLAC :", self.spin_flac)
-        self.chk_eject = QCheckBox("Éjecter après extraction")
-        self.chk_eject.setChecked(bool(self._config.eject_after_rip))
-        form.addRow("", self.chk_eject)
         return box
 
     def _build_advanced(self) -> QGroupBox:
@@ -209,16 +213,6 @@ class SettingsPage(QWidget):
         self.edit_logs.setToolTip(path_tooltip(self._config.log_dir))
         form.addRow("Dossier temporaire :", self.edit_jobs)
         form.addRow("Dossier logs :", self.edit_logs)
-
-        chk = QCheckBox("Auto-approuver si haute confiance — non disponible")
-        chk.setChecked(False)
-        chk.setEnabled(False)
-        form.addRow(chk)
-
-        dvd = QLabel("DVD-Video : choisissez ce type de disque dans Archiver.")
-        dvd.setProperty("role", "muted")
-        dvd.setWordWrap(True)
-        form.addRow(dvd)
 
         tech = QPushButton("Lancer un test technique (zone temporaire uniquement)…")
         tech.setMinimumHeight(36)
@@ -288,7 +282,6 @@ class SettingsPage(QWidget):
         pref = (self.edit_pref.text() or "CA").strip().upper()
         c.preferred_release_country = pref or "CA"
         c.auto_approve_high_confidence = False
-        c.library_ui_mode = self.combo_lib_ui.currentData() or "widgets"
         return c
 
     def _save(self) -> None:

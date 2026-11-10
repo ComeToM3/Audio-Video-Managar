@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import threading
+import uuid
 from pathlib import Path
 
 from PySide6.QtCore import QObject, Signal, Slot
@@ -15,9 +16,9 @@ from audio_video_manager.storage.database import Database
 
 
 class ArchiveWorker(QObject):
-    progress = Signal(str, object)
+    progress = Signal(str, object, str)
     finished = Signal(object)
-    failed = Signal(str)
+    failed = Signal(str, str)
 
     def __init__(
         self,
@@ -54,6 +55,7 @@ class ArchiveWorker(QObject):
         self._staged = staged_flac_files
         self._skip_disc_match = skip_disc_match
         self._confirmed_rearchive = confirmed_rearchive
+        self.job_id = uuid.uuid4().hex
         self._cancel = threading.Event()
 
     @Slot()
@@ -67,7 +69,7 @@ class ArchiveWorker(QObject):
             db.initialize()
 
             def on_progress(message: str, fraction: float | None) -> None:
-                self.progress.emit(message, fraction)
+                self.progress.emit(message, fraction, self.job_id)
 
             report: ArchiveJobReport = run_archive_job(
                 metadata=self._metadata,
@@ -85,10 +87,11 @@ class ArchiveWorker(QObject):
                 skip_disc_match=self._skip_disc_match,
                 staged_flac_files=self._staged,
                 confirmed_rearchive=self._confirmed_rearchive,
+                job_id=self.job_id,
                 on_progress=on_progress,
                 cancel_event=self._cancel,
             )
             db.close()
             self.finished.emit(report)
         except Exception as exc:  # noqa: BLE001
-            self.failed.emit(str(exc))
+            self.failed.emit(str(exc), self.job_id)

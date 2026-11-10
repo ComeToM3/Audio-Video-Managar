@@ -35,8 +35,6 @@ class AppConfig:
     preferred_release_country: str = "CA"
     # Futur : auto-approbation haute confiance — désactivé par défaut (D-015)
     auto_approve_high_confidence: bool = False
-    # AVM-08B — Widgets par défaut; QML reste sélectionnable explicitement.
-    library_ui_mode: str = "widgets"
 
     def resolved_freaccmd(self) -> Path | None:
         raw = (self.freaccmd_path or "").strip()

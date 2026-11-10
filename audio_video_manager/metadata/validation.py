@@ -103,7 +103,6 @@ def validate_disc_metadata(sheet: DiscMetadata) -> ValidationResult:
     ed = sheet.edition
     _require_confirmed(errors, "album_title", ed.field_meta, "album_title")
     _require_confirmed(errors, "album_artist", ed.field_meta, "album_artist")
-    _require_confirmed(errors, "is_compilation", ed.field_meta, "is_compilation")
     if is_forbidden_label(ed.album_title):
         errors.append("album_title: valeur générique / interdite.")
     if is_forbidden_label(ed.album_artist):
@@ -153,9 +152,7 @@ def validate_disc_metadata(sheet: DiscMetadata) -> ValidationResult:
             if _trust(ed.field_meta, key) == FieldTrust.AMBIGUOUS:
                 errors.append(f"{key}: ambiguous — trancher l'édition exacte.")
 
-    # Compilation
-    if ed.is_compilation:
-        _require_confirmed(errors, "is_compilation", ed.field_meta, "is_compilation")
+    # Compilation is optional metadata; missing/ambiguous never blocks approval.
 
     # MB IDs: never invent — if set must be confirmed; missing/unavailable OK for manual
     for key, val in (

@@ -48,6 +48,22 @@ _TRACK_OF_RE = re.compile(
     r"track\s+(\d+)\s*/\s*(\d+)",
     re.IGNORECASE,
 )
+_TRACK_DONE_RE = re.compile(
+    r"processing\s+file:.*?\btrack\s+(\d+)\s*\.{3,}\s*done\.",
+    re.IGNORECASE,
+)
+
+
+def parse_completed_track_number(raw: str) -> int | None:
+    """Extrait une piste terminée depuis l’événement observé dans freac_stdout.txt."""
+    match = _TRACK_DONE_RE.search(raw or "")
+    if not match:
+        return None
+    try:
+        number = int(match.group(1))
+    except ValueError:
+        return None
+    return number if number >= 1 else None
 
 
 def parse_track_number_from_progress(raw: str) -> int | None:
@@ -59,6 +75,9 @@ def parse_track_number_from_progress(raw: str) -> int | None:
             return int(m.group(1))
         except ValueError:
             return None
+    completed = parse_completed_track_number(text)
+    if completed is not None:
+        return completed
     m = _TRACK_FILE_RE.search(text)
     if m:
         try:
@@ -84,6 +103,9 @@ def map_progress_message(
     text = (raw or "").strip()
     low = text.casefold()
     track_no = parse_track_number_from_progress(text)
+
+    if "fre:ac est actif" in low and "aucun nouvel événement observé" in low:
+        return text
 
     if track_no is not None:
         total = track_total

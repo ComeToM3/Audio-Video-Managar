@@ -53,6 +53,28 @@ def test_ac_m5_forbidden_placeholders() -> None:
     assert not is_forbidden_label("Radiohead")
 
 
+@pytest.mark.parametrize(
+    ("value", "trust"),
+    [
+        (True, FieldTrust.CONFIRMED),
+        (False, FieldTrust.CONFIRMED),
+        (False, FieldTrust.MISSING),
+        (True, FieldTrust.AMBIGUOUS),
+    ],
+)
+def test_compilation_yes_no_or_unknown_does_not_block_approval(value, trust) -> None:
+    sheet = make_approvable_sheet()
+    sheet.edition.is_compilation = value
+    sheet.edition.field_meta["is_compilation"] = FieldMeta(trust=trust)
+
+    result = validate_disc_metadata(sheet)
+
+    assert result.ok
+    assert not any("is_compilation" in error for error in result.errors)
+    approve_sheet(sheet)
+    assert sheet.approval == ApprovalState.APPROVED
+
+
 def test_ac_m3_toc_mismatch_blocks() -> None:
     sheet = make_approvable_sheet(tracks=2)
     sheet.tracks.append(

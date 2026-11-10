@@ -34,7 +34,7 @@ Processus GUI unique ; outils externes en sous-processus. Pas de microservices.
 
 | Module | Responsabilité | Ne fait pas |
 |--------|----------------|-------------|
-| `ui` | Présentation, confirmations Skip/Replace/Rename, reprise | Logique métier longue |
+| `ui` (Qt Widgets) | Présentation, navigation, confirmations Skip/Replace/Rename, reprise | Logique métier longue |
 | `orchestration` | Machine à états, checkpoints, reprise | I/O CD brut |
 | `extraction.cd` | Encapsulation `freaccmd` | MusicBrainz |
 | `extraction.dvd` | Inspection DVD-Video lecture seule (`DvdInspector`) | Archivage, conversion et contournement des protections |

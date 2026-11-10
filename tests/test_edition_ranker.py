@@ -13,7 +13,7 @@ from audio_video_manager.metadata.enums import ApprovalState, FieldTrust
 from audio_video_manager.metadata.models import TocSnapshot
 from audio_video_manager.metadata.musicbrainz_client import DiscLookupResult, ReleaseCandidate
 from audio_video_manager.metadata.toc_reader import DiscReadResult
-from audio_video_manager.metadata.validation import assert_can_start_archive_rip
+from audio_video_manager.metadata.validation import approve_sheet, assert_can_start_archive_rip
 import pytest
 
 
@@ -119,7 +119,59 @@ def test_different_track_titles_manual() -> None:
     decision = rank_and_select_releases([a, b], preferred_country="CA")
     assert decision.auto_selected is False
     assert decision.require_manual_choice is True
-    assert decision.selected is None
+    assert decision.selected is decision.ranked[0].candidate
+    assert decision.selected is not None
+    assert "présélectionnée" in decision.summary
+
+
+def test_identify_manual_choice_keeps_candidate_unconfirmed() -> None:
+    primary = _queen_ca()
+    alternate = ReleaseCandidate(
+        release_id="other-edition",
+        title=primary.title,
+        artist_credit=primary.artist_credit,
+        country="CA",
+        year=1992,
+        track_titles=["Different recording"] + primary.track_titles[1:],
+        track_artists=list(primary.track_artists),
+        track_durations_ms=list(primary.track_durations_ms),
+        toc_match="partial",
+        score_notes=list(primary.score_notes),
+        catalog_numbers=["ALT-CATALOG"],
+        labels=["Other Label"],
+    )
+    toc = TocSnapshot(
+        first_track=1,
+        last_track=17,
+        track_offsets_sectors=[150] * 17,
+        track_durations_ms=[122_000] * 16 + [262_000],
+        audio_track_count=17,
+        raw_source="synthetic-test",
+    )
+    read = DiscReadResult(disc_id="manual-choice-disc", toc=toc, device="D:")
+    lookup = DiscLookupResult(
+        disc_id=read.disc_id,
+        candidates=[primary, alternate],
+        raw_release_count=2,
+        message="2 éditions non équivalentes",
+        ambiguous=True,
+    )
+
+    sheet, _, _, decision = identify_disc(
+        disc_read=read,
+        lookup=lookup,
+        fetch_cover=False,
+        preferred_release_country="CA",
+    )
+
+    assert decision.require_manual_choice
+    assert not decision.auto_selected
+    assert decision.selected is not None
+    assert sheet.approval == ApprovalState.PENDING
+    assert sheet.edition.field_meta["album_title"].trust == FieldTrust.AMBIGUOUS
+    assert sheet.edition.field_meta["album_artist"].trust == FieldTrust.AMBIGUOUS
+    with pytest.raises(Exception, match="album_title.*ambiguous|album_artist.*ambiguous"):
+        approve_sheet(sheet)
 
 
 def test_track_count_mismatch_blocking() -> None:

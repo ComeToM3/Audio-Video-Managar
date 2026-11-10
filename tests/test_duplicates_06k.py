@@ -72,15 +72,26 @@ def _insert_release(
     year: int = 1999,
 ) -> None:
     conn = db.connect()
-    conn.execute(
+    cur = conn.execute(
         """
         INSERT INTO releases(disc_id, mbid, album_artist, album, year, path, status, imported_at)
         VALUES (?, ?, ?, ?, ?, ?, 'imported', ?)
         """,
         (disc_id, mbid, artist, album, year, path, _utc()),
     )
+    release_id = int(cur.lastrowid)
+    album_dir = Path(path)
+    if album_dir.is_dir():
+        for number in range(1, 3):
+            track_path = album_dir / f"{number:02d}.flac"
+            track_path.write_bytes(b"presence-only test fixture")
+            conn.execute(
+                """INSERT INTO tracks(
+                    release_id, number, title, path, duration_ms, flac_ok
+                ) VALUES (?, ?, 'Track', ?, 1000, 1)""",
+                (release_id, number, str(track_path)),
+            )
     conn.commit()
-
 
 def _insert_job(
     db: Database,
@@ -161,6 +172,30 @@ def test_same_mbid_present_requires_confirm(db: Database, tmp_path: Path) -> Non
     assert any(h.kind == MatchKind.SAME_MBID for h in a.hits)
 
 
+def test_same_mbid_other_published_medium_is_not_a_duplicate(
+    db: Database, tmp_path: Path
+) -> None:
+    disc_one = tmp_path / "lib" / "Demo Artist" / "Demo Album (1999)" / "Disc 1"
+    disc_one.mkdir(parents=True)
+    _insert_release(
+        db,
+        disc_id="disc-one",
+        mbid="mbid-a",
+        artist="Demo Artist",
+        album="Demo Album",
+        path=str(disc_one),
+    )
+    sheet = _approved()
+    sheet.identity.disc_id = "disc-two"
+    sheet.disc.disc_number = 2
+    sheet.disc.disc_total = 2
+
+    assessment = assess_from_sheet(db, sheet)
+
+    assert assessment.gate == DuplicateGate.ALLOW
+    assert not assessment.hits
+
+
 def test_different_editions_not_auto_equated(db: Database, tmp_path: Path) -> None:
     """Même titre, MBID distincts → similarité advisory, jamais REQUIRE sur titre seul."""
     album_dir = tmp_path / "B"
@@ -216,6 +251,36 @@ def test_missing_folder_warns_not_blocks(db: Database, tmp_path: Path) -> None:
     a = assess_from_sheet(db, sheet)
     assert a.gate == DuplicateGate.WARN
     assert_archive_allowed(a)
+
+
+def test_partial_strong_match_warns_with_missing_track_count(
+    db: Database, tmp_path: Path
+) -> None:
+    album_dir = tmp_path / "partial"
+    album_dir.mkdir()
+    present = album_dir / "01.flac"
+    present.write_bytes(b"track one")
+    conn = db.connect()
+    release_id = conn.execute(
+        """INSERT INTO releases(disc_id, mbid, album_artist, album, year, path,
+           status, imported_at) VALUES (?, ?, ?, ?, ?, ?, 'imported', ?)""",
+        ("demo.disc.id", "mbid-a", "Demo Artist", "Demo Album", 1999, str(album_dir), _utc()),
+    ).lastrowid
+    conn.execute(
+        "INSERT INTO tracks(release_id, number, path) VALUES (?, 1, ?)",
+        (release_id, str(present)),
+    )
+    conn.execute(
+        "INSERT INTO tracks(release_id, number, path) VALUES (?, 2, ?)",
+        (release_id, str(album_dir / "02.flac")),
+    )
+    conn.commit()
+
+    assessment = assess_from_sheet(db, _approved())
+
+    assert assessment.gate == DuplicateGate.WARN
+    assert any("1 piste(s) sur 2 sont présentes" in line for line in assessment.detail_lines)
+    assert_archive_allowed(assessment, confirmed_rearchive=False)
 
 
 def test_title_only_never_require_confirm(db: Database, tmp_path: Path) -> None:

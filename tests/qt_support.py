@@ -12,7 +12,6 @@ import os
 from typing import Any
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-os.environ.setdefault("QT_QUICK_CONTROLS_STYLE", "Basic")
 
 _tracked: list[Any] = []
 

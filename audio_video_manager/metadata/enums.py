@@ -21,6 +21,7 @@ class MetadataProvenance(str, Enum):
     # Réservés (non utilisés tant que MB non branché) :
     MUSICBRAINZ = "musicbrainz"
     COVER_ART_ARCHIVE = "cover_art_archive"
+    DISCOGS = "discogs"
     FREAC_CDDB = "freac_cddb"
 
 

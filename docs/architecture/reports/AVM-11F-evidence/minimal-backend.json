@@ -1,0 +1,31 @@
+{
+  "minimal_dlls": [
+    {
+      "name": "libdvdnav-4.dll",
+      "size": 150493,
+      "sha256": "33b0c2131d6447c0ff5b66f3aacd8614b7ff42c2403bf3b2bd56ca195244c542"
+    },
+    {
+      "name": "libdvdread-8.dll",
+      "size": 196882,
+      "sha256": "2066e90e736c3df2aea66a29fd43fa876afdf681918ee70bab23f351c0d84f3e"
+    }
+  ],
+  "status": "inspected",
+  "titles": 2,
+  "path_used": "C:\\WINDOWS\\System32",
+  "ffmpeg_preflight_errors": [
+    {
+      "case": "missing",
+      "message": "ffmpeg introuvable; extraction DVD indisponible."
+    },
+    {
+      "case": "invalid",
+      "message": "Sonde ffmpeg impossible : OSError."
+    },
+    {
+      "case": "incompatible",
+      "message": "Le build ffmpeg ne fournit pas le d\u00e9multiplexeur dvdvideo."
+    }
+  ]
+}

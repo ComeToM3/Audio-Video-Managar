@@ -267,6 +267,132 @@ def test_release_candidate_cannot_overwrite_approved_sheet() -> None:
     assert sheet.edition.album_title == ""
 
 
+def test_replacing_candidate_clears_metadata_absent_from_new_release() -> None:
+    sheet = sheet_from_disc_read(_disc_read())
+    previous = ReleaseCandidate(
+        release_id="old-release",
+        title="Old Album",
+        artist_credit="Old Artist",
+        year=2001,
+        country="CA",
+        labels=["Old Label"],
+        catalog_numbers=["OLD-1"],
+        track_titles=["Old Track 1", "Old Track 2"],
+        track_artists=["Old Artist", "Old Artist"],
+        matched_medium_position=2,
+        medium_count=2,
+    )
+    apply_release_candidate(
+        sheet,
+        previous,
+        cover=CoverArtResult(
+            release_id="old-release",
+            status="confirmed",
+            front_url="https://example.test/old.jpg",
+            thumbnail_url="https://example.test/old-small.jpg",
+            message="found",
+        ),
+    )
+    sheet.edition.year_unavailable_justification = "Old edition note"
+
+    replacement = ReleaseCandidate(
+        release_id="new-release",
+        title="New Album",
+        artist_credit="New Artist",
+    )
+    apply_release_candidate(
+        sheet,
+        replacement,
+        user_selected=True,
+        replace_candidate=True,
+    )
+
+    assert sheet.edition.musicbrainz_release_id == "new-release"
+    assert sheet.edition.year is None
+    assert sheet.edition.country is None
+    assert sheet.edition.label is None
+    assert sheet.edition.catalog_number is None
+    assert sheet.edition.cover_status == CoverStatus.MISSING
+    assert sheet.edition.cover_path_or_url is None
+    assert sheet.edition.year_unavailable_justification is None
+    assert sheet.disc.disc_number == 1
+    assert sheet.disc.disc_total == 1
+    assert [track.title for track in sheet.tracks] == ["", ""]
+    assert [track.artist for track in sheet.tracks] == ["", ""]
+    assert [track.duration_ms for track in sheet.tracks] == _toc().track_durations_ms
+
+
+def test_fuzzy_toc_candidate_is_prefilled_but_not_confirmed() -> None:
+    read = _disc_read()
+    candidate = ReleaseCandidate(
+        release_id="toc-release",
+        title="TOC Album",
+        artist_credit="Artist X",
+        year=1997,
+        track_titles=["Track A", "Track B"],
+        track_artists=["Artist X", "Artist X"],
+        match_source="toc",
+        toc_match="exact",
+    )
+    lookup = DiscLookupResult(
+        disc_id=read.disc_id,
+        candidates=[candidate],
+        raw_release_count=1,
+        message="TOC match",
+        ambiguous=False,
+    )
+
+    sheet, _, _, decision = identify_disc(
+        disc_read=read,
+        lookup=lookup,
+        fetch_cover=False,
+    )
+
+    assert decision.selected is candidate
+    assert decision.auto_selected is False
+    assert decision.require_manual_choice is True
+    assert sheet.edition.album_title == "TOC Album"
+    assert sheet.edition.field_meta["album_title"].trust == FieldTrust.AMBIGUOUS
+    assert sheet.approval == ApprovalState.PENDING
+
+
+def test_cdstub_prefills_available_fields_without_release_identity() -> None:
+    read = _disc_read()
+    stub = ReleaseCandidate(
+        release_id="",
+        title="Stub Album",
+        artist_credit="Stub Artist",
+        track_titles=["Stub Track 1", "Stub Track 2"],
+        track_artists=["", ""],
+        is_cdstub=True,
+        match_source="cdstub",
+        disc_id=read.disc_id,
+        medium_track_count=2,
+    )
+    lookup = DiscLookupResult(
+        disc_id=read.disc_id,
+        candidates=[stub],
+        raw_release_count=0,
+        message="CD stub",
+        ambiguous=True,
+    )
+
+    sheet, _, cover, decision = identify_disc(
+        disc_read=read,
+        lookup=lookup,
+        fetch_cover=True,
+    )
+
+    assert decision.selected is stub
+    assert sheet.edition.album_title == "Stub Album"
+    assert sheet.edition.album_artist == "Stub Artist"
+    assert sheet.edition.musicbrainz_release_id is None
+    assert sheet.edition.year is None
+    assert sheet.edition.field_meta["album_title"].trust == FieldTrust.AMBIGUOUS
+    assert sheet.approval == ApprovalState.PENDING
+    assert cover is None
+
+
 def test_caa_404_unavailable() -> None:
     def urlopen(req, timeout=30):  # noqa: ARG001
         import urllib.error
@@ -378,9 +504,139 @@ def test_identify_multiple_candidates_stays_pending() -> None:
     )
     assert sheet.approval == ApprovalState.PENDING
     assert mb.ambiguous is True
-    # Titres/artistes différents → pas d'auto-select (faux positif évité)
+    # Titres/artistes différents → proposition classée, mais vérification requise.
     assert decision.require_manual_choice is True
+    assert decision.auto_selected is False
+    assert decision.selected is decision.ranked[0].candidate
+    assert sheet.edition.album_title == decision.selected.title
+    assert sheet.edition.album_artist == decision.selected.artist_credit
     assert sheet.edition.field_meta["album_title"].trust == FieldTrust.AMBIGUOUS
+
+
+def test_lookup_falls_back_to_fuzzy_toc_after_exact_404() -> None:
+    calls: list[dict] = []
+
+    def get_fn(_disc_id, **kwargs):
+        calls.append(kwargs)
+        if "toc" not in kwargs:
+            import musicbrainzngs
+
+            cause = MagicMock()
+            cause.code = 404
+            raise musicbrainzngs.ResponseError("not found", cause=cause)
+        return {"release-list": [_mb_release("rel-toc", "TOC Album")]}
+
+    with patch(
+        "audio_video_manager.metadata.musicbrainz_client._rate_limit",
+        lambda: None,
+    ):
+        result = lookup_releases_by_discid(
+            DISC_ID,
+            toc_durations_ms=[180_000, 181_000],
+            toc_string="1 2 3000 150 1500",
+            get_releases_fn=get_fn,
+        )
+
+    assert len(calls) == 2
+    assert calls[1]["toc"] == "1 2 3000 150 1500"
+    assert calls[1]["cdstubs"] is False
+    assert len(result.candidates) == 1
+    assert result.candidates[0].match_source == "toc"
+    assert result.candidates[0].title == "TOC Album"
+
+
+def test_identify_forwards_captured_toc_string_to_musicbrainz(monkeypatch) -> None:
+    read = _disc_read()
+    read = DiscReadResult(
+        disc_id=read.disc_id,
+        toc=read.toc,
+        device=read.device,
+        toc_string="1 2 3000 150 1500",
+    )
+    received: dict[str, object] = {}
+
+    def lookup(disc_id, **kwargs):
+        received.update(kwargs)
+        return DiscLookupResult(
+            disc_id=disc_id,
+            candidates=[],
+            raw_release_count=0,
+            message="no match",
+            ambiguous=False,
+        )
+
+    monkeypatch.setattr(
+        "audio_video_manager.metadata.apply_lookup.lookup_releases_by_discid",
+        lookup,
+    )
+    identify_disc(disc_read=read, fetch_cover=False)
+
+    assert received["toc_string"] == "1 2 3000 150 1500"
+
+
+def test_lookup_exposes_cdstub_as_unconfirmed_source() -> None:
+    payload = {
+        "cdstub": {
+            "id": DISC_ID,
+            "title": "Stub Album",
+            "artist": "Stub Artist",
+            "count": 2,
+            "track-list": [
+                {"title": "Stub Track 1"},
+                {"title": "Stub Track 2"},
+            ],
+        }
+    }
+    with patch(
+        "audio_video_manager.metadata.musicbrainz_client._rate_limit",
+        lambda: None,
+    ):
+        result = lookup_releases_by_discid(
+            DISC_ID,
+            get_releases_fn=lambda *_args, **_kwargs: payload,
+        )
+
+    assert len(result.candidates) == 1
+    stub = result.candidates[0]
+    assert stub.is_cdstub is True
+    assert stub.release_id == ""
+    assert stub.selection_key == f"cdstub:{DISC_ID}"
+    assert stub.title == "Stub Album"
+    assert stub.artist_credit == "Stub Artist"
+    assert stub.year is None
+    assert "sans édition confirmée" in result.message
+
+
+def test_cdstub_survives_fuzzy_lookup_network_error() -> None:
+    payload = {
+        "cdstub": {
+            "id": DISC_ID,
+            "title": "Stub Album",
+            "artist": "Stub Artist",
+            "count": 2,
+        }
+    }
+
+    def get_fn(_disc_id, **kwargs):
+        if "toc" in kwargs:
+            import musicbrainzngs
+
+            raise musicbrainzngs.NetworkError("offline")
+        return payload
+
+    with patch(
+        "audio_video_manager.metadata.musicbrainz_client._rate_limit",
+        lambda: None,
+    ):
+        result = lookup_releases_by_discid(
+            DISC_ID,
+            toc_string="1 2 3000 150 1500",
+            get_releases_fn=get_fn,
+        )
+
+    assert len(result.candidates) == 1
+    assert result.candidates[0].is_cdstub
+    assert "Recherche TOC indisponible" in result.message
 
 
 def test_identify_single_prefill_ambiguous_until_user_select() -> None:

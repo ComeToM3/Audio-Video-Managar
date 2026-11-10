@@ -33,7 +33,6 @@ jobs:
         shell: bash
         env:
           QT_QPA_PLATFORM: offscreen
-          QT_QUICK_CONTROLS_STYLE: Basic
           # AVM-10C.2 — fermeture naturelle (os._exit seulement si forcé localement)
           AVM_QT_SAFE_EXIT: "0"
         run: |

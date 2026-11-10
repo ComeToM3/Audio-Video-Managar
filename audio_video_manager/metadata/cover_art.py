@@ -23,6 +23,7 @@ class CoverArtResult:
     front_url: str | None
     thumbnail_url: str | None
     message: str
+    source: str = "Cover Art Archive"
 
 
 def fetch_cover_art_info(
